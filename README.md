@@ -9,6 +9,8 @@ git clone https://github.com/hughjonesd-private/negative-selection.git
 
 # To run
 
+Edit directory locations in `_drake.R`.
+
 Within R:
 
 ```r
