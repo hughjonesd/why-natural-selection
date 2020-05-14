@@ -76,19 +76,14 @@ pretty_names <- function (names) {
 # Data
 
 Data is taken from UK Biobank. Polygenic scores were  normalized to mean 0,
-variance 1. Scores for ADHD, substance use, alcohol, Alzheimer's disease,
-autism, bipolarity, BMI, body fat, caffeine, cannabis use, coronary artery
-disease, eating disorders, waist-hip ratio, major depressive disorder,
-neuroticism, and schizophrenia were reverse coded. High scores are therefore
-"positive" in the loose sense that their target phenotypes would be considered
-desirable by many people.
+variance 1. 
 
 # Results
 
 
 We run regressions on two dependent variables:
 
-* *total siblings*, the number of full siblings of the respondent (including
+* *siblings*, the number of full siblings in the respondent's sib (including
   himself or herself).
 * The number of *children* ever born to/fathered by the respondent.
 
@@ -120,6 +115,10 @@ median_prop_sibs <- median(abs(res_all_wide[["controlled_N siblings"]]) /
 median_prop_children <- median(abs(res_all_wide[["controlled_N children"]]) /
     abs(res_all_wide[["raw_N children"]]))
 
+prop_gens_raw <- res_all_wide[["raw_N children"]]/res_all_wide[["raw_N siblings"]]
+prop_gens_controlled <- res_all_wide[["controlled_N children"]]/res_all_wide[["controlled_N siblings"]]
+median_prop_gens_raw <- median(prop_gens_raw[prop_gens_raw > 0])
+median_prop_gens_controlled <- median(prop_gens_controlled[prop_gens_controlled > 0])
 ```
 
 
@@ -128,9 +127,15 @@ Figure \@ref(fig:plot-basic-regs) shows effect sizes of a one-standard
 deviation shift in each polygenic score. 
 
 Estimates are broadly consistent across generations. For 
-`r sum(res_all_wide$consistent)` out of `r n_pgs` polygenic scores, all 4 estimates have the same sign.
+`r sum(res_all_wide$consistent)` out of `r n_pgs` polygenic scores, all 4 
+estimates have the same sign. 
 
-Within siblings regressions, effect sizes are smaller when controlling for
+However, effect sizes are much smaller for *children* than *siblings*
+regressions. Among consistently-signed estimates, the median effect size for
+children as a proportion of the effect size for  siblings is 
+`r median_prop_gens_raw`, or `r median_prop_gens_controlled` with controls.
+
+In siblings regressions, effect sizes are smaller when controlling for
 principal components -- sometimes much smaller, as in the case of height. 
 `r sum(controlled_smaller_sibs)` out of `r n_pgs` "controlled" effect sizes have 
 a smaller absolute value than the corresponding "raw" effect size. The median
@@ -139,7 +144,7 @@ Among the children regressions, this no longer holds. Effect sizes are barely
 affected by controlling for principal components.
 
 
-```{r plot-basic-regs, fig.cap = "Effects of polygenic scores on number of siblings/children. Scores marked * are reverse coded.", fig.height = 7}
+```{r plot-basic-regs, fig.cap = "Effects of polygenic scores on number of siblings/children. Scores are plotted on different scales.", fig.height = 7}
 
 n_regs <- as.double(nrow(res_all))
 res_all %>% 
@@ -153,7 +158,7 @@ res_all %>%
       my_hline + 
       geom_point(size = 2.5, alpha = 0.8) + 
       labs(y = "Effect size", x = "") +
-      facet_wrap(vars(dep.var), ncol = 2, scales = "free") +
+      facet_wrap(vars(dep.var), ncol = 2, scales = "free_x") +
       coord_flip() +
       scale_colour_manual(values = pval_palette) +
       scale_shape_manual(values = c("circle", "triangle"), 
@@ -165,7 +170,34 @@ res_all %>%
 
 ```
 
+
+
+To get a further insight into this we regress *siblings* and *children* on
+individual principal components themselves. As Figure \@ref(fig:plot-pc-regs) shows,
+there are many more large and significant effects  in siblings regressions.
+
+
+```{r plot-pc-regs, fig.cap = "Effect of principal components on number of siblings/children. Each dot represents one principal component. Points are jittered on the Y axis.", fig.height = 2}
+
+drake::loadd(res_pcs)
+n_regs <- as.double(nrow(res_pcs))
+
+res_pcs %>% 
+      mutate(
+        estimate = abs(estimate),
+        dep.var  = fct_relevel(dep.var, "N children")
+      ) %>% 
+      ggplot(aes(estimate, dep.var, colour = p.value < 0.05/{{n_regs}})) + 
+        geom_jitter(height = 0.15, width = 0) + 
+        scale_x_log10(labels = scales::label_number(accuracy = 0.0001)) +
+        labs(x = "Effect size (log scale)", y = "") + 
+        scale_colour_manual(values = pval_palette)
+        
+
+```
+
 # Selection over time
+
 
 ```{r period-regs-data}
 

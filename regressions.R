@@ -22,6 +22,15 @@ run_regs <- function (dep_var, score_name, famhist) {
 }
 
 
+run_regs_pcs <- function (dep_var, pc_name, famhist) {
+  fml <- as.formula(glue("{dep_var} ~ {pc_name}"))
+  regs <- tidy(lm(fml, famhist), conf.int = TRUE) 
+  regs %<>% filter(term != "(Intercept)")
+  
+  return(regs)
+}
+
+
 run_regs_period <- function (children, score_name, famhist) {
   dep_var  <- if (children) "n_children" else "n_sibs"
   year_var <- if (children) "YOB" else "parents_imp_YOB"

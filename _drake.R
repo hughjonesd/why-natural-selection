@@ -20,11 +20,6 @@ mf_pairs_file <- "~/UKBB data 2019/spouse_pair_info/UKB_out.mf_pairs_rebadged.cs
 
 
 plan <- drake_plan(
-  report       = rmarkdown::render(
-                   input       = knitr_in("why-negative-selection.Rmd"), 
-                   output_file = file_out("why-negative-selection.pdf"), 
-                   quiet       = TRUE
-                 ),
   
   
   famhist      = edit_famhist(famhist_raw, reverse_code),
@@ -53,63 +48,83 @@ plan <- drake_plan(
    
   
   score_names  = {
-                   sub(
-                           ".*UKB\\.AMC\\.(.*?)\\..*", 
-                           "\\1", 
-                           list.files(file_in(!! pgs_dir), pattern = "csv$"), 
-                           perl = TRUE
-                         )
-                 },
+    sub(
+            ".*UKB\\.AMC\\.(.*?)\\..*", 
+            "\\1", 
+            list.files(file_in(!! pgs_dir), pattern = "csv$"), 
+            perl = TRUE
+          )
+  },
   
   
-  reverse_code =  {
-                    setdiff(score_names, c("agreeableness", "age_at_menarche",
-                      "age_at_menopauze", "cognitive_ability", 
-                      "conscientiousness", "EA2_noUKB", "EA3_excl_23andMe_UK", 
-                      "extraversion", "height_combined", "openness"))
-                  },
+  reverse_code = c(), # don't reverse code anything
+  # {
+  #   setdiff(score_names, c("agreeableness", "age_at_menarche",
+  #           "age_at_menopauze", "cognitive_ability", 
+  #           "conscientiousness", "EA2_noUKB", "EA3_excl_23andMe_UK", 
+  #           "extraversion", "height_combined", "openness")
+  #         )
+  # },
   
   
   res_all      = {
-                    res_sibs <- map_dfr(score_names, run_regs, 
-                      dep_var = "n_sibs", 
-                      famhist = famhist
-                    )
-                    res_chn <- map_dfr(score_names, run_regs, 
-                      dep_var = "n_children", 
-                      famhist = famhist
-                    )
-                    dplyr::bind_rows(
-                      "N siblings" = res_sibs, 
-                      "N children" = res_chn, 
-                      .id = "dep.var"
-                    )
-                  },
+    res_sibs <- map_dfr(score_names, run_regs, 
+            dep_var = "n_sibs", 
+            famhist = famhist
+          )
+    res_chn <- map_dfr(score_names, run_regs, 
+            dep_var = "n_children", 
+            famhist = famhist
+          )
+    dplyr::bind_rows(
+            "N siblings" = res_sibs, 
+            "N children" = res_chn, 
+            .id = "dep.var"
+          )
+  },
+  
+  
+  res_pcs     = {
+    pcs <- paste0("PC", 1:40)
+    res_sibs_pcs <- map_dfr(pcs, run_regs_pcs, 
+      dep_var     = "n_sibs", 
+      famhist     = famhist
+    )
+    res_chn_pcs <- map_dfr(pcs, run_regs_pcs, 
+      dep_var     = "n_children", 
+      famhist     = famhist
+    )
+    dplyr::bind_rows(
+      "N siblings" = res_sibs_pcs, 
+      "N children" = res_chn_pcs, 
+      .id = "dep.var"
+    ) 
+  },
   
   
   res_period   = {
-                    expand_grid(
-                      children = c(TRUE, FALSE),
-                      score_name = score_names
-                    ) %>% 
-                    pmap_dfr(run_regs_period, famhist = famhist)
-                 },
+    expand_grid(
+            children = c(TRUE, FALSE),
+            score_name = score_names
+          ) %>% 
+          pmap_dfr(run_regs_period, famhist = famhist)
+  },
   
   
   res_sex      = {
-                   sexes <- rlang::exprs(
-                     sex == 0, 
-                     sex == 1
-                   )
-                   res_sex <- expand_grid(
-                     score_name = score_names, 
-                     subset     = sexes
-                   ) %>% 
-                     pmap_dfr(run_regs_subset, famhist = famhist)
-                   res_sex$sex <- ifelse(res_sex$subset == "sex == 0", 
-                     "Female", "Male") 
-                   res_sex
-                 },
+   sexes <- rlang::exprs(
+           sex == 0, 
+           sex == 1
+         )
+   res_sex <- expand_grid(
+           score_name = score_names, 
+           subset     = sexes
+         ) %>% 
+           pmap_dfr(run_regs_subset, famhist = famhist)
+         res_sex$sex <- ifelse(res_sex$subset == "sex == 0", 
+           "Female", "Male") 
+   res_sex
+ },
   
   
   res_partners = {
@@ -184,8 +199,16 @@ plan <- drake_plan(
     
     bind_rows("No" = res_all_pgs, "Yes" = res_all_pgs_pcs, .id = "PCs") %>% 
           filter(term != "(Intercept)", ! grepl("^PC", term))
-  }
+  },
+  
+  
+  report       =  rmarkdown::render(
+                    input       = knitr_in("why-negative-selection.Rmd"), 
+                    output_file = file_out("why-negative-selection.pdf"), 
+                    quiet       = TRUE
+                  )
+  
 )
 
-drake_history(history = FALSE)
+
 drake_config(plan)
