@@ -6,7 +6,6 @@ output:
   bookdown::pdf_document2:
     toc: false
     latex_engine: xelatex
-    keep_tex: true
 ---
 
 ```md
