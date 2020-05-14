@@ -149,9 +149,6 @@ plan <- drake_plan(
   
   
   res_edu = {
-    famhist$age_fte_cat <- santoku::chop(famhist$age_fulltime_edu, 
-          c(16, 18), 
-          c("< 16", "16-18", "> 18"))
     subsets <- rlang::exprs(
             age_fte_cat == "< 16",
             age_fte_cat == "16-18",
@@ -174,6 +171,58 @@ plan <- drake_plan(
             age_fte_cat = sub("age_fte_cat == \"(.*)\"", "\\1", subset)
           ) %>% 
           select(-row_number, -subset)
+  },
+  
+  
+  res_income = {
+    subsets = rlang::exprs(
+            income_cat == 1,
+            income_cat == 2,
+            income_cat == 3,
+            income_cat == 4,
+            income_cat == 5
+          ) 
+    pars <- expand_grid(score_name = score_names, subset = subsets) 
+    res_income <- pmap_dfr(pars,
+            ~ run_regs_fml(
+              "n_children ~ {score_name}", 
+              score_name = .x, 
+              subset     = .y,
+              famhist    = famhist
+            ),
+            .id = "row_number"
+          ) 
+    pars$row_number <- as.character(seq_len(nrow(pars)))
+    res_income %>% left_join(pars, by = "row_number") %>% 
+          filter(term != "(Intercept)") %>% 
+          mutate(
+            income_cat = sub("income_cat == (.*)", "\\1", subset)
+          ) %>% 
+          select(-row_number, -subset)
+  },
+  
+  
+  res_income_controlled = {
+    res <- map_dfr(score_names, 
+            ~run_regs_fml(
+              "n_children ~ {score_name}*(income_cat + YOB +I(YOB^2))", 
+              score_name = .x, famhist = famhist
+            ),
+            .id = "score_name"
+          )
+    res %>% filter(grepl(":income_cat", term))
+  },
+  
+  
+  res_edu_controlled = {
+    res <- map_dfr(score_names, 
+      ~run_regs_fml(
+        "n_children ~ {score_name}*(as.numeric(age_fte_cat) + YOB + I(YOB^2))", 
+        score_name = .x, famhist = famhist
+      ),
+      .id = "score_name"
+    )
+    res %>% filter(grepl(":.*age_fte_cat", term))
   },
   
   

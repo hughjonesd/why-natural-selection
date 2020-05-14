@@ -177,7 +177,7 @@ individual principal components themselves. As Figure \@ref(fig:plot-pc-regs) sh
 there are many more large and significant effects  in siblings regressions.
 
 
-```{r plot-pc-regs, fig.cap = "Effect of principal components on number of siblings/children. Each dot represents one principal component. Points are jittered on the Y axis.", fig.height = 2}
+```{r plot-pc-regs, fig.cap = "Effect of principal components on number of siblings/children. Absolute effect sizes are plotted. Each dot represents one bivariate regression. Points are jittered on the Y axis.", fig.height = 2}
 
 drake::loadd(res_pcs)
 n_regs <- as.double(nrow(res_pcs))
@@ -466,7 +466,7 @@ res_partners %>%
 ```
 
 
-## Education levels
+## Education and income
 
 
 Figure \@ref(fig:plot-educ-levels) splits respondents up by education levels.
@@ -501,9 +501,9 @@ res_edu %>%
 
 
 
-```{r plot-educ-levels, fig.cap = "Effect sizes on number of children by age left full-time education", fig.height = 7}
+```{r plot-educ-levels, fig.cap = "Effect sizes on number of children by age left full-time education"}
 
-loadd(res_edu)
+drake::loadd(res_edu)
 res_edu %>% 
       mutate(
         term = pretty_names(term), 
@@ -517,6 +517,54 @@ res_edu %>%
         scale_colour_viridis_d(begin = 0.1, end = 0.85) +
         coord_flip()
 ```
+
+
+Figure \@ref(fig:plot-income) splits respondents by household income category.
+A very similar pattern holds, with selection effects being larger for those
+in the poorest income category.
+
+
+```{r plot-income, fig.cap = "Effect sizes on number of children by household income"}
+
+drake::loadd(res_income)
+
+n_regs <- as.double(nrow(res_income))
+res_income %>% 
+      mutate(
+        term = pretty_names(term), 
+        term = fct_reorder(term, estimate, order_abs),
+        Income = factor(income_cat, 
+          labels = c("< £18K", "£18-30K", "£31-51K", "£52-100K", "> £100K")
+        )
+      ) %>% 
+      ggplot(aes(term, estimate, fill = Income, colour = p.value < 0.05/{{n_regs}})) +
+        my_hline +
+        geom_point(alpha = 0.8, shape = 21, size = 1.5, stroke = 0.9) + 
+        scale_fill_brewer(direction = -1) +
+        scale_colour_manual(values = pval_palette) +
+        coord_flip()
+```
+
+
+```{r income-edu-controlled}
+drake::loadd(res_income_controlled, res_edu_controlled)
+n_regs_ic <- nrow(res_income_controlled)
+n_sig_ic <- sum(res_income_controlled$p.value < 0.05/n_regs_ic)
+
+n_regs_educ <- nrow(res_edu_controlled)
+n_sig_educ <- sum(res_edu_controlled$p.value < 0.05/n_regs_educ)
+```
+
+
+These results could be driven by age, if older respondents are poorer and less
+educated, and also more subject to selection on polygenic scores. However, if we
+rerun the regressions, interacting the polygenic score with income category and
+also with a quadratic in age, the interaction with income remains significant at
+0.05/`r n_regs_ic` for `r n_sig_ic` out of `r n_regs_ic` regressions. Similarly
+if we interact the PGS with age of leaving full time education and a quadratic
+in age, the interaction with age leaving FTE remains significant at 
+0.05/`r n_regs_educ` for `r n_sig_educ` out of `r n_regs_educ` regressions.
+
 
 # Number of children
 

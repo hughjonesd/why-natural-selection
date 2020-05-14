@@ -4,6 +4,7 @@ suppressPackageStartupMessages({
   library(magrittr)
   library(dplyr)
   library(rlang)
+  library(santoku)
 })
 
 
@@ -106,11 +107,16 @@ edit_famhist <- function (famhist, reverse_code) {
   famhist$n_children[famhist$n_children < 0] <- NA
   
   famhist$age_fulltime_edu[famhist$age_fulltime_edu < 0] <- NA
-  
+  famhist$age_fte_cat <- santoku::chop(famhist$age_fulltime_edu, 
+    c(16, 18), 
+    c("< 16", "16-18", "> 18"))
   child_vars <- rlang::quos(f.2754.0.0, f.2754.1.0, f.2754.2.0)
   famhist %<>% mutate_at(vars(!!!child_vars), ~ ifelse(.x < 0, NA, .x))
   famhist$age_flb <- rowMeans(famhist %>% select(!!!child_vars), na.rm = TRUE)
   famhist$year_flb <- famhist$YOB + famhist$age_flb
+  
+  famhist$income_cat <- famhist$f.738.0.0
+  famhist$income_cat[famhist$income_cat < 0] <- NA
   
   famhist[reverse_code] <- famhist[reverse_code] * -1
   
