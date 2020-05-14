@@ -1,0 +1,10 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.drake
+*.pdf
+*.tex
+*.log
+
+EA3_rgs.10052019.rgs.csv

@@ -1,0 +1,556 @@
+---
+title: "Negative Selection in the 20th Century"
+author: "David Hugh-Jones, Abdel Abdellaoui"
+date: "April 2020"
+output: 
+  bookdown::pdf_document2:
+    toc: false
+    latex_engine: xelatex
+    keep_tex: true
+---
+
+```md
+# TODO
+* Improve imputation of parents' YOB.
+* Selection bias. 
+  - You could weight subjects by education level; sex; birth region? 
+
+## Data to gather
+* f.2139 - age first had sex (includes "never had sex" which may explain
+  some of the many NAs for f.2141, num sex partners)
+
+```
+
+```{r setup, include = FALSE}
+
+library(drake)
+library(magrittr)
+library(dplyr)
+library(forcats)
+library(ggplot2)
+library(tidyr)
+library(santoku) # keep this after tidyr as it masks chop
+library(purrr)
+library(glue)
+library(broom)
+library(huxtable)
+
+drake::loadd(famhist)
+drake::loadd(rgs)
+drake::loadd(score_names)
+drake::loadd(reverse_code)
+
+options(digits = 2)
+knitr::opts_chunk$set(
+        echo = FALSE, 
+        warning = FALSE, 
+        cache = FALSE, 
+        error = TRUE
+      )
+
+theme_set(theme_minimal())
+pval_palette <- c("FALSE" = "grey50", "TRUE" = "orange2")
+my_hline <- geom_hline(yintercept = 0, colour = "grey20", linetype = "dashed")
+order_abs <- function (x) x[1] # for use when reordering factors
+
+huxtable::set_default_properties(latex_float = "h!")
+
+pretty_names <- function (names) {
+  reverse <- names %in% reverse_code
+  names <- gsub("_", " ", names)
+  names %<>% 
+        strsplit(" ") %>% 
+        map_chr(~paste0(
+          toupper(substring(.x, 1, 1)), 
+          substring(.x, 2),
+          collapse = " "
+        ))
+  names[reverse] %<>% paste0("*")
+  
+  return(names)
+}
+
+```
+
+
+# Data
+
+Data is taken from UK Biobank. Polygenic scores were  normalized to mean 0,
+variance 1. Scores for ADHD, substance use, alcohol, Alzheimer's disease,
+autism, bipolarity, BMI, body fat, caffeine, cannabis use, coronary artery
+disease, eating disorders, waist-hip ratio, major depressive disorder,
+neuroticism, and schizophrenia were reverse coded. High scores are therefore
+"positive" in the loose sense that their target phenotypes would be considered
+desirable by many people.
+
+# Results
+
+
+We run regressions on two dependent variables:
+
+* *total siblings*, the number of full siblings of the respondent (including
+  himself or herself).
+* The number of *children* ever born to/fathered by the respondent.
+
+We run regressions both with and without controls for the 40 top principal components
+of the genetic data.
+
+
+```{r regs-data}
+
+drake::loadd(res_all)
+
+res_all_wide <- res_all %>% 
+  select(reg.type, dep.var, term, estimate) %>% 
+  pivot_wider(names_from = c(reg.type, dep.var), values_from = estimate) %>% 
+  mutate(
+    consistent = sign(`raw_N siblings`) == sign(`controlled_N siblings`) &
+      sign(`raw_N siblings`) == sign(`raw_N children`) &
+      sign(`raw_N siblings`) == sign(`controlled_N children`)
+  )
+
+n_pgs  <- as.double(nrow(res_all_wide))
+prop_consistent <- mean(res_all_wide$consistent)
+controlled_smaller_sibs <- abs(res_all_wide[["controlled_N siblings"]]) < 
+  abs(res_all_wide[["raw_N siblings"]])
+controlled_smaller_children <- abs(res_all_wide[["controlled_N children"]]) < 
+  abs(res_all_wide[["raw_N children"]])
+median_prop_sibs <- median(abs(res_all_wide[["controlled_N siblings"]]) /
+    abs(res_all_wide[["raw_N siblings"]]))
+median_prop_children <- median(abs(res_all_wide[["controlled_N children"]]) /
+    abs(res_all_wide[["raw_N children"]]))
+
+```
+
+
+
+Figure \@ref(fig:plot-basic-regs) shows effect sizes of a one-standard
+deviation shift in each polygenic score. 
+
+Estimates are broadly consistent across generations. For 
+`r sum(res_all_wide$consistent)` out of `r n_pgs` polygenic scores, all 4 estimates have the same sign.
+
+Within siblings regressions, effect sizes are smaller when controlling for
+principal components -- sometimes much smaller, as in the case of height. 
+`r sum(controlled_smaller_sibs)` out of `r n_pgs` "controlled" effect sizes have 
+a smaller absolute value than the corresponding "raw" effect size. The median
+proportion between raw and controlled effect sizes is `r median_prop_sibs`.
+Among the children regressions, this no longer holds. Effect sizes are barely
+affected by controlling for principal components.
+
+
+```{r plot-basic-regs, fig.cap = "Effects of polygenic scores on number of siblings/children. Scores marked * are reverse coded.", fig.height = 7}
+
+n_regs <- as.double(nrow(res_all))
+res_all %>% 
+      mutate(
+        term    = pretty_names(term),
+        term    = fct_reorder(term, estimate, order_abs),
+        dep.var = fct_inorder(dep.var) 
+      ) %>% 
+      ggplot(aes(x = term, y = estimate, shape = reg.type, 
+        colour = p.value < 0.05/{{n_regs}})) +
+      my_hline + 
+      geom_point(size = 2.5, alpha = 0.8) + 
+      labs(y = "Effect size", x = "") +
+      facet_wrap(vars(dep.var), ncol = 2, scales = "free") +
+      coord_flip() +
+      scale_colour_manual(values = pval_palette) +
+      scale_shape_manual(values = c("circle", "triangle"), 
+        guide = guide_legend(title = "")) +
+      theme(
+        legend.position = "bottom", 
+        legend.margin = margin(2,2,2,2)
+      )
+
+```
+
+# Selection over time
+
+```{r period-regs-data}
+
+drake::loadd(res_period)
+res_period %<>% 
+      tidyr::extract(term, c("score_name", "period"),
+        regex="(.*):year_split(.*)")
+n_tests <- nrow(res_period)/2
+
+
+summary_period <- res_period %>% 
+      select(-std.error, -statistic) %>% 
+      pivot_wider(
+        names_from  = period, 
+        values_from = c(estimate, conf.low, conf.high, p.value)
+      ) %>% 
+      group_by(score_name, children) %>% 
+      mutate(
+        significant = diff.p.value < 0.05/n_tests,
+        increasing  = estimate_early < estimate_late,
+        size_inc    = abs(estimate_early) < abs(estimate_late),
+        change_sign = sign(estimate_early) != sign(estimate_late),
+        Change      = case_when(
+                        ! significant ~ "Insignificant",
+                        change_sign  & increasing   ~ "Change sign to +",
+                        change_sign  & ! increasing ~ "Change sign to -",
+                        increasing   & size_inc   ~ "Increasing +",
+                        ! increasing & size_inc   ~ "Decreasing -",
+                        increasing   & ! size_inc ~ "Increasing towards 0",
+                        ! increasing & ! size_inc ~ "Decreasing towards 0"
+                      )
+      ) %>% 
+      select(score_name, children, Change, increasing, significant) %>% 
+      mutate(children = ifelse(children, "Respondents", "Parents")) %>% 
+      pivot_wider(names_from = children, 
+        values_from = c(Change, increasing, significant)) %>% 
+      mutate(overall = case_when(
+              increasing_Respondents   & increasing_Parents   ~ 
+                "Consistent increase",
+              ! increasing_Respondents & ! increasing_Parents ~ 
+                "Consistent decrease",
+              increasing_Respondents & ! increasing_Parents
+                 & (significant_Parents | significant_Respondents) ~ 
+                "Changes direction",
+              TRUE ~ 
+              "Other"
+            ))
+
+
+
+```
+
+
+
+Negative selection seems to decrease over time. Figure \@ref(fig:plot-by-period) shows
+effect sizes for *number of siblings* and *number of children*, median-split by
+parents' year of birth and own year of birth respectively.  Parents' year of
+birth is imputed, which is likely to produce some bias.
+
+
+
+```{r plot-by-period, fig.cap = "Effect sizes of PGS on number of children/siblings by own/parents' year of birth. PGS with the largest mean effect sizes are shown.", fig.height = 7, fig.width = 6}
+
+max_abs <- function (x) max(abs(x))
+res_period %>% 
+      mutate(
+        dep.var       = ifelse(children, "Children", "Siblings"),
+        period        = (period == "late") + children,
+        score_name    = pretty_names(score_name),
+        score_name    = fct_reorder(score_name, estimate, max_abs, 
+                          .desc = TRUE),
+        p             = diff.p.value
+      ) %>% 
+      arrange(score_name) %>% 
+      slice(1:48) %>% 
+ggplot(aes(period, estimate, colour = dep.var, group = dep.var)) + 
+      geom_hline(yintercept = 0, colour = "grey30") + 
+      geom_point(size = 1.5) +
+      geom_line(aes(linetype = p < 0.05/{{n_tests}})) +
+      facet_wrap(vars(score_name), nrow = 4) + 
+      scale_fill_manual(values = pval_palette) +
+      scale_colour_manual(values = c("darkgreen", "navy")) +
+      scale_linetype_manual(values = c("FALSE" = "dashed", "TRUE" = "solid"))
+      
+      
+```
+
+
+By definition, the sibling regressions exclude members of the parents'
+generation who had no children. This is likely to bias results towards zero, since
+much of the effect in children regressions is due to respondents with high scores
+being more likely to have no children. So, we cannot directly compare 
+effect sizes for the two sets of regressions. Within the sibling regressions,
+the most common pattern is that negative effects shrink in absolute size 
+(Table \@ref(tab:siblings-by-period)).
+
+
+```{r siblings-by-period}
+
+period_table <- function (tbl, caption) {
+  tbl %>% 
+      as_hux() %>%
+      set_bold(1, everywhere) %>% 
+      set_bottom_border(1, everywhere) %>% 
+      
+      add_footnote(glue("Significance is measured at p < 0.05/{n_tests}"), 
+        border = 0.4) %>% 
+      set_contents(1, everywhere, 
+        c("Change", "Number of scores")) %>% 
+      set_right_border(final(1), 1, 0) %>% 
+      set_top_padding(1) %>% 
+      set_bottom_padding(1) %>%
+      set_left_padding(everywhere, 1, 0) %>% 
+      set_right_padding(everywhere, 2, 0) %>% 
+      set_caption(caption) %>% 
+      set_caption_width(1)
+}
+
+summary_period %>% 
+      group_by(Change_Parents) %>% 
+      count() %>% 
+      period_table("Change in effect sizes between early and late born parents, 'sibling' regressions")
+      
+```
+
+In children regressions, no clear pattern is visible 
+(Table \@ref(tab:children-by-period)).
+
+
+```{r children-by-period}
+summary_period %>% 
+      group_by(Change_Respondents) %>% 
+      count() %>% 
+      period_table("Change in effect sizes between early and late born respondents, 'children' regressions")
+```
+
+Despite this, effect sizes tend to be smaller for children regressions. This
+could be caused by ascertainment bias in the UK Biobank sample -- e.g.,
+if respondents themselves are a more selected sample than the respondents' 
+parents.
+
+# Causality
+
+
+```{r pgs-corrs}
+cor_tbl <- cor(famhist[score_names], use = "pair") %>% 
+      as_tibble() %>% 
+      mutate(score_name = score_names, .before = 1) %>% 
+      pivot_longer(cols = -score_name, values_to = "Correlation") %>% 
+      filter(score_name < name) %>% 
+      arrange(desc(Correlation)) %>% 
+      slice(1:10) %>% 
+      mutate(across(c(score_name, name), pretty_names)) 
+
+as_hux(cor_tbl, add_colnames = TRUE) %>% 
+      set_contents(1, 1:2, c("PGS", "PGS")) %>% 
+      theme_basic(header_col = FALSE) %>% 
+      set_bottom_border(1, everywhere, 0.4) %>% 
+      set_bottom_border(final(1), everywhere, 0.4) %>% 
+      set_caption("Top 10 correlations between polygenic scores")
+
+```
+
+Different polygenic scores are correlated. Table \@ref(tab:pgs-corrs) shows the top
+correlations in the sample. Because of this, bivariate correlations between
+PGS and number of children might be driven by other genetic scores. To explore which polygenic scores are driving negative selection, we run a single
+omnibus regression of *number of children* on all the PGS. We exclude EA2, 
+waist-hip ratio, WC (XXX what is it?) and "Hip combined" since they are 
+highly correlated with other scores, which could make our estimates unstable. Figure \@ref(fig:plot-together) shows the results. Interestingly, several PGS remain independently significant, although
+effect sizes are reduced.
+
+```{r plot-together, fig.cap = "Partial correlations with number of children"}
+
+loadd(res_together)
+n_regs <- as.double(nrow(res_together))
+res_together %>% 
+      mutate(
+        term = pretty_names(term),
+        term = fct_reorder(term, estimate),
+        dep.var = recode(dep.var, 
+          "n_children" = "N Children", "n_sibs" = "N Siblings")
+      ) %>% 
+      ggplot(aes(term, estimate, color = p.value < 0.05/{{n_regs}}, shape  = PCs)) + 
+        geom_pointrange(aes(ymin = conf.low, ymax = conf.high)) +
+        my_hline +
+        facet_wrap(vars(dep.var), scales = "free_x") +
+        coord_flip() +
+        scale_color_manual(values = pval_palette) +
+        theme(legend.position = "bottom")
+```
+
+
+# Subgroups
+
+We next examine how different subgroups contribute to natural selection. 
+
+
+## Males and females
+
+```{r}
+
+drake::loadd(res_sex)
+
+female_lower <- res_sex %>% 
+      pivot_wider(id_cols = c(term), names_from = sex, 
+        values_from = c(estimate, conf.low, conf.high)) %>% 
+      mutate(female_lower = estimate_Female < estimate_Male) %>% 
+      pull(female_lower)
+```
+
+
+Figure \@ref(fig:plot-sexes) shows effect sizes of PGS on number of children
+separately for males and females. For `r sum(female_lower)` out of
+`r length(female_lower)` PGS, selection is more negative for women
+than for men. Differences are particularly large for educational attainment and height PGS.
+
+
+```{r plot-sexes, fig.cap = "Effect sizes on number of children by sex"}
+
+
+res_sex %>% 
+      mutate(
+        term = pretty_names(term),
+        term = fct_reorder(term, estimate, order_abs)
+      ) %>% 
+      ggplot(aes(term, estimate, group = sex, colour = sex)) +
+        my_hline +
+        geom_pointrange(aes(ymin = conf.low, ymax = conf.high), alpha = 0.7) +
+        coord_flip() +
+        scale_colour_brewer(palette = 2, type = "qual")
+
+```
+
+
+## Number of sexual partners
+
+Figure \@ref(fig:plot-n-partners) splits males and females up by lifetime number
+of sexual partners. Remarkably, across both sexes, negative selection is
+strongly reversed for respondents who had 3 or fewer sexual partners in their
+lifetime.
+
+
+```{r plot-n-partners, fig.cap = "Effect sizes on number of children by number of sexual partners", fig.height = 7, fig.width = 6}
+
+drake::loadd(res_partners)
+res_partners %<>%       
+      filter(term != "(Intercept)", term != "lo_partnersTRUE") %>% 
+      mutate(`N partners` = ifelse(grepl(":", term), "<= 3", "> 3")) 
+
+n_regs <- nrow(res_partners)
+res_partners %>% 
+      mutate(
+        score_name = pretty_names(score_name),
+        score_name = fct_reorder(score_name, estimate, order_abs)
+      ) %>% 
+      ggplot(aes(score_name, estimate, colour = `N partners`)) + 
+        my_hline +
+        geom_pointrange(aes(ymin = conf.low, ymax = conf.high), alpha = .8) +
+        facet_wrap(vars(sex)) +
+        coord_flip() +
+        scale_colour_manual(values = c("darkred", "steelblue")) +
+        theme(legend.position = "bottom")
+
+      
+
+```
+
+
+## Education levels
+
+
+Figure \@ref(fig:plot-educ-levels) splits respondents up by education levels.
+Both negative and positive selection are typically larger and more significant
+for those who left school before 16. Table \@ref(tab:educ-levels) summarizes
+the results.
+
+
+```{r educ-levels}
+loadd(res_edu)
+res_edu %>% 
+      mutate(
+        age_fte_cat = fct_relevel(age_fte_cat, "< 16", "16-18", "> 18")
+      ) %>% 
+      group_by(age_fte_cat) %>% 
+      summarize(
+        prop_sig = 100 * mean(p.value < 0.05/nrow(res_edu)), 
+        .groups  = "drop"
+      ) %>% 
+      as_huxtable(add_colnames = TRUE) %>% 
+      set_contents(1, everywhere, 
+        c("Age left FTE", "% PGS significant")) %>%
+      set_caption("Negative selection by education level") %>% 
+      set_bold(1, everywhere, TRUE) %>% 
+      set_bottom_border(1, everywhere, 0.4) %>% 
+      set_left_padding(everywhere, 1, 0) %>% 
+      set_right_padding(everywhere, final(1), 0) %>% 
+      set_top_padding(14)
+
+```
+
+
+
+
+```{r plot-educ-levels, fig.cap = "Effect sizes on number of children by age left full-time education", fig.height = 7}
+
+loadd(res_edu)
+res_edu %>% 
+      mutate(
+        term = pretty_names(term), 
+        term = fct_reorder(term, estimate, order_abs),
+        "Age left FTE" = fct_relevel(age_fte_cat, "< 16", "16-18", "> 18")
+      ) %>% 
+      ggplot(aes(term, estimate, colour = `Age left FTE`)) +
+        my_hline +
+        geom_pointrange(aes(ymin=conf.low, ymax=conf.high), alpha = 0.8,
+          position = position_dodge(width = 0.4)) + 
+        scale_colour_viridis_d(begin = 0.1, end = 0.85) +
+        coord_flip()
+```
+
+# Number of children
+
+
+Figure \@ref(fig:plot-n-children-bar) shows the full distribution of number 
+of children born for different ventiles of the EA3 polygenic score. The 
+strongest relationship seems to be for having 0 children versus 1 or more.
+
+
+```{r plot-n-children-bar, fig.cap = "Number of children by ventiles of EA3 PGS"}
+famhist %>% 
+      select(n_children, EA3_excl_23andMe_UK, sex) %>% 
+      mutate(
+        "EA3 Ventile" = chop_equally(EA3_excl_23andMe_UK, 20, labels = 1:20),
+        "N Children"  = santoku::chop(n_children, brk_left(0:4, FALSE), 
+                          labels = c(0:3, "4+")),
+        Sex           = factor(sex, levels = 0:1, labels = c("Female", "Male"))
+        ) %>% 
+      filter(! is.na(`EA3 Ventile`), ! is.na(`N Children`)) %>% 
+      ggplot(aes(`EA3 Ventile`, fill = `N Children`, group = `N Children`)) + 
+        geom_bar(position = position_fill(reverse = TRUE), alpha = 0.7) + 
+        facet_wrap(vars(Sex)) +
+        scale_fill_viridis_d(option = "A") +
+        scale_y_continuous(n.breaks = 10, labels = scales::percent) +
+        theme(legend.position = "bottom")
+
+
+```
+
+
+
+```{r plot-sd-years, eval = FALSE}
+# inequality over time. Nothing to see, almost everything is flat.
+grid <- expand_grid(score_name = score_names, YOB = 1940:1965)  
+grid$sd <- pmap_dbl(grid, ~sd(famhist[famhist$YOB==.y, ][[.x]], na.rm = TRUE))
+ggplot(grid, aes(YOB, sd)) + 
+      geom_line() + 
+      facet_wrap(~score_name, scales = "free_y", ncol = 4)
+```
+
+
+```{r rgs-by-effect-size, eval = FALSE, fig.cap = "Genetic correlations with EA3 by effect size on n siblings."}
+rgs <- left_join(rgs, res %>% filter(reg.type == "residualized"), by = c("p2" = "term"))
+
+rgs %>% 
+      filter(p2 != "EA3_excl_23andMe_UK", p2 != "EA2_noUKB") %>% 
+      ggplot(aes(rg, estimate)) + 
+        geom_smooth(method = lm) +
+        geom_point(colour = "red2") + 
+        geom_label(aes(label = p2, hjust = "left", vjust = "middle"), 
+          size = 3, nudge_x = 0.02, alpha = 0.5, 
+          label.padding = unit(0.1, "lines")) +
+        labs(x = "rG", y = "Effect size", 
+          title = "rG with EA3 vs. effect size on # siblings")
+```
+
+```{r correlate-effect-sizes, eval = FALSE}
+combined_results <- res %>% 
+      mutate(PCs = ifelse(reg.type=="raw", "no", "yes")) %>% 
+      dplyr::select(-reg.type) %>% 
+      {bind_rows(bivariate = ., multivariate = all_res, .id = "reg.type")} %>% 
+      arrange(term, reg.type, PCs) %>% 
+      dplyr::select(term, reg.type, PCs, estimate) %>% 
+      pivot_wider(names_from = c(reg.type, PCs), values_from = estimate)
+
+cor(combined_results[-1], use = "complete")
+
+```
+
