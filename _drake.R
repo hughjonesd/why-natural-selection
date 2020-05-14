@@ -6,8 +6,10 @@ suppressPackageStartupMessages({
   library(tidyr)
 })
 
+
 source("make-data.R")
 source("regressions.R")
+
 
 pgs_dir       <- "~/UKBB data 2019/polygenic_scores/"
 ph_file       <- "~/UKBB data 2019/UKB.EA_pheno.coordinates.QC.david.csv"
@@ -17,13 +19,11 @@ famhist2_file <- "~/UKBB data 2019/david.family_history.traits.20042020.out.csv"
 famhist3_file <- "~/UKBB data 2019/david.family_history.traits.05052020.out.csv"
 rgs_file      <- "EA3_rgs.10052019.rgs.csv"
 mf_pairs_file <- "~/UKBB data 2019/spouse_pair_info/UKB_out.mf_pairs_rebadged.csv"
-
+nomis_file    <- "nomis-2011-statistics.csv"
+ghs_file      <- "UKDA-5804-stata8/stata8/Ghs06client.dta"
 
 plan <- drake_plan(
-  
-  
-  famhist      = edit_famhist(famhist_raw, reverse_code),
-  
+
   
   famhist_raw  = target(
                    make_famhist( 
@@ -36,6 +36,15 @@ plan <- drake_plan(
                     ), 
                     format = "fst"
                   ),
+  
+  
+  famhist      = target(
+                  edit_famhist(famhist_raw, reverse_code), 
+                  format = "fst"
+                 ),
+
+    
+  ghs_weights  = weight_by_ghs(file_in(!! ghs_file), famhist),
   
   
   mf_pairs     = target(
@@ -100,6 +109,13 @@ plan <- drake_plan(
       .id = "dep.var"
     ) 
   },
+  
+  
+  res_weighted =  map_dfr(score_names, 
+                    run_regs_weighted, 
+                    famhist = famhist, 
+                    weights = ghs_weights
+                  ),
   
   
   res_period   = {

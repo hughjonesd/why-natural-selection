@@ -1,0 +1,217 @@
+<!-- Handler="ReadmeFileHandler.cs" -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>read5804.htm</title>
+	<meta  http-equiv="Pragma" content="no-cache" />
+	<meta  http-equiv="Expires" content="-1" />
+
+	
+	<script type="text/JavaScript">
+
+		function toggleDiv(which) {
+
+			NS4 = (document.layers) ? true : false;
+			if (NS4){
+				document.layers["SPSS"].visibility = "show";
+			} else{
+				if (!document.getElementById)
+					return
+					if (which.style.display=="none"){
+						which.style.display=""
+
+					}else{
+						which.style.display="none"
+					}
+				}
+		}
+		
+	</script>
+</head>
+
+<body style="font: normal normal normal x-small verdana; color:#191970;">
+
+<h2 style="font: normal normal bold medium verdana;color:#191970;">UK  DATA  ARCHIVE:  IMPORTANT  STUDY  INFORMATION</h2>
+<div align="justify">
+<h3 style="font: normal normal bold small verdana;color:#191970;margin-top:10;margin-bottom:10">Study Number 5804 - General Household Survey, 2006</h3>
+
+<br />
+
+
+
+<h3 style="font: normal normal bold small verdana;color:#191970;margin-top:10;margin-bottom:10">NEW EDITION INFORMATION</h3> 
+<p/>Edition history:<ul><li>The first edition of the GHS 2006 dataset was released in March 2008.</li><li>For the second edition (July 2008), the following previously unavailable variables were added to the individual file: JbChnge, YJbChnge, JobBYr, JobBMon, FtWk, PtWk, EverOT, UsuHr, POTHr, UOTHr, AgreeHrs, OthJbs, TotHrOth, SameSit, WkKind, WkSchl, WkBA, WkDcare, WkPcare, WkUPcare, HRPSC, hhtypd and Wave.</li><li>
+For the third edition (February 2009), amendments were made to variables LGLSTAT, CHNBORN and CHEXCM in the individual file. A minor error had been discovered by the depositor with the LGLSTAT variable, where 188 cases had been assigned as being in a cohabiting couple, when they should have been classified as either single, widowed or divorced. The subsequent derived variables concerning the number of children in cohabiting relationships (variables CHNBORN and CHEXCM) should also have been set to 'not applicable' for these cases. This error has now been corrected, but it had a minor impact on the breakdown between non-married categories in tables 5.3, 5.4, 5.5, 5.6, 5.8, 5.10 and 5.11 of the 2006 GHS report. Original and correct versions of the tables are included in the documentation for reference (also available from the GHS website).</li></ul>
+
+										
+<h3 style="font: normal normal bold small verdana;color:#191970;margin-top:10;margin-bottom:10">DATA PROCESSING NOTES</h3>
+<br />
+<b>Data Archive Processing Standards</b>
+
+<p/>The data were processed to the UK Data Archive's A* standard. This is the 
+Archive's highest standard, and means that an extremely rigorous and 
+comprehensive series of checks was carried out to ensure the quality of the data 
+and documentation.�Firstly, checks were made that the number of cases and 
+variables matched the depositor's records. Secondly, checks were made that all 
+variables had comprehensible variable labels and all nominal (categorical) 
+variables had comprehensible value labels. Where possible, either with reference 
+to the documentation and/or in communication with the depositor, labels were 
+accordingly edited or created. Thirdly, logical checks were performed to ensure 
+that nominal (categorical) variables had values within the range defined (either 
+by value labels or in the depositor's documentation). Lastly, any data or 
+documentation that breached confidentiality rules were altered or suppressed to 
+preserve anonymity. 
+
+<p/>All notable and/or outstanding problems discovered are detailed under the 'Data 
+and documentation problems' heading below. 
+
+
+
+
+
+
+
+
+<br /><br /><b>Data and documentation problems</b>
+<p/><i>Potential anomalies in Family Information variables</i><br>
+Users should note that crosstabulation between variables 'Sex' and 'Baby' ('Ever had a baby') may show anomalous values in that 17 male cases contain positive responses to 'Baby'. Also, where the Family Information section was asked of respondents aged 16-59 years, there are 59 cases (+4 NAs) where women aged 60-64 have answered the 'Baby' question. These issues are currently under investigation by the GHS team.<br><br>
+<i>Missing value labels</i><br> 
+The individual data file (Ghs06client) contains a few variables which have odd value labels missing.  These are PenPer, fuhsec8, ChAtt1, ChPeo1 and GrpIntro.
+
+
+
+<br /><br /><b>Data conversion information</b>
+
+
+<p/>From January 2003 onwards, almost all data conversions have been performed 
+using software developed by the UKDA. This enables standardisation of the 
+conversion methods and ensures optimal data quality. In addition to its own data 
+processing/conversion code, this software uses the SPSS and Stat/Transfer 
+command processors to perform certain format translations. Although data 
+conversion is automated, all data files are also subject to visual inspection by 
+a UKDA data processing officer.
+<p/>With some format conversions data, and more especially internal metadata (i.e. 
+variable labels, value labels, missing value definitions, data type 
+information), will inevitably be lost or truncated owing to the differential 
+limits of the proprietary formats.�A UKDA Data Dictionary file (in rich text 
+format), corresponding to each data file, is usually provided for viewing and 
+searching the internal metadata as it existed in the originating format. These 
+files are called:
+
+[data file name]_UKDA_Data_Dictionary.rtf
+
+<br /><br /><b>Important information about the data format supplied</b>
+
+<p/>The links below provide important information about the format in which you have 
+	been supplied the data. Some of this information is specific to the <i>ingest 
+	format</i> of the data, that is the format in which the UKDA was supplied the 
+	data in. The ingest format for this study was
+SPSS
+<br /><br />
+Please click below to find out information about the <em>format that you have 
+been supplied the data in</em>.
+<br /><br />
+<p/><a href="javascript:toggleDiv(document.getElementById('SPSS'))">SPSS (*.por)</a>
+<div id="SPSS" style="CURSOR: hand;display:none">
+	<p/><b>SPSS portable (*.por files)</b>
+	<br />If SPSS portable was not the ingest format, this format will generally either 
+		have been created via the SPSS command processor (e.g. if the ingest format is 
+		SPSS .sav, SAS, Excel, or dBase), or if the ingest format was STATA, the SPSS 
+		version will be created via the Stat/Transfer command processor. If the ingest 
+		format was undelimited text, the data will have been read into SPSS using an 
+		SPSS command file. 
+	<p/>Issues: There is very seldom any loss of data or internal metadata when 
+		importing data files into SPSS. Any problems will have been listed above in the 
+		Data and Documentation Problems section of this file.<p/>
+</div>
+
+<a href="javascript:toggleDiv(document.getElementById('STATA'))">STATA (*.dta)</a>
+<div id="STATA" style="CURSOR: hand;display:none">
+	<p/><b>STATA (*.dta files)</b>
+	<br />If STATA was not the ingest format, all STATA files will have been created from 
+		SPSS .sav format via the Stat/Transfer command processor. Importantly, 
+		Stat/Transfer's optimisation routine is run so that variables with SPSS write 
+		formats narrower than the data (e.g. numeric variables with 10 decimal places of 
+		data formatted to FX.2) are not rounded upon conversion to STATA because they 
+		are converted to 'doubles ' rather than floats. User missing values are copied 
+		across into STATA (as opposed to being collapsed into a single system missing 
+		code).
+	<p/>Issues: There are a number of data and metadata handling mismatches between SPSS 
+		and STATA. Where any data or internal metadata has been lost or truncated, this 
+		will have been automatically logged in this file:
+	5804_SPSS_to_STATA_conversion.rtf
+		Note that the complete internal metadata has been supplied�in the UKDA Data 
+		Dictionary file(s): [data file name]_UKDA_Data_Dictionary.rtf
+</div>
+
+<br /><a href="javascript:toggleDiv(document.getElementById('Tab'))">Tab-delimited text (*.tab)</a>
+<div id="Tab" style="CURSOR: hand;display:none">
+	<br />If tab-delimited text was not the ingest format, tab-delimited files�will have 
+		been�created from SPSS portable files via the SPSS command processor, and also 
+		from Excel and MS Access files. When exporting from Access data tables to 
+		tab-delimited text, the�potentially problematic�special characters (tabs, 
+		carriage returns, line feeds, etc.) allowed by Access memo and text fields� are 
+		stripped out by the UKDA. 
+
+	<p/>Issues: Date formats in SPSS are always exported to mm/dd/yyyy in tab-delimited 
+		text format - so�there be be a�mismatch with the documentation on such 
+		variables. Variables that include both date and time such as dd-mm-yyyy hh:mm:ss 
+		(e.g. 18-JUN-2001 13:28:00), will lose the time information and become 
+		mm/dd/yyyy. If the time information is critical, a new variable will have been 
+		created in the tab-delimited data file by the UKDA. All users of the data in 
+		tab-delimited format should consult the UKDA Data Dictionary file(s):  [data file name]_UKDA_Data_Dictionary.rtf
+
+	<p/>If the data was exported from MS Access, more limited 'data documenter' 
+		information is suppied�in the file(s): [data table name]_variableinformation.rtf
+		These files may also contain SQL setup information.
+</div>
+
+
+<br /><a href="javascript:toggleDiv(document.getElementById('Excel'))">MS Excel (*.xls files)</a>
+<div id="Excel" style="CURSOR: hand;display:none">
+	<br />If MS Excel was not the ingest format, Excel files�will have�been�created via 
+		the SPSS command processor. The date and time issues noted under tab-delimited 
+		format�apply to SPSS to Excel conversion via the SPSS command processor. 
+</div>
+
+<br /><a href="javascript:toggleDiv(document.getElementById('SAS'))">SAS (supplied as *.dat and *.sas)</a>
+<div id="SAS" style="CURSOR: hand;display:none">
+	<p/>If SAS was not the ingest format, all SAS files will have been created from SPSS 
+		.sav format via the Stat/Transfer command processor. The data files are provided 
+		as a fixed-width text file (*.dat) and a SAS command file (*.sas), which when 
+		run will create a SAS dataset. This enables the user to recreate the SAS dataset 
+		and formats library in almost all versions of SAS and all operating systems.
+
+	<p/>Issues: The main loss of information when converting from SPSS to SAS is 
+		user-missing value definitions. By editing the .sas file, the user can choose 
+		whether to collapse all user-missing values into system missing or preserve 
+		the�value and lose the user-missing definition. To achieve the latter�the 
+		following section of the .sas file should be removed before running it: 
+
+	<p/>/* User Missing Value Specifications */
+
+	<p/>Note that the complete internal metadata has been supplied�in the UKDA Data 
+		Dictionary file(s): [data file name]_UKDA_Data_Dictionary.rtf
+</div>
+
+<br /><a href="javascript:toggleDiv(document.getElementById('Access'))">MS Access (*.mdb files)</a>
+<div id="Access" style="CURSOR: hand;display:none">
+	<p/>Due to the substantial incompatibilities between versions of MS Access, the UKDA 
+		only make data available in MS Access format if this is the ingest format and 
+		the database contains important information in addition to the data tables 
+		(coding information, forms, queries, etc.).
+</div>
+
+
+<br /><br /><b>Conversion of documentation formats</b> 
+<p/>Electronic and paper documentation supplied with this study is usually 
+	incorporated into the UKDA User Guide (in PDF format). The conversion programmes 
+	used are the latest versions of Adobe PDF Writer for electronic documentation 
+	and Adobe Paper Capture (Acrobat 'plugin' version) for paper documentation. 
+	Occasionally, some�of the electronic documentation cannot be usefully converted 
+	to PDF (e.g. MS Excel files with wide worksheets) and this is supplied in�a more 
+	appropriate format. All User Guides are fully bookmarked.
+</div>
+</body>
+
+</html>

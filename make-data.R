@@ -148,3 +148,79 @@ make_mf_pairs <- function (mf_pairs_file, famhist) {
   
   mf_pairs
 }
+
+
+weight_by_ghs <- function (ghs_file, famhist) {
+  library(haven)
+  
+  ghs <- haven::read_dta(ghs_file)
+  # variables of interest: 
+  # sex (1 male)
+  # age
+  # ethnic = 1 = white nbritish
+  # EdAge - age left FTE
+  # hiqual - highest qualification 
+  # edlev00 - education level
+  # edlev10 - ditto, fewer categories
+  # weight06 - "weight you should use to weight the data"
+  # 
+  # grfam1h - gross weekly income of family (harmonized)
+  # grhhold - gross weekly household income
+  # for comparison, the UKBB question was "what is the average total
+  # income before tax received by your household" (p.a.)
+  # 
+  # ten1 - tenure
+  # llord - landlord
+  
+  ghs <- ghs %>% 
+    zap_labels() %>% 
+    filter(ethnic == 1, sex %in% 1:2, edage > 0, edage < age) %>% 
+    select(sex, age, edage, weight06, ten1, llord) 
+  
+  ghs_props <- ghs %>% 
+    group_by(sex, age, edage) %>% 
+    summarize(
+      weighted_n = sum(weight06)
+    )
+  ghs_prop_totals <- ghs %>% 
+    group_by(sex, age) %>% 
+    summarize(
+      weighted_n_sex_age = sum(weight06)
+    )
+  ghs_props <- ghs_props %>% 
+    left_join(ghs_prop_totals, by = c("sex", "age")) %>% 
+    mutate(
+      prop_age_fte = weighted_n/weighted_n_sex_age,
+      sex = recode(sex, "1" = "male", "2" = "female")
+    ) %>% 
+    select(-weighted_n, -weighted_n_sex_age)
+  
+  ukbb_props <- famhist %>% 
+    group_by(sex, age_at_reqruitment, age_fulltime_edu) %>% 
+    summarize(n = n())
+  ukbb_prop_totals <- famhist %>% 
+    group_by(sex, age_at_reqruitment) %>% 
+    summarize(n_sex_age = n())
+  ukbb_props <- ukbb_props %>% 
+    left_join(ukbb_prop_totals, by = c("sex", "age_at_reqruitment")) %>% 
+    mutate(
+      prop_age_fte = n/n_sex_age,
+      sex = recode(sex, "0" = "female", "1" = "male")
+    ) %>% 
+    select(-n, -n_sex_age)
+  
+  ghs_weight_df <- left_join(ukbb_props, ghs_props, 
+    by = c("sex", "age_at_reqruitment" = "age", "age_fulltime_edu" = "edage"),
+    suffix = c(".ukbb", ".ghs")) %>% 
+    mutate(
+      educ_weight = prop_age_fte.ghs/prop_age_fte.ukbb
+    ) %>% 
+    select(-starts_with("prop")) %>% 
+    filter(
+      ! is.na(educ_weight)
+    ) %>% mutate(
+      sex = ifelse(sex == "female", 0, 1)
+    )
+  
+  famhist %>% left_join(ghs_weight_df) %>% select(f.eid, educ_weight)
+}

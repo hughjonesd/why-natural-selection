@@ -31,6 +31,18 @@ run_regs_pcs <- function (dep_var, pc_name, famhist) {
 }
 
 
+run_regs_weighted <- function (score_name, famhist, weights) {
+  famhist <- left_join(famhist, weights, by = "f.eid")
+  
+  fml <- as.formula(glue("n_children ~ {score_name}"))
+  regs <- tidy(lm(fml, famhist, weights = educ_weight,
+        na.action = na.exclude), conf.int = TRUE) 
+  regs %<>% filter(term != "(Intercept)")
+  
+  return(regs)
+}
+
+
 run_regs_period <- function (children, score_name, famhist) {
   dep_var  <- if (children) "n_children" else "n_sibs"
   year_var <- if (children) "YOB" else "parents_imp_YOB"
