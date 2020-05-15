@@ -8,21 +8,53 @@ suppressPackageStartupMessages({
 })
 
 
+make_pcs <- function (pcs_file) {
+  pcs <- read_table(pcs_file)
+  pc_names <- grep("PC", names(pcs), value = TRUE)
+  pcs[pc_names] <- scale(pcs[pc_names])
+  pcs
+}
+
+
+join_famhist_pcs <- function (famhist, pcs) {
+  left_join(famhist, pcs, by = c("f.eid" = "IID"))
+}
+
+
+join_famhist_resid_scores <- function (famhist, resid_scores) {
+  cbind(famhist, resid_scores)
+}
+
+
+make_resid_scores <- function (famhist, pcs, score_names) {
+  famhist <- join_famhist_pcs(famhist, pcs)
+  resid_scores <- data.frame(dummy = numeric(nrow(famhist))) 
+  
+  for (score_name in score_names) {
+    resid_fml <- paste(score_name, "~", paste0("PC", 1:40, collapse = " + "))
+    resid_score <- resid(lm(as.formula(resid_fml), famhist, 
+          na.action = na.exclude))
+    resid_scores[[paste0(score_name, "_resid")]] <- resid_score
+  }
+  
+  resid_score$dummy <- NULL
+  resid_scores
+}
+
+
 make_famhist <- function (
         ph_file, 
-        pcs_file, 
         famhist_file,
         famhist2_file,
         famhist3_file,
         pgs_dir
       ) {
-  ph_spec <- spec_csv(ph_file)
   ph <- read_csv(ph_file, col_types = cols(
     geno_measurement_plate = col_skip(),
     geno_measurement_well = col_skip(),
     .default = col_double()
   ))
-  pcs <- read_csv(pcs_file)
+  
   famhist <- read_csv(famhist_file, col_types = strrep("d", 40))
   famhist2 <- read_csv(famhist2_file, col_types = strrep("d", 17))
   famhist3 <- read_csv(famhist3_file)
@@ -34,7 +66,6 @@ make_famhist <- function (
   names(famhist3) <- paste0("f.", names(famhist3))
   names(famhist3) <- gsub("\\-", ".", names(famhist3))
   
-  famhist %<>% left_join(pcs, by = c("f.eid" = "eid"))
   famhist %<>% left_join(ph, by = c("f.eid" = "eid"))
   famhist %<>% left_join(famhist2, by = "f.eid")
   famhist %<>% left_join(famhist3, by = "f.eid")
@@ -44,25 +75,17 @@ make_famhist <- function (
   
   for (pgs_file in list.files(pgs_dir, pattern = "csv$", full.names = TRUE)) {
     score_name <- sub(".*UKB\\.AMC\\.(.*?)\\..*", "\\1", pgs_file, perl = TRUE)
-    
     pgs <- read_delim(pgs_file, delim = " ", col_types = "dd")
-    
     pgs %<>% filter(FID > 0) 
     names(pgs)[2] <- score_name # instead of "SCORE"
-    pgs[[score_name]] <- c(scale(pgs[[score_name]]))
-    
     famhist %<>% left_join(pgs, by = c("f.eid" = "FID"))
-    
-    resid_fml <- paste(score_name, "~", paste0("PC", 1:40, collapse = " + "))
-    resid_score <- resid(lm(as.formula(resid_fml), famhist, na.action = na.exclude))
-    famhist[[paste0(score_name, "_resid")]] <- c(scale(resid_score))
   }
   
   return(famhist)
 }
 
 
-edit_famhist <- function (famhist, reverse_code) {
+edit_famhist <- function (famhist, score_names) {
   # we get very few extra cases from adding f.2946.1.0 etc, and it makes calculating
   # father's year of birth more complex
   
@@ -118,7 +141,7 @@ edit_famhist <- function (famhist, reverse_code) {
   famhist$income_cat <- famhist$f.738.0.0
   famhist$income_cat[famhist$income_cat < 0] <- NA
   
-  famhist[reverse_code] <- famhist[reverse_code] * -1
+  famhist[score_names] <- scale(famhist[score_names])
   
   return(famhist)
 }

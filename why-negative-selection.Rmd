@@ -10,9 +10,33 @@ output:
 
 ```md
 # TODO
-* Improve imputation of parents' YOB.
-* Selection bias. 
-  - You could weight subjects by education level; sex; birth region? 
+
+* Use Abdel's 100 PCs, not UKBB's 40. DONE
+ 
+* Look at geography, esp. in siblings regressions.
+
+* Divide siblings regressions by own YOB, into early and late.
+  - Use this to confirm the basic "selection decreasing" story
+
+* Plot average scores over time, as an intro graph
+  - Can we work out how to plot selection effects on the "same scale"?
+  - Let X_i be i's polygenic score.
+  - If E(X_parents) = 1/n \sum X_i in the parent's generation, then
+    E(X_kids) = 1/n \sum X_i K_i, in the children's gernation, where K_i is 
+    the number of kids i has. 
+  - Up to a change of means, this is the same as the sample correlation between
+    X and K. 
+  - Do we calculate correlations per year, then plot? Probably too low N....
+    Maybe calculate the correlation over the whole sample but then use
+    it with each year's X_i profile
+
+* How much does age at first live birth "account for" selection?
+
+* Work more on weighting the data?
+
+* control for age in n_partners regressions
+
+* check for new 100 PCs
 
 ## Data to gather
 * f.2139 - age first had sex (includes "never had sex" which may explain
@@ -37,7 +61,6 @@ library(huxtable)
 drake::loadd(famhist)
 drake::loadd(rgs)
 drake::loadd(score_names)
-drake::loadd(reverse_code)
 
 options(digits = 2)
 knitr::opts_chunk$set(
@@ -55,7 +78,6 @@ order_abs <- function (x) x[1] # for use when reordering factors
 huxtable::set_default_properties(latex_float = "h!")
 
 pretty_names <- function (names) {
-  reverse <- names %in% reverse_code
   names <- gsub("_", " ", names)
   names %<>% 
         strsplit(" ") %>% 
@@ -64,8 +86,7 @@ pretty_names <- function (names) {
           substring(.x, 2),
           collapse = " "
         ))
-  names[reverse] %<>% paste0("*")
-  
+
   return(names)
 }
 
@@ -80,14 +101,41 @@ variance 1.
 # Results
 
 
+
+```{r}
+pgs_over_time <- famhist %>% 
+      group_by(
+        YOB = santoku::chop(YOB, 
+          brk_left(seq(1940, 1970, 5), close_end = FALSE), 
+          seq(40, 65, 5),
+          extend = FALSE
+        ) 
+      ) %>% 
+      filter(! is.na(YOB)) %>% 
+      summarize(across(all_of(score_names), mean, na.rm = TRUE)) %>% 
+      pivot_longer(-YOB, names_to = "score_name", values_to = "score")
+
+```
+
+
+```{r plot-means-over-time, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Lines are means for 5-year intervals"}
+pgs_over_time %>% 
+      mutate(score_name = pretty_names(score_name),) %>% 
+      ggplot(aes(YOB, score, group = score_name)) + 
+      geom_line() +
+      facet_wrap(~score_name) +
+      theme(strip.text = element_text(size = 7)) +
+      labs(y = "PGS", x = "Birth year (5 year intervals)")
+```
+
 We run regressions on two dependent variables:
 
 * *siblings*, the number of full siblings in the respondent's sib (including
   himself or herself).
 * The number of *children* ever born to/fathered by the respondent.
 
-We run regressions both with and without controls for the 40 top principal components
-of the genetic data.
+We run regressions both with and without controls for the 100 top principal
+components of the genetic data.
 
 
 ```{r regs-data}
@@ -171,17 +219,28 @@ res_all %>%
 
 ```
 
+```{r}
+drake::loadd(res_pcs)
+n_regs <- as.double(nrow(res_pcs))
+prop_sig <- res_pcs %>% 
+      group_by(dep.var) %>% 
+      summarize(sig = sum(p.value <= 0.05/nrow(res_pcs))) %>% 
+      pull(sig, name = dep.var)
+```
 
 
 To get a further insight into this we regress *siblings* and *children* on
-individual principal components themselves. As Figure \@ref(fig:plot-pc-regs) shows,
-there are many more large and significant effects  in siblings regressions.
+individual principal components. As Figure \@ref(fig:plot-pc-regs)
+shows, effects are larger and more significant in siblings regressions. 
+`r prop_sig[["N siblings"]]` principal components significantly predicted number of
+siblings, while only `r prop_sig[["N children"]]` significantly predicted number
+of children.
 
 
-```{r plot-pc-regs, fig.cap = "Effect of principal components on number of siblings/children. Absolute effect sizes are plotted. Each dot represents one bivariate regression. Points are jittered on the Y axis.", fig.height = 2}
 
-drake::loadd(res_pcs)
-n_regs <- as.double(nrow(res_pcs))
+```{r plot-pc-regs, fig.cap = "Effect of principal components of genetic data on number of siblings/children. Absolute effect sizes are plotted. Each dot represents one bivariate regression. Points are jittered on the Y axis.", fig.height = 2}
+
+
 
 res_pcs %>% 
       mutate(

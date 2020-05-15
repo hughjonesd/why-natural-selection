@@ -4,6 +4,7 @@ suppressPackageStartupMessages({
   library(rlang)
   library(purrr)
   library(tidyr)
+  library(readr)
 })
 
 
@@ -13,7 +14,7 @@ source("regressions.R")
 
 pgs_dir       <- "~/UKBB data 2019/polygenic_scores/"
 ph_file       <- "~/UKBB data 2019/UKB.EA_pheno.coordinates.QC.david.csv"
-pcs_file      <- "~/UKBB data 2019/ukb30545.40PCs.csv"
+pcs_file      <- "~/UKBB data 2019/UKB.HM3.100PCs.40310.txt"
 famhist_file  <- "~/Dropbox/assortative mating/biobank-analysis/david.family_history.traits.out.csv"
 famhist2_file <- "~/UKBB data 2019/david.family_history.traits.20042020.out.csv"
 famhist3_file <- "~/UKBB data 2019/david.family_history.traits.05052020.out.csv"
@@ -23,12 +24,21 @@ nomis_file    <- "nomis-2011-statistics.csv"
 ghs_file      <- "UKDA-5804-stata8/stata8/Ghs06client.dta"
 
 plan <- drake_plan(
-
+  
+  
+  score_names  = {
+    sub(
+      ".*UKB\\.AMC\\.(.*?)\\..*", 
+      "\\1", 
+      list.files(file_in(!! pgs_dir), pattern = "csv$"), 
+      perl = TRUE
+    )
+  },
+  
   
   famhist_raw  = target(
                    make_famhist( 
                       file_in(!! ph_file), 
-                      file_in(!! pcs_file), 
                       file_in(!! famhist_file),
                       file_in(!! famhist2_file),
                       file_in(!! famhist3_file),
@@ -38,9 +48,18 @@ plan <- drake_plan(
                   ),
   
   
+  pcs          = read_table2(file_in(!! pcs_file)),
+  
+  
   famhist      = target(
-                  edit_famhist(famhist_raw, reverse_code), 
+                  edit_famhist(famhist_raw, score_names), 
                   format = "fst"
+                 ),
+  
+  
+  resid_scores = target(
+                   make_resid_scores(famhist, pcs, score_names), 
+                   format = "fst"
                  ),
 
     
@@ -54,36 +73,20 @@ plan <- drake_plan(
   
   
   rgs          = make_rgs(file_in(!! rgs_file)),
-   
-  
-  score_names  = {
-    sub(
-            ".*UKB\\.AMC\\.(.*?)\\..*", 
-            "\\1", 
-            list.files(file_in(!! pgs_dir), pattern = "csv$"), 
-            perl = TRUE
-          )
-  },
-  
-  
-  reverse_code = c(), # don't reverse code anything
-  # {
-  #   setdiff(score_names, c("agreeableness", "age_at_menarche",
-  #           "age_at_menopauze", "cognitive_ability", 
-  #           "conscientiousness", "EA2_noUKB", "EA3_excl_23andMe_UK", 
-  #           "extraversion", "height_combined", "openness")
-  #         )
-  # },
   
   
   res_all      = {
-    res_sibs <- map_dfr(score_names, run_regs, 
-            dep_var = "n_sibs", 
-            famhist = famhist
+    res_sibs <- run_regs(
+            dep_var     = "n_sibs", 
+            score_names = score_names,
+            famhist     = famhist, 
+            pcs         = pcs
           )
-    res_chn <- map_dfr(score_names, run_regs, 
-            dep_var = "n_children", 
-            famhist = famhist
+    res_chn <- run_regs(
+            dep_var     = "n_children", 
+            score_names = score_names, 
+            famhist     = famhist, 
+            pcs         = pcs
           )
     dplyr::bind_rows(
             "N siblings" = res_sibs, 
@@ -94,14 +97,16 @@ plan <- drake_plan(
   
   
   res_pcs     = {
-    pcs <- paste0("PC", 1:40)
-    res_sibs_pcs <- map_dfr(pcs, run_regs_pcs, 
+    pc_names <- grep("PC", names(pcs), value = TRUE)
+    res_sibs_pcs <- run_regs_pcs( 
       dep_var     = "n_sibs", 
-      famhist     = famhist
+      famhist     = famhist,
+      pcs         = pcs
     )
-    res_chn_pcs <- map_dfr(pcs, run_regs_pcs, 
+    res_chn_pcs <- run_regs_pcs(
       dep_var     = "n_children", 
-      famhist     = famhist
+      famhist     = famhist,
+      pcs         = pcs
     )
     dplyr::bind_rows(
       "N siblings" = res_sibs_pcs, 
@@ -254,8 +259,9 @@ plan <- drake_plan(
             ~run_regs_fml(fml, dep_var = .x, famhist = famhist),
             .id = "dep.var"
           )
-    
-    all_pcs <- paste0("PC", 1:40, collapse = " + ")
+    famhist <- join_famhist_pcs(famhist, pcs)
+    all_pcs <- grep("PC", names(pcs), value = TRUE)
+    all_pcs <- paste(all_pcs, collapse = " + ")
     fml_pcs <- glue("{{dep_var}} ~ {all_pgs} + {all_pcs}")
     res_all_pgs_pcs <- map_dfr(dep_vars,
             ~run_regs_fml(fml_pcs, dep_var = .x, famhist = famhist),
