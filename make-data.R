@@ -95,19 +95,6 @@ edit_famhist <- function (famhist, score_names) {
   famhist$moth_age <- famhist$f.1845.0.0
   famhist$moth_age[famhist$moth_age < 0] <- NA
   
-  # TODO: get f.53 (year attended assessment) from Abdel
-  # the below is a quick hack
-  famhist$fath_YOB <- 2008 - famhist$fath_age
-  famhist$moth_YOB <- 2008 - famhist$moth_age
-  
-  famhist %<>% group_by(YOB) %>% mutate(
-          parents_imp_YOB  = rowMeans(cbind(fath_YOB, moth_YOB), na.rm = TRUE),
-          mean_parents_YOB = mean(parents_imp_YOB, na.rm = TRUE),
-          parents_imp_YOB  = ifelse(is.na(parents_imp_YOB),
-                               mean_parents_YOB, parents_imp_YOB),
-          mean_parents_YOB = NULL
-        ) %>% ungroup()
-  
   # full brothers and sisters
   famhist$nbro <- pmax(famhist$f.1873.0.0, famhist$f.1873.1.0, 
     famhist$f.1873.2.0, na.rm = TRUE)

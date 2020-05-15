@@ -12,14 +12,14 @@ source("make-data.R")
 source("regressions.R")
 
 
-pgs_dir       <- "~/UKBB data 2019/polygenic_scores/"
-ph_file       <- "~/UKBB data 2019/UKB.EA_pheno.coordinates.QC.david.csv"
-pcs_file      <- "~/UKBB data 2019/UKB.HM3.100PCs.40310.txt"
-famhist_file  <- "~/Dropbox/assortative mating/biobank-analysis/david.family_history.traits.out.csv"
-famhist2_file <- "~/UKBB data 2019/david.family_history.traits.20042020.out.csv"
-famhist3_file <- "~/UKBB data 2019/david.family_history.traits.05052020.out.csv"
+pgs_dir       <- "polygenic_scores/"
+ph_file       <- "UKB.EA_pheno.coordinates.QC.david.csv"
+pcs_file      <- "UKB.HM3.100PCs.40310.txt"
+famhist_file  <- "david.family_history.traits.out.csv"
+famhist2_file <- "david.family_history.traits.20042020.out.csv"
+famhist3_file <- "david.family_history.traits.05052020.out.csv"
 rgs_file      <- "EA3_rgs.10052019.rgs.csv"
-mf_pairs_file <- "~/UKBB data 2019/spouse_pair_info/UKB_out.mf_pairs_rebadged.csv"
+mf_pairs_file <- "spouse_pair_info/UKB_out.mf_pairs_rebadged.csv"
 nomis_file    <- "nomis-2011-statistics.csv"
 ghs_file      <- "UKDA-5804-stata8/stata8/Ghs06client.dta"
 
@@ -133,18 +133,18 @@ plan <- drake_plan(
   
   
   res_sex      = {
-   sexes <- rlang::exprs(
-           sex == 0, 
-           sex == 1
-         )
-   res_sex <- expand_grid(
-           score_name = score_names, 
-           subset     = sexes
-         ) %>% 
-           pmap_dfr(run_regs_subset, famhist = famhist)
-         res_sex$sex <- ifelse(res_sex$subset == "sex == 0", 
-           "Female", "Male") 
-   res_sex
+    sexes <- rlang::exprs(
+            sex == 0, 
+            sex == 1
+          )
+    res_sex <- expand_grid(
+            score_name = score_names, 
+            subset     = sexes
+          ) %>% 
+            pmap_dfr(run_regs_subset, famhist = famhist)
+    res_sex$sex <- ifelse(res_sex$subset == "sex == 0", "Female", "Male") 
+    
+    res_sex
  },
   
   
@@ -282,4 +282,4 @@ plan <- drake_plan(
 )
 
 
-drake_config(plan)
+drake_config(plan, history = FALSE)

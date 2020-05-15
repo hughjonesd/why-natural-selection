@@ -17,21 +17,15 @@ output:
 
 * Divide siblings regressions by own YOB, into early and late.
   - Use this to confirm the basic "selection decreasing" story
+  - Actually almost no change.
 
-* Plot average scores over time, as an intro graph
+* Plot average scores over time, as an intro graph. DONE
   - Can we work out how to plot selection effects on the "same scale"?
-  - Let X_i be i's polygenic score.
-  - If E(X_parents) = 1/n \sum X_i in the parent's generation, then
-    E(X_kids) = 1/n \sum X_i K_i, in the children's gernation, where K_i is 
-    the number of kids i has. 
-  - Up to a change of means, this is the same as the sample correlation between
-    X and K. 
-  - Do we calculate correlations per year, then plot? Probably too low N....
-    Maybe calculate the correlation over the whole sample but then use
-    it with each year's X_i profile
+  - Simplest thing would be to use birth dates
 
 * How much does age at first live birth "account for" selection?
-
+  - Need f.3872 age at flb for women with one child
+  
 * Work more on weighting the data?
 
 * control for age in n_partners regressions
@@ -277,33 +271,28 @@ summary_period <- res_period %>%
       group_by(score_name, children) %>% 
       mutate(
         significant = diff.p.value < 0.05/n_tests,
-        increasing  = estimate_early < estimate_late,
+        sign_early  = sign(estimate_early),
+        sign_late   = sign(estimate_late),
         size_inc    = abs(estimate_early) < abs(estimate_late),
-        change_sign = sign(estimate_early) != sign(estimate_late),
+        change_sign = sign_early != sign_late,
         Change      = case_when(
                         ! significant ~ "Insignificant",
-                        change_sign  & increasing   ~ "Change sign to +",
-                        change_sign  & ! increasing ~ "Change sign to -",
-                        increasing   & size_inc   ~ "Increasing +",
-                        ! increasing & size_inc   ~ "Decreasing -",
-                        increasing   & ! size_inc ~ "Increasing towards 0",
-                        ! increasing & ! size_inc ~ "Decreasing towards 0"
+                        change_sign   ~ "Change sign",
+                        size_inc      ~ "Size increasing",
+                        ! size_inc    ~ "Size decreasing"
                       )
       ) %>% 
-      select(score_name, children, Change, increasing, significant) %>% 
+      select(score_name, children, Change, significant, change_sign, 
+        sign_early, sign_late) %>% 
       mutate(children = ifelse(children, "Respondents", "Parents")) %>% 
       pivot_wider(names_from = children, 
-        values_from = c(Change, increasing, significant)) %>% 
+        values_from = c(Change, significant, change_sign, sign_early, 
+        sign_late)) %>% 
       mutate(overall = case_when(
-              increasing_Respondents   & increasing_Parents   ~ 
-                "Consistent increase",
-              ! increasing_Respondents & ! increasing_Parents ~ 
-                "Consistent decrease",
-              increasing_Respondents & ! increasing_Parents
-                 & (significant_Parents | significant_Respondents) ~ 
-                "Changes direction",
-              TRUE ~ 
-              "Other"
+              ! change_sign_Parents & ! change_sign_Respondents & 
+                sign_late_Parents == sign_early_Parents ~ 
+                "Consistent",
+              TRUE ~ "Changes direction"
             ))
 
 

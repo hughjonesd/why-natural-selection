@@ -59,9 +59,7 @@ run_regs_weighted <- function (score_name, famhist, weights) {
 
 run_regs_period <- function (children, score_name, famhist) {
   dep_var  <- if (children) "n_children" else "n_sibs"
-  year_var <- if (children) "YOB" else "parents_imp_YOB"
-  famhist$year_split <- famhist[[year_var]] >= median(famhist[[year_var]], 
-        na.rm = TRUE)
+  famhist$year_split <- famhist$YOB >= median(famhist$YOB, na.rm = TRUE)
   famhist$year_split <- factor(famhist$year_split, labels = c("early", "late"))
   fml <- as.formula(glue("{dep_var} ~ {score_name}:year_split"))
   mod <- lm(fml, famhist)
