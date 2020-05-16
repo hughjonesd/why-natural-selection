@@ -18,10 +18,12 @@ output:
 * Divide siblings regressions by own YOB, into early and late.
   - Use this to confirm the basic "selection decreasing" story
   - Actually almost no change.
+  - Overall, diffs between siblings and children regressions
+    now look more like ascertainment bias than change over time.
 
 * Plot average scores over time, as an intro graph. DONE
   - Can we work out how to plot selection effects on the "same scale"?
-  - Simplest thing would be to use birth dates
+  - Simplest thing would be to use birth dates of children.
 
 * How much does age at first live birth "account for" selection?
   - Need f.3872 age at flb for women with one child
@@ -491,7 +493,7 @@ n_regs <- as.double(nrow(res_together))
 res_together %>% 
       mutate(
         term = pretty_names(term),
-        term = fct_reorder(term, estimate),
+        term = fct_reorder(term, estimate, order_abs),
         dep.var = recode(dep.var, 
           "n_children" = "N Children", "n_sibs" = "N Siblings")
       ) %>% 
