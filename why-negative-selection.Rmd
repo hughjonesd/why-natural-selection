@@ -11,8 +11,6 @@ output:
 ```md
 # TODO
 
-* Use Abdel's 100 PCs, not UKBB's 40. DONE
- 
 * Look at geography, esp. in siblings regressions.
 
 * Divide siblings regressions by own YOB, into early and late.
@@ -20,6 +18,7 @@ output:
   - Actually almost no change.
   - Overall, diffs between siblings and children regressions
     now look more like ascertainment bias than change over time.
+  - Double check your code!
 
 * Plot average scores over time, as an intro graph. DONE
   - Can we work out how to plot selection effects on the "same scale"?
@@ -32,7 +31,6 @@ output:
 
 * control for age in n_partners regressions
 
-* check for new 100 PCs
 
 ## Data to gather
 * f.2139 - age first had sex (includes "never had sex" which may explain
