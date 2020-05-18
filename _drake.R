@@ -11,17 +11,17 @@ suppressPackageStartupMessages({
 source("make-data.R")
 source("regressions.R")
 
-
-pgs_dir       <- "polygenic_scores/"
-ph_file       <- "UKB.EA_pheno.coordinates.QC.david.csv"
-pcs_file      <- "UKB.HM3.100PCs.40310.txt"
-famhist_file  <- "david.family_history.traits.out.csv"
-famhist2_file <- "david.family_history.traits.20042020.out.csv"
-famhist3_file <- "david.family_history.traits.05052020.out.csv"
-rgs_file      <- "EA3_rgs.10052019.rgs.csv"
-mf_pairs_file <- "spouse_pair_info/UKB_out.mf_pairs_rebadged.csv"
-nomis_file    <- "nomis-2011-statistics.csv"
-ghs_file      <- "UKDA-5804-stata8/stata8/Ghs06client.dta"
+data_dir      <- "../negative-selection-data/"
+pgs_dir       <- paste(data_dir, "polygenic_scores/")
+ph_file       <- paste(data_dir, "UKB.EA_pheno.coordinates.QC.david.csv")
+pcs_file      <- paste(data_dir, "UKB.HM3.100PCs.40310.txt")
+famhist_file  <- paste(data_dir, "david.family_history.traits.out.csv")
+famhist2_file <- paste(data_dir, "david.family_history.traits.20042020.out.csv")
+famhist3_file <- paste(data_dir, "david.family_history.traits.05052020.out.csv")
+rgs_file      <- paste(data_dir, "EA3_rgs.10052019.rgs.csv")
+mf_pairs_file <- paste(data_dir, "spouse_pair_info/UKB_out.mf_pairs_rebadged.csv")
+nomis_file    <- paste(data_dir, "nomis-2011-statistics.csv")
+ghs_file      <- paste(data_dir, "UKDA-5804-stata8/stata8/Ghs06client.dta")
 
 plan <- drake_plan(
   
