@@ -11,17 +11,19 @@ suppressPackageStartupMessages({
 source("make-data.R")
 source("regressions.R")
 
-data_dir      <- "../negative-selection-data/"
-pgs_dir       <- paste(data_dir, "polygenic_scores/")
-ph_file       <- paste(data_dir, "UKB.EA_pheno.coordinates.QC.david.csv")
-pcs_file      <- paste(data_dir, "UKB.HM3.100PCs.40310.txt")
-famhist_file  <- paste(data_dir, "david.family_history.traits.out.csv")
-famhist2_file <- paste(data_dir, "david.family_history.traits.20042020.out.csv")
-famhist3_file <- paste(data_dir, "david.family_history.traits.05052020.out.csv")
-rgs_file      <- paste(data_dir, "EA3_rgs.10052019.rgs.csv")
-mf_pairs_file <- paste(data_dir, "spouse_pair_info/UKB_out.mf_pairs_rebadged.csv")
-nomis_file    <- paste(data_dir, "nomis-2011-statistics.csv")
-ghs_file      <- paste(data_dir, "UKDA-5804-stata8/stata8/Ghs06client.dta")
+data_dir      <- "../negative-selection-data"
+pgs_dir       <- file.path(data_dir, "polygenic_scores/")
+ph_file       <- file.path(data_dir, "UKB.EA_pheno.coordinates.QC.david.csv")
+pcs_file      <- file.path(data_dir, "UKB.HM3.100PCs.40310.txt")
+famhist_file  <- file.path(data_dir, "david.family_history.traits.out.csv")
+famhist2_file <- file.path(data_dir, "david.family_history.traits.20042020.out.csv")
+famhist3_file <- file.path(data_dir, "david.family_history.traits.05052020.out.csv")
+famhist4_file <- file.path(data_dir, "david.family_history.traits.16052020.out.csv")
+famhist5_file <- file.path(data_dir, "david.family_history.traits.18052020.out.csv")
+rgs_file      <- file.path(data_dir, "EA3_rgs.10052019.rgs.csv")
+mf_pairs_file <- file.path(data_dir, "spouse_pair_info/UKB_out.mf_pairs_rebadged.csv")
+nomis_file    <- file.path(data_dir, "nomis-2011-statistics.csv")
+ghs_file      <- file.path(data_dir, "UKDA-5804-stata8/stata8/Ghs06client.dta")
 
 plan <- drake_plan(
   
@@ -42,6 +44,7 @@ plan <- drake_plan(
                       file_in(!! famhist_file),
                       file_in(!! famhist2_file),
                       file_in(!! famhist3_file),
+                      file_in(!! famhist4_file),
                       file_in(!! pgs_dir)
                     ), 
                     format = "fst"
@@ -145,7 +148,22 @@ plan <- drake_plan(
     res_sex$sex <- ifelse(res_sex$subset == "sex == 0", "Female", "Male") 
     
     res_sex
- },
+  },
+  
+  
+  res_age_flb = {
+    res_age_flb <-map_dfr(setNames(score_names, score_names), 
+            ~run_regs_fml(
+              fml = "n_children ~ {score_name} + age_flb",
+              score_name = .x, 
+              famhist = famhist
+            ), 
+            .id = "score_name"
+          )
+    res_age_flb %<>% filter(term != "(Intercept)")
+    
+    res_age_flb
+  },
   
   
   res_partners = {
