@@ -61,12 +61,12 @@ run_regs_period <- function (children, score_name, famhist) {
   dep_var  <- if (children) "n_children" else "n_sibs"
   famhist$year_split <- famhist$YOB >= median(famhist$YOB, na.rm = TRUE)
   famhist$year_split <- factor(famhist$year_split, labels = c("early", "late"))
-  fml <- as.formula(glue("{dep_var} ~ {score_name}:year_split"))
+  fml <- as.formula(glue("{dep_var} ~ year_split + {score_name}:year_split"))
   mod <- lm(fml, famhist)
   res <- tidy(mod, conf.int = TRUE)
   res <- filter(res, grepl(score_name, term))
   
-  test_spec <- glue("{score_name}:year_splitearly - {score_name}:year_splitlate = 0")
+  test_spec <- glue("year_splitearly:{score_name} - year_splitlate:{score_name} = 0")
   test <- car::lht(mod, test_spec)
   pval <- test[["Pr(>F)"]]
   res$diff.p.value <- pval[2]
