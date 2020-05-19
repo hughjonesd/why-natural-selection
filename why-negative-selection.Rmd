@@ -19,19 +19,12 @@ output:
   
 * Look at geography, esp. in siblings regressions.
 
-* Divide siblings regressions by own YOB, into early and late.
-  - Use this to confirm the basic "selection decreasing" story. DONE.
-  - Actually almost no change.
-  - Overall, diffs between siblings and children regressions
-    now look more like ascertainment bias than change over time.
-  - (I checked my code: I hadn't been controlling for one main term when
-    running the interaction. Doh.)
 
 * Work more on weighting the data?
   - weight by age at first live birth
-  - education using ISCED
-
-* direct regressions of scores on age_flb
+  - education using ISCED?
+  - geography?
+  - ask for existing work by others?
 
 * control for age in n_partners regressions
 
@@ -83,6 +76,7 @@ pval_geom_point <- function (size = 1.5, stroke = 0.7, ...) {
   geom_point(shape = 21, size = size, stroke = stroke, ...)
 }
 
+
 my_fill_scale <- function (n, aesthetics = "fill", ...) {
   if (n == 2) {
     scale_color_brewer(type = "qual", palette = 3, aesthetics = aesthetics, ...)
@@ -90,6 +84,10 @@ my_fill_scale <- function (n, aesthetics = "fill", ...) {
     scale_color_brewer(aesthetics = aesthetics, ...)
   }
 }
+
+
+my_labs <- function (x = "Effect size", y = "", ...) labs(x = x, y = y, ...)
+
 
 # for use when reordering factors. Order by the nth score in a group
 order_abs <- function (n = 1) {
@@ -565,6 +563,7 @@ res_together %>%
         facet_wrap(vars(dep.var)) +
         pval_scale() +
         my_fill_scale(n = 2, direction = -1) +
+        my_labs() +
         theme(legend.position = "bottom")
 ```
 
@@ -607,7 +606,8 @@ res_sex %>%
         my_vline +
         pval_geom_point() +
         pval_scale() +
-        my_fill_scale(n = 2, direction = -1)
+        my_fill_scale(n = 2, direction = -1) +
+        my_labs()
 
 ```
 
@@ -672,7 +672,8 @@ res_combined %>%
         geom_vline(xintercept = 0, linetype = "dashed", color = "grey20") +
         pval_geom_point() +
         pval_scale() +
-        scale_fill_brewer(type = "qual", palette = 3)
+        scale_fill_brewer(type = "qual", palette = 3) +
+        my_labs()
 ```
 
 
@@ -695,20 +696,17 @@ cor_raw_moth <- with(
   cor(estimate.x, estimate.y))
 ```
 
-
-The dataset has no information on fathers' age at birth of their first child.
-However, we can calculate this information for the parents' generation,
-for the subsets of respondents who reported their mother's or father's age
+We can run similar regressions for the parents' generation, using the subsets of respondents who reported their mother's or father's age
 and who had no elder siblings. We run *sibling* regressions on these subsets,
 controlling for either parent's age at their birth.
 Figure \@ref(fig:plot-age-birth-parents) shows
 the results. Effect sizes are very similar, whether controlling for
-father's or mother's age at respondent's birth or mother's age at respondent's birth. Unlike for the respondent's own generation, effect sizes are positively correlated with
+father's or mother's age at respondent's birth or mother's age at respondent's birth. Unlike for the respondents' generation, effect sizes are positively correlated with
 the effect sizes from bivariate regressions (father's age at birth: 
 $\rho$ `r cor_raw_fath`; mother's age at birth: $\rho$ `r cor_raw_moth`).
 
 
-```{r plot-age-birth-parents}
+```{r plot-age-birth-parents, fig.cap = "Effect sizes on number of siblings controlling for parents' age at birth, eldest siblings"}
 
 
 n_regs <- as.double(nrow(res_age_birth_parents)/2)
@@ -728,13 +726,84 @@ res_age_birth_parents %>%
       pval_geom_point(alpha = 0.8) +  
       my_vline +
       my_fill_scale(2) +
-      pval_scale()
+      pval_scale() +
+      my_labs()
+
+```
+
+
+```{r calc-age-flb-dv}
+
+drake::loadd(res_age_flb_dv)
+drake::loadd(res_age_birth_parents_dv)
+
+compare_flb_dv <- left_join(
+        res_age_flb_dv           %>% select(term, estimate),
+        res_age_birth_parents_dv %>% select(term, estimate, dep.var),
+        by = "term"
+      )
+
+cor_flb_fath <- with(compare_flb_dv %>% filter(dep.var == "fath_age_birth"),
+        cor(estimate.x, estimate.y)
+      )
+cor_flb_moth <- with(compare_flb_dv %>% filter(dep.var == "moth_age_birth"),
+        cor(estimate.x, estimate.y)
+      )
+```
+
+These results suggest that polygenic scores may directly correlate with
+age at first live birth. Figure \@ref(fig:plot-age-flb-dv) plots
+estimated effect sizes from bivariate regressions for respondents, and
+Figure \@ref(fig:plot-age-birth-parents-dv) does the same for their parents. 
+Effect sizes are reasonably large. They are also very highly correlated across 
+generations. Effect sizes of PGS on father's age at own birth, and on own age
+at first live birth, have a correlation of `r cor_flb_fath`; for mother's age
+and own age it is `r cor_flb_moth`
+
+
+```{r plot-age-flb-dv, fig.cap = "Effects of polygenic scores on age at first live birth"}
+
+n_regs <- as.double(nrow(res_age_flb_dv))
+
+res_age_flb_dv %>% 
+      mutate(
+        term = pretty_names(term),
+        term = fct_reorder(term, estimate, order_abs(1))
+      ) %>% 
+      ggplot(aes(estimate, term, colour = p.value < 0.05 / {{n_regs}})) + 
+      my_vline +
+      pval_geom_point(fill = "steelblue4") +
+      pval_scale() + 
+      my_labs()
 
 ```
 
 
 
 
+
+```{r plot-age-birth-parents-dv, fig.cap = "Effects of polygenic scores on parents' age at own birth, eldest siblings"}
+
+n_regs <- as.double(nrow(res_age_birth_parents_dv))
+
+res_age_birth_parents_dv %>% 
+      mutate(
+        term = pretty_names(term),
+        term = fct_reorder(term, estimate, order_abs(1)),
+        "Dependent variable" = dplyr::recode(dep.var, 
+          "fath_age_birth" = "Father's age", 
+          "moth_age_birth" = "Mother's age"
+        )
+      ) %>% 
+      ggplot(aes(estimate, term, fill = `Dependent variable`, 
+        colour = p.value < 0.05 / {{n_regs}})) + 
+        my_vline +
+        pval_geom_point() +
+        pval_scale() +
+        my_fill_scale(n = 2, direction = -1) +
+        my_labs()
+
+```
 
 ## Number of sexual partners
 
@@ -764,7 +833,8 @@ res_partners %>%
         facet_wrap(vars(sex)) +
         my_fill_scale(n = 2) +
         pval_scale() +
-        theme(legend.position = "bottom")
+        theme(legend.position = "bottom") +
+        my_labs(x = "", y = "")
 
       
 
@@ -821,7 +891,8 @@ res_edu %>%
         my_vline +
         pval_geom_point() + 
         pval_scale() +
-        my_fill_scale(n = 3, direction = -1)
+        my_fill_scale(n = 3, direction = -1) +
+        my_labs()
         
 ```
 
@@ -849,7 +920,8 @@ res_income %>%
         my_vline +
         pval_geom_point(alpha = 0.8) + 
         my_fill_scale(n = 5, direction = -1) +
-        pval_scale()
+        pval_scale() +
+        my_labs()
 ```
 
 

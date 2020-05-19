@@ -167,14 +167,13 @@ plan <- drake_plan(
   
   
   res_age_flb_dv = {
-    res <- map_dfr(setNames(score_names, score_names), 
-      ~run_regs_fml(
-        fml = "age_flb ~ {score_name}",
-        score_name = .x, 
-        famhist = famhist
-      ), 
-      .id = "score_name"
-    )
+    res <- map_dfr(score_names,
+            ~run_regs_fml(
+              fml        = "age_flb ~ {score_name}",
+              score_name = .x, 
+              famhist    = famhist
+            )
+          )
     res %<>% filter(term != "(Intercept)")
     
     res
@@ -201,6 +200,28 @@ plan <- drake_plan(
     
     res
   },
+  
+  
+    res_age_birth_parents_dv = {
+      vars <- expand_grid(
+              score_name = score_names, 
+              dep.var    = c("fath_age_birth", "moth_age_birth")
+            )
+      res <- pmap_dfr(vars,
+              run_regs_fml,
+              fml = "{dep.var} ~ {score_name}",
+              subset = quote(n_older_sibs == 0),
+              famhist = famhist,
+              .id = "id"
+            )
+      
+      res$score_name <- vars$score_name[as.numeric(res$id)]
+      res$dep.var    <- vars$dep.var[as.numeric(res$id)]
+      res$id <- NULL
+      res %<>% filter(term != "(Intercept)")
+      
+      res
+    },
   
   
   res_partners = {
