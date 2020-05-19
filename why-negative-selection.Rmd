@@ -20,23 +20,18 @@ output:
 * Look at geography, esp. in siblings regressions.
 
 * Divide siblings regressions by own YOB, into early and late.
-  - Use this to confirm the basic "selection decreasing" story
+  - Use this to confirm the basic "selection decreasing" story. DONE.
   - Actually almost no change.
   - Overall, diffs between siblings and children regressions
     now look more like ascertainment bias than change over time.
   - (I checked my code: I hadn't been controlling for one main term when
     running the interaction. Doh.)
 
-* Plot average scores over time, as an intro graph. DONE
-  - Can we work out how to plot selection effects on the "same scale"?
-  - Simplest thing would be to use birth dates of children. (Maybe average of
-    first and last live birth)
-  - Also weight?
-
-* How much does age at first live birth "account for" selection?
-  - Need f.3872 age at flb for women with one child
-  
 * Work more on weighting the data?
+  - weight by age at first live birth
+  - education using ISCED
+
+* direct regressions of scores on age_flb
 
 * control for age in n_partners regressions
 
@@ -73,12 +68,33 @@ knitr::opts_chunk$set(
         error = TRUE
       )
 
-theme_set(theme_minimal())
-pval_palette <- c("FALSE" = "grey50", "TRUE" = "orange2")
-my_hline <- geom_hline(yintercept = 0, colour = "grey20", linetype = "dashed")
-order_abs <- function (x) x[1] # for use when reordering factors
-
 huxtable::set_default_properties(latex_float = "h!")
+
+theme_set(theme_minimal())
+my_hline <- geom_hline(yintercept = 0, colour = "grey20", linetype = "dotted")
+my_vline <- geom_vline(xintercept = 0, colour = "grey20", linetype = "dotted")
+pval_palette <- c("FALSE" = "grey50", "TRUE" = "orange2")
+
+
+pval_scale <- function (...) scale_color_manual(values = pval_palette, ...)
+
+
+pval_geom_point <- function (size = 1.5, stroke = 0.7, ...) {
+  geom_point(shape = 21, size = size, stroke = stroke, ...)
+}
+
+my_fill_scale <- function (n, aesthetics = "fill", ...) {
+  if (n == 2) {
+    scale_color_brewer(type = "qual", palette = 3, aesthetics = aesthetics, ...)
+  } else {
+    scale_color_brewer(aesthetics = aesthetics, ...)
+  }
+}
+
+# for use when reordering factors. Order by the nth score in a group
+order_abs <- function (n = 1) {
+  function (x) x[n] 
+}
 
 pretty_names <- function (names) {
   names <- gsub("_", " ", names)
@@ -90,6 +106,12 @@ pretty_names <- function (names) {
           collapse = " "
         ))
 
+  acronyms <- c("WHR", "BMI", "DPW", "CPD", "SI", "AI", "WC")
+  for (acronym in acronyms) {
+    regex <- paste0("\\b", acronym, "\\b")
+    names <- gsub(regex, toupper(acronym), names, ignore.case = TRUE)
+  }
+  
   return(names)
 }
 
@@ -105,7 +127,7 @@ variance 1.
 
 
 
-```{r}
+```{r calc-means-over-time}
 
 drake::loadd(famhist)
 pgs_over_time <- famhist %>% 
@@ -118,18 +140,52 @@ pgs_over_time <- famhist %>%
       ) %>% 
       filter(! is.na(YOB)) %>% 
       summarize(across(all_of(score_names), mean, na.rm = TRUE)) %>% 
+      pivot_longer(
+        -YOB, 
+        names_to = "score_name",
+        values_to = "score"
+      ) 
+ 
+```
+
+
+```{r calc-means-over-time-children, eval = FALSE}
+pgs_over_time_children <- famhist %>% 
+      mutate(
+        YOB_kids = (year_flb + year_llb)/2,
+        YOB      = santoku::chop(
+                     YOB_kids, 
+                     brk_left(seq(1960, 1995, 5), close_end = FALSE), 
+                     seq(60, 90, 5),
+                     extend = FALSE
+                   )
+      ) %>% 
+      filter(! is.na(YOB)) %>% 
+      group_by(YOB) %>% 
+      summarize(across(all_of(score_names), 
+        ~weighted.mean(.x, n_children, na.rm = TRUE)
+      )) %>% 
       pivot_longer(-YOB, names_to = "score_name", values_to = "score")
+
+pgs_over_time <- bind_rows(
+        Respondents = pgs_over_time,
+        Children    = pgs_over_time_children,
+        .id         = "Generation"
+      )
 
 ```
 
 
 ```{r plot-means-over-time, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Lines are means for 5-year intervals"}
 pgs_over_time %>% 
-      mutate(score_name = pretty_names(score_name),) %>% 
+      mutate(score_name = pretty_names(score_name)) %>% 
       ggplot(aes(YOB, score, group = score_name)) + 
       geom_line() +
       facet_wrap(~score_name) +
-      theme(strip.text = element_text(size = 7)) +
+      theme(
+        strip.text  = element_text(size = 7), 
+        axis.text.x = element_text(size = 7)
+      ) +
       labs(y = "PGS", x = "Birth year (5 year intervals)")
 ```
 
@@ -196,7 +252,7 @@ Among the children regressions, this no longer holds. Effect sizes are barely
 affected by controlling for principal components.
 
 
-```{r plot-basic-regs, fig.cap = "Effects of polygenic scores on number of siblings/children. Scores are plotted on different scales.", fig.height = 7}
+```{r plot-basic-regs, fig.cap = "Effects of polygenic scores on number of siblings/children.", fig.height = 7}
 
 drake::loadd(res_all)
 
@@ -204,22 +260,20 @@ n_regs <- as.double(nrow(res_all))
 res_all %>% 
       mutate(
         term    = pretty_names(term),
-        term    = fct_reorder(term, estimate, order_abs),
+        term    = fct_reorder(term, estimate, order_abs(1)),
         dep.var = fct_inorder(dep.var) 
       ) %>% 
-      ggplot(aes(x = term, y = estimate, shape = reg.type, 
+      ggplot(aes(y = term, x = estimate, fill = reg.type, 
         colour = p.value < 0.05/{{n_regs}})) +
-      my_hline + 
-      geom_point(size = 2.5, alpha = 0.8) + 
-      labs(y = "Effect size", x = "") +
-      facet_wrap(vars(dep.var), ncol = 2, scales = "free_x") +
-      coord_flip() +
-      scale_colour_manual(values = pval_palette) +
-      scale_shape_manual(values = c("circle", "triangle"), 
-        guide = guide_legend(title = "")) +
+      my_vline + 
+      pval_geom_point() +
+      labs(x = "Effect size", y = "") +
+      facet_wrap(vars(dep.var), ncol = 2) +
+      pval_scale() +
+      my_fill_scale(n = 2, guide = guide_legend(title = "")) +
       theme(
         legend.position = "bottom", 
-        legend.margin = margin(2,2,2,2)
+        legend.margin   = margin(2, 2, 2, 2)
       )
 
 ```
@@ -254,7 +308,7 @@ res_pcs %>%
         geom_jitter(height = 0.15, width = 0, alpha = 0.9) + 
         scale_x_log10(labels = scales::label_number(accuracy = 0.0001)) +
         labs(x = "Effect size (log scale)", y = "") + 
-        scale_colour_manual(values = pval_palette)
+        pval_scale(aesthetics = "colour")
         
 
 ```
@@ -337,8 +391,8 @@ ggplot(aes(period, estimate, colour = dep.var, group = dep.var)) +
       geom_point(size = 1.5) +
       geom_line(aes(linetype = p < 0.05/{{n_tests}})) +
       facet_wrap(vars(score_name), nrow = 4) + 
-      scale_fill_manual(values = pval_palette) +
-      scale_colour_manual(values = c("darkgreen", "navy")) +
+      pval_scale() +
+      my_fill_scale(n = 2, aesthetics = "colour") +
       scale_linetype_manual(values = c("FALSE" = "dashed", "TRUE" = "solid"))
       
       
@@ -443,22 +497,20 @@ n_regs <- as.double(nrow(res_weighted_all))
 res_weighted_all %>% 
       mutate(
         term    = pretty_names(term),
-        term    = fct_reorder(term, estimate_weighted, order_abs)
+        term    = fct_reorder(term, estimate_weighted, order_abs(1))
       ) %>% 
       pivot_longer(cols = c(estimate_weighted, estimate_unweighted), 
         names_to = "Regression", values_to = "estimate") %>% 
       mutate(
         Regression = sub("estimate_", "", Regression)
       ) %>% 
-      ggplot(aes(x = term, y = estimate, fill = Regression,
+      ggplot(aes(y = term, x = estimate, fill = Regression,
         colour = p.value < 0.05/{{n_regs}})) +
-      my_hline + 
-      geom_point(size = 1.5, stroke = .8, shape = 21) + 
-      labs(y = "Effect size", x = "") +
-      coord_flip() +
-      scale_fill_manual(values = 
-        c("unweighted" = "transparent", "weighted" = "darkgreen")) +
-      scale_colour_manual(values = pval_palette)
+      my_vline + 
+      pval_geom_point() +
+      labs(x = "Effect size", y = "") +
+      my_fill_scale(n = 2) +
+      pval_scale(aesthetics = "colour")
 
 ```
 
@@ -501,16 +553,18 @@ n_regs <- as.double(nrow(res_together))
 res_together %>% 
       mutate(
         term = pretty_names(term),
-        term = fct_reorder(term, estimate, order_abs),
+        term = fct_reorder(term, estimate, order_abs(2)),
         dep.var = dplyr::recode(dep.var, 
-          "n_children" = "N Children", "n_sibs" = "N Siblings")
+          "n_children" = "N Children", "n_sibs" = "N Siblings"),
+        dep.var = fct_relevel(dep.var, "N Siblings")
       ) %>% 
-      ggplot(aes(term, estimate, color = p.value < 0.05/{{n_regs}}, shape  = PCs)) + 
-        geom_pointrange(aes(ymin = conf.low, ymax = conf.high)) +
-        my_hline +
-        facet_wrap(vars(dep.var), scales = "free_x") +
-        coord_flip() +
-        scale_color_manual(values = pval_palette) +
+      ggplot(aes(y = term, x = estimate, color = p.value < 0.05/{{n_regs}}, 
+        fill  = PCs)) + 
+        pval_geom_point(alpha = 0.8) +
+        my_vline +
+        facet_wrap(vars(dep.var)) +
+        pval_scale() +
+        my_fill_scale(n = 2, direction = -1) +
         theme(legend.position = "bottom")
 ```
 
@@ -542,17 +596,18 @@ than for men. Differences are particularly large for educational attainment and 
 
 ```{r plot-sexes, fig.cap = "Effect sizes on number of children by sex"}
 
-
+n_regs <- as.double(nrow(res_sex))
 res_sex %>% 
       mutate(
         term = pretty_names(term),
-        term = fct_reorder(term, estimate, order_abs)
+        term = fct_reorder(term, estimate, order_abs(1))
       ) %>% 
-      ggplot(aes(term, estimate, group = sex, colour = sex)) +
-        my_hline +
-        geom_pointrange(aes(ymin = conf.low, ymax = conf.high), alpha = 0.7) +
-        coord_flip() +
-        scale_colour_brewer(palette = 2, type = "qual")
+      ggplot(aes(y = term, x = estimate, fill = sex, 
+            colour = p.value < 0.05/{{n_regs}})) +
+        my_vline +
+        pval_geom_point() +
+        pval_scale() +
+        my_fill_scale(n = 2, direction = -1)
 
 ```
 
@@ -609,16 +664,76 @@ n_regs <- as.double(nrow(res_age_flb))
 
 res_combined %>% 
       mutate(
-        score_name = fct_reorder(score_name, estimate, order_abs),
+        score_name = fct_reorder(score_name, estimate, order_abs(2)),
         Regression = ifelse(reg.type == "raw", "Bivariate", "Controlled for age FLB")
       ) %>% 
       ggplot(aes(y = score_name, x = estimate, fill = Regression, 
         color = p.value < 0.05/{{n_regs}})) + 
         geom_vline(xintercept = 0, linetype = "dashed", color = "grey20") +
-        geom_point(shape = 21, size = 1.8, stroke = 0.8) + 
-        scale_color_manual(values = pval_palette) +
+        pval_geom_point() +
+        pval_scale() +
         scale_fill_brewer(type = "qual", palette = 3)
 ```
+
+
+
+```{r calc-age-birth-parents}
+
+drake::loadd(res_age_birth_parents)
+drake::loadd(res_all)
+
+res_sibs_raw <- filter(res_all, dep.var == "N siblings", reg.type == "raw")
+compare_abp_raw <- res_age_birth_parents %>% 
+      filter(! term %in% c("fath_age_birth", "moth_age_birth")) %>% 
+      left_join(res_sibs_raw, by = "term")
+
+cor_raw_fath <- with(
+  compare_abp_raw %>% filter(control == "fath_age_birth"), 
+  cor(estimate.x, estimate.y))
+cor_raw_moth <- with(
+  compare_abp_raw %>% filter(control == "moth_age_birth"), 
+  cor(estimate.x, estimate.y))
+```
+
+
+The dataset has no information on fathers' age at birth of their first child.
+However, we can calculate this information for the parents' generation,
+for the subsets of respondents who reported their mother's or father's age
+and who had no elder siblings. We run *sibling* regressions on these subsets,
+controlling for either parent's age at their birth.
+Figure \@ref(fig:plot-age-birth-parents) shows
+the results. Effect sizes are very similar, whether controlling for
+father's or mother's age at respondent's birth or mother's age at respondent's birth. Unlike for the respondent's own generation, effect sizes are positively correlated with
+the effect sizes from bivariate regressions (father's age at birth: 
+$\rho$ `r cor_raw_fath`; mother's age at birth: $\rho$ `r cor_raw_moth`).
+
+
+```{r plot-age-birth-parents}
+
+
+n_regs <- as.double(nrow(res_age_birth_parents)/2)
+
+res_age_birth_parents %>% 
+    filter(! term %in% c("fath_age_birth", "moth_age_birth")) %>% 
+    mutate(
+      term    = pretty_names(term),
+      term    = fct_reorder(term, estimate, order_abs(2)),
+      Control = ifelse(control == "fath_age_birth", 
+                  "Father's age at birth", 
+                  "Mother's age at birth"
+                )
+    ) %>% 
+    ggplot(aes(y = term, x = estimate, fill = Control, 
+      colour = p.value < 0.05/{{n_regs}})) + 
+      pval_geom_point(alpha = 0.8) +  
+      my_vline +
+      my_fill_scale(2) +
+      pval_scale()
+
+```
+
+
+
 
 
 ## Number of sexual partners
@@ -636,18 +751,19 @@ res_partners %<>%
       filter(term != "(Intercept)", term != "lo_partnersTRUE") %>% 
       mutate(`N partners` = ifelse(grepl(":", term), "<= 3", "> 3")) 
 
-n_regs <- nrow(res_partners)
+n_regs <- as.double(nrow(res_partners))
 res_partners %>% 
       mutate(
         score_name = pretty_names(score_name),
-        score_name = fct_reorder(score_name, estimate, order_abs)
+        score_name = fct_reorder(score_name, estimate, order_abs(1))
       ) %>% 
-      ggplot(aes(score_name, estimate, colour = `N partners`)) + 
-        my_hline +
-        geom_pointrange(aes(ymin = conf.low, ymax = conf.high), alpha = .8) +
+      ggplot(aes(y = score_name, x = estimate, fill = `N partners`, 
+        colour = p.value < 0.05/{{n_regs}})) + 
+        my_vline +
+        pval_geom_point() +
         facet_wrap(vars(sex)) +
-        coord_flip() +
-        scale_colour_manual(values = c("darkred", "steelblue")) +
+        my_fill_scale(n = 2) +
+        pval_scale() +
         theme(legend.position = "bottom")
 
       
@@ -693,18 +809,20 @@ res_edu %>%
 ```{r plot-educ-levels, fig.cap = "Effect sizes on number of children by age left full-time education"}
 
 drake::loadd(res_edu)
+n_regs <- as.double(nrow(res_edu))
 res_edu %>% 
       mutate(
         term = pretty_names(term), 
-        term = fct_reorder(term, estimate, order_abs),
+        term = fct_reorder(term, estimate, order_abs(1)),
         "Age left FTE" = fct_relevel(age_fte_cat, "< 16", "16-18", "> 18")
       ) %>% 
-      ggplot(aes(term, estimate, colour = `Age left FTE`)) +
-        my_hline +
-        geom_pointrange(aes(ymin=conf.low, ymax=conf.high), alpha = 0.8,
-          position = position_dodge(width = 0.4)) + 
-        scale_colour_viridis_d(begin = 0.1, end = 0.85) +
-        coord_flip()
+      ggplot(aes(y = term, x = estimate, colour = p.value < 0.05/{{n_regs}}, 
+        fill = `Age left FTE`)) +
+        my_vline +
+        pval_geom_point() + 
+        pval_scale() +
+        my_fill_scale(n = 3, direction = -1)
+        
 ```
 
 
@@ -721,17 +839,17 @@ n_regs <- as.double(nrow(res_income))
 res_income %>% 
       mutate(
         term = pretty_names(term), 
-        term = fct_reorder(term, estimate, order_abs),
+        term = fct_reorder(term, estimate, order_abs(1)),
         Income = factor(income_cat, 
           labels = c("< £18K", "£18-30K", "£31-51K", "£52-100K", "> £100K")
         )
       ) %>% 
-      ggplot(aes(term, estimate, fill = Income, colour = p.value < 0.05/{{n_regs}})) +
-        my_hline +
-        geom_point(alpha = 0.8, shape = 21, size = 1.5, stroke = 0.9) + 
-        scale_fill_brewer(direction = -1) +
-        scale_colour_manual(values = pval_palette) +
-        coord_flip()
+      ggplot(aes(y = term, x = estimate, fill = Income, 
+        colour = p.value < 0.05/{{n_regs}})) +
+        my_vline +
+        pval_geom_point(alpha = 0.8) + 
+        my_fill_scale(n = 5, direction = -1) +
+        pval_scale()
 ```
 
 

@@ -7,6 +7,7 @@ suppressPackageStartupMessages({
   library(santoku)
   library(haven)
   loadNamespace("car") # very annoying if it overwrites recode
+  loadNamespace("matrixStats")
 })
 
 
@@ -99,16 +100,19 @@ edit_famhist <- function (famhist, score_names) {
   # we get very few extra cases from adding f.2946.1.0 etc, and it makes calculating
   # father's year of birth more complex
   
+  names(famhist) <- sub("age_at_reqruitment", "age_at_recruitment", 
+        names(famhist))
+  
   # remove negatives
   negative_to_na <- function (x) {
     x[x < 0] <- NA
     x
   }
-  
   famhist %<>% mutate(across(
       c(age_fulltime_edu, starts_with(c(
         "f.2946", "f.1845", "f.2754", "f.738",  "f.2764", "f.2405", "f.2734",
-        "f.2149", "f.1873", "f.1883", "f.2784", "f.2794", "f.709",  "f.3872"
+        "f.2149", "f.1873", "f.1883", "f.2784", "f.2794", "f.709",  "f.3872",
+        "f.5057"
       ))), 
       negative_to_na
     )
@@ -119,6 +123,8 @@ edit_famhist <- function (famhist, score_names) {
   # roughly speaking, these are ages in 2007-10
   famhist$fath_age <- famhist$f.2946.0.0
   famhist$moth_age <- famhist$f.1845.0.0
+  famhist$fath_age_birth <- famhist$fath_age - famhist$age_at_recruitment
+  famhist$moth_age_birth <- famhist$moth_age - famhist$age_at_recruitment
   
   # full brothers and sisters
   famhist$nbro <- pmax(famhist$f.1873.0.0, famhist$f.1873.1.0, 
@@ -126,6 +132,12 @@ edit_famhist <- function (famhist, score_names) {
   famhist$nsis <- pmax(famhist$f.1883.0.0, famhist$f.1883.1.0, 
         famhist$f.1883.2.0, na.rm = TRUE)
   famhist$n_sibs <- famhist$nbro + famhist$nsis + 1
+  # a few people give varying answers, we assume median is fine.
+  # including later answers picks up c. 10K extra people
+  famhist$n_older_sibs <- matrixStats::rowMedians(
+          as.matrix(famhist[, c("f.5057.0.0", "f.5057.1.0", "f.5057.2.0")]),
+          na.rm = TRUE
+        )
   
   famhist$n_partners <- pmax(famhist$f.2149.0.0, famhist$f.2149.1.0, 
     famhist$f.2149.2.0, na.rm = TRUE)
@@ -137,7 +149,7 @@ edit_famhist <- function (famhist, score_names) {
     na.rm = TRUE
   )
   
-  famhist$n_household <- famhist$f.709.0.0
+  famhist$n_in_household <- famhist$f.709.0.0
   
   famhist$age_fte_cat <- santoku::chop(famhist$age_fulltime_edu, 
     c(16, 18), 
@@ -165,9 +177,6 @@ edit_famhist <- function (famhist, score_names) {
           9 = NA_character_
           "
         )
-  
-  names(famhist) <- sub("age_at_reqruitment", "age_at_recruitment", 
-        names(famhist))
   
   famhist[score_names] <- scale(famhist[score_names])
   
