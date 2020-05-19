@@ -10,6 +10,11 @@ suppressPackageStartupMessages({
   loadNamespace("matrixStats")
 })
 
+# utility function:
+negative_to_na <- function (x) {
+  x[x < 0] <- NA
+  x
+}
 
 make_pcs <- function (pcs_file) {
   pcs <- read_table(pcs_file)
@@ -104,10 +109,6 @@ edit_famhist <- function (famhist, score_names) {
         names(famhist))
   
   # remove negatives
-  negative_to_na <- function (x) {
-    x[x < 0] <- NA
-    x
-  }
   famhist %<>% mutate(across(
       c(age_fulltime_edu, starts_with(c(
         "f.2946", "f.1845", "f.2754", "f.738",  "f.2764", "f.2405", "f.2734",
@@ -154,6 +155,9 @@ edit_famhist <- function (famhist, score_names) {
   famhist$age_fte_cat <- santoku::chop(famhist$age_fulltime_edu, 
     c(16, 18), 
     c("< 16", "16-18", "> 18"))
+  # -7 means never went to school. We recode to 0 for simpliciy
+  famhist$edu_qual[famhist$edu_qual == -7] <- 0
+  famhist$edu_qual[famhist$edu_qual == -3] <- NA
   
   # we use pmax, assuming that people *can* have given birth for the first
   # time in between surveys.
@@ -210,7 +214,9 @@ make_mf_pairs <- function (mf_pairs_file, famhist) {
 }
 
 
-weight_by_ghs <- function (ghs_file, famhist) {
+make_ghs_subset <- function(ghs_file) {
+  # calculate population totals from ghs file for variables of interest
+  # using only 40-70 year olds I guess!
   
   ghs <- haven::read_dta(ghs_file)
   # variables of interest: 
@@ -233,55 +239,70 @@ weight_by_ghs <- function (ghs_file, famhist) {
   # ten1 - tenure
   # llord - landlord
   
-  ghs <- ghs %>% 
+  ghs_subset <- ghs %>% 
     zap_labels() %>% 
-    filter(ethnic == 1, sex %in% 1:2, edage > 0, edage < age) %>% 
-    select(sex, age, edage, weight06, ten1, llord) 
-  
-  ghs_props <- ghs %>% 
-    group_by(sex, age, edage) %>% 
-    summarize(
-      weighted_n = sum(weight06)
-    )
-  ghs_prop_totals <- ghs %>% 
-    group_by(sex, age) %>% 
-    summarize(
-      weighted_n_sex_age = sum(weight06)
-    )
-  ghs_props <- ghs_props %>% 
-    left_join(ghs_prop_totals, by = c("sex", "age")) %>% 
-    mutate(
-      prop_age_fte = weighted_n/weighted_n_sex_age,
-      sex = dplyr::recode(sex, "1" = "male", "2" = "female")
-    ) %>% 
-    select(-weighted_n, -weighted_n_sex_age)
-  
-  ukbb_props <- famhist %>% 
-    group_by(sex, age_at_recruitment, age_fulltime_edu) %>% 
-    summarize(n = n())
-  ukbb_prop_totals <- famhist %>% 
-    group_by(sex, age_at_recruitment) %>% 
-    summarize(n_sex_age = n())
-  ukbb_props <- ukbb_props %>% 
-    left_join(ukbb_prop_totals, by = c("sex", "age_at_recruitment")) %>% 
-    mutate(
-      prop_age_fte = n/n_sex_age,
-      sex = dplyr::recode(sex, "0" = "female", "1" = "male")
-    ) %>% 
-    select(-n, -n_sex_age)
-  
-  ghs_weight_df <- left_join(ukbb_props, ghs_props, 
-    by = c("sex", "age_at_recruitment" = "age", "age_fulltime_edu" = "edage"),
-    suffix = c(".ukbb", ".ghs")) %>% 
-    mutate(
-      educ_weight = prop_age_fte.ghs/prop_age_fte.ukbb
-    ) %>% 
-    select(-starts_with("prop")) %>% 
     filter(
-      ! is.na(educ_weight)
-    ) %>% mutate(
-      sex = ifelse(sex == "female", 0, 1)
-    )
+      ethnic == 1, sex %in% 1:2, edage < age, age %in% c(40:71),
+      chbnbm1 < age
+    ) %>% 
+    select(sex, age, edage, weight06, ten1, llord, chbnbm1, edlev00) 
   
-  famhist %>% left_join(ghs_weight_df) %>% select(f.eid, educ_weight)
+  ghs_subset$edlev00[ghs_subset$edlev00 == -9] <- 0 # "never went to school"
+  ghs_subset %<>% mutate(
+    across(c(edage, chbnbm1, ten1, llord, chbnbm1, edlev00), negative_to_na)
+  )
+  ghs_subset$chbnbm1[ghs_subset$chbnbm1 == 0] <- NA # "none", presumably no children
+  
+  # create variables with the same meaning as in famhist
+  # ghs: 1 male, 2 female; famhist: 0 female, 1 male
+  ghs_subset$sex                <- 2 - ghs_subset$sex
+  ghs_subset$age_at_recruitment <- ghs_subset$age
+  ghs_subset$age_fulltime_edu   <- ghs_subset$edage
+  ghs_subset$age_flb            <- ghs_subset$chbnbm1
+  # YearsEdu is 7, 10, 13, 15, 19 or 20. It maps from
+  # edu_qual, which is:
+  # 1	College or University degree
+  # 2	A levels/AS levels or equivalent
+  # 3	O levels/GCSEs or equivalent
+  # 4	CSEs or equivalent
+  # 5	NVQ or HND or HNC or equivalent
+  # 6	Other professional qualifications eg: nursing, teaching
+  # -7 None (but I recoded this to 0)
+  # 
+  # ghs$edlev00 is:
+  # -9    Never attended school
+  # -8    NA
+  # -6    CHILD/OUT AGE/NO INT
+  # 1     Higher Degree
+  # 2    First Degree
+  # 3    Teaching qualification
+  # 4    Other higher qualification
+  # 5    Nursing qualification
+  # 6    GCE A level in two or more subjects
+  # 7    GCE A level in one subject
+  # 8    GCSE/Olevel, standard grades, 5+
+  # 9    GCSE/Olevel 1-4
+  # 10    CSE below grade 1, GCSE below grade C
+  # 11    Apprenticeship
+  # 12    Other qualification
+  # 13    no qualification
+  ghs_subset$edu_qual     <- dplyr::recode(ghs_subset$edlev00,
+    "0" = 0,
+    "1"  = 1,
+    "2"  = 1,
+    "3"  = 6,
+    "4"  = 5,
+    "5"  = 6,
+    "6"  = 2,
+    "7"  = 2,
+    "8"  = 3,
+    "9"  = 3,
+    "10"  = 4,
+    "11"  = 5,
+    "12"  = 0, # mostly "started an apprenticeship, not yet finished"
+    "13"  = 0
+  )
+  
+  ghs_subset
 }
+

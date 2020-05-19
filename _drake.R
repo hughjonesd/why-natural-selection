@@ -10,6 +10,7 @@ suppressPackageStartupMessages({
 
 source("make-data.R")
 source("regressions.R")
+source("weight-data.R")
 
 data_dir      <- "../negative-selection-data"
 pgs_dir       <- file.path(data_dir, "polygenic_scores/")
@@ -65,9 +66,21 @@ plan <- drake_plan(
                    format = "fst"
                  ),
 
-    
-  ghs_weights  = weight_by_ghs(file_in(!! ghs_file), famhist),
   
+  ghs_subset   = target(make_ghs_subset(file_in(!! ghs_file)), format = "fst"),
+  
+  
+  ghs_weights  =  weight_by_ghs(
+                    ~ factor(sex) + age_at_recruitment + factor(edu_qual), 
+                    ghs_subset, 
+                    famhist
+                  ),
+  
+  flb_weights = weight_by_ghs(
+                  ~ age_at_recruitment + age_flb, 
+                  ghs_subset, 
+                  famhist
+                ),
   
   mf_pairs     = target(
                    make_mf_pairs(file_in(!! mf_pairs_file), famhist), 
@@ -122,8 +135,15 @@ plan <- drake_plan(
   res_weighted =  map_dfr(score_names, 
                     run_regs_weighted, 
                     famhist = famhist, 
-                    weights = ghs_weights
+                    weight_data = ghs_weights
                   ),
+  
+  
+  res_flb_weights = map_dfr(score_names, 
+                      run_regs_weighted, 
+                      famhist = famhist, 
+                      weight_data = flb_weights
+                    ),
   
   
   res_period   = {

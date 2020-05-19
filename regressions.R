@@ -45,12 +45,12 @@ run_regs_pcs <- function (dep_var, famhist, pcs) {
 }
 
 
-run_regs_weighted <- function (score_name, famhist, weights) {
-  famhist <- left_join(famhist, weights, by = "f.eid")
-  
+run_regs_weighted <- function (score_name, famhist, weight_data) {
+  famhist <- inner_join(famhist, weight_data, by = "f.eid")
+
   fml <- as.formula(glue("n_children ~ {score_name}"))
-  regs <- tidy(lm(fml, famhist, weights = educ_weight,
-        na.action = na.exclude), conf.int = TRUE) 
+  mod <- lm(fml, data = famhist, weights = weights, na.action = na.exclude)
+  regs <- tidy(mod, conf.int = TRUE)
   regs %<>% filter(term != "(Intercept)")
   
   return(regs)

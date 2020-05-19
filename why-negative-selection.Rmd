@@ -20,11 +20,10 @@ output:
 * Look at geography, esp. in siblings regressions.
 
 
-* Work more on weighting the data?
-  - weight by age at first live birth
-  - education using ISCED?
-  - geography?
+* Work more on weighting the data
   - ask for existing work by others?
+  - deal with the fact that GHS 06 has its own weights and use
+    subset.svydesign to reweight?
 
 * control for age in n_partners regressions
 
@@ -32,6 +31,28 @@ output:
 ## Data to gather
 * f.2139 - age first had sex (includes "never had sex" which may explain
   some of the many NAs for f.2141, num sex partners)
+
+## Paper plan
+
+* Intro: changes in PGS over time
+* We investigate using n siblings and n children. Effect sizes are much larger
+  for n siblings.
+  - This isn't because of change over time. (Details in appendix.)
+  - Instead we hypoth that it is due to selection bias.
+* To support this argument, we show that the strength of selection 
+  varies dramatically across social groups.
+  - Women more than men.
+  - Effect sizes are larger among less educated and poorer respondents. (Appendix.)
+  - Effect sizes are reversed in people with less than median sexual partners.
+  - Effect sizes are reversed if we control for age at first live birth.
+  - There are strong effects of PGS on age at flb, both among respondents and
+    their parents
+* The UK Biobank sample is highly selected with respect to education, income
+  and age at FLB. (Show using GHS.)
+  - GHS variable for age at CHBNBM1; raw data babdata
+* We reweight the data to get more accurate estimates.
+* The data can be explained by a story where...
+  - 
 
 ```
 
@@ -447,6 +468,17 @@ summary_period %>%
 
 
 
+
+# Accounting for ascertainment bias
+
+Effect sizes tend to be smaller for children regressions. This could be caused
+by ascertainment bias in the UK Biobank sample -- e.g., if respondents
+themselves are a more selected sample than the respondents' parents. To check
+this, we weighted UK Biobank participants by sex, age (within the 40-71 age
+group), and education. Our sample weights are calibrated based on the 2006
+General Household Survey. We then rerun the basic *children* regressions.
+
+
 ```{r res-weighted}
 
 drake::loadd(res_weighted)
@@ -470,21 +502,9 @@ mean_prop_wtd_unwtd <- res_weighted_all %>%
 ```
 
 
-# Accounting for ascertainment bias
-
-Effect sizes tend to be smaller for children regressions. This
-could be caused by ascertainment bias in the UK Biobank sample -- e.g.,
-if respondents themselves are a more selected sample than the respondents' 
-parents. To check this, we weighted UK Biobank participants by age of leaving
-full time education. Our sample weights are based on the 2006 General Household
-Survey, calculating proportions within age and sex cells among White British
-respondents. We then rerun the basic *children* regressions.
-
 Figure \@ref(fig:plot-weighted) shows the results, with unweighted estimates
 plotted for comparison. Weighting increases effect sizes on average by 
-`r 100 * (mean_prop_wtd_unwtd - 1)` per cent. These weights are only basic 
-attempts to correct for ascertainment bias. Effect sizes might be increased 
-further by more precise weighting.
+`r 100 * (mean_prop_wtd_unwtd - 1)` per cent. 
 
 
 ```{r plot-weighted, fig.cap = "Effects of polygenic scores on number of children, regressions weighted by education levels within age categories"}
@@ -513,6 +533,33 @@ res_weighted_all %>%
 ```
 
 
+We also weighted data by age at first live birth and age, among women only.
+These weights are only basic attempts to correct for ascertainment bias. Effect
+sizes might be increased further by more precise weighting.
+
+
+```{r plot-flb-weights, fig.cap = "Effect sizes on number of children, female respondents weighted by age at first live birth"}
+
+drake::loadd(res_flb_weights)
+drake::loadd(res_sex)
+
+bind_rows(
+        Weighted   = res_flb_weights, 
+        Unweighted = res_sex %>% filter(sex == "Female") %>% select(-subset, - sex),
+        .id        = "Regression"
+      ) %>% 
+      mutate(
+        term = pretty_names(term),
+        term = fct_reorder(term, estimate, order_abs(1))
+      ) %>% 
+      ggplot(aes(estimate, term, fill = Regression, 
+        color = p.value < 0.05/66)) +
+        my_vline +
+        pval_geom_point() +
+        pval_scale() +
+        my_fill_scale(n = 2) +
+        my_labs()
+```
 
 # Causality
 
