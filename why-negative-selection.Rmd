@@ -494,10 +494,7 @@ res_weighted_all <- res_weighted %>%
         prop_wtd_unwtd = estimate_weighted/estimate_unweighted
       )
 
-mean_prop_wtd_unwtd <- res_weighted_all %>% 
-      filter(sign(estimate_weighted) == sign(estimate_unweighted)) %>% 
-      summarize(mean = mean(prop_wtd_unwtd)) %>% 
-      pull(mean)
+mean_prop_wtd_unwtd <- mean(res_weighted_all$prop_wtd_unwtd)
 
 ```
 
@@ -530,22 +527,45 @@ res_weighted_all %>%
       my_fill_scale(n = 2) +
       pval_scale(aesthetics = "colour")
 
+
 ```
 
 
-We also weighted data by age at first live birth and age, among women only.
+```{r calc-res-flb-weights}
+
+drake::loadd(res_flb_weights)
+drake::loadd(res_sex)
+res_flb_all <- left_join(
+        res_flb_weights, 
+        res_sex %>% filter(sex=="Female") %>% select(-subset, -sex), 
+        by = "term", 
+        suffix = c(".wt", ".nowt")
+      ) %>% 
+      mutate(prop_estimate = estimate.wt/estimate.nowt)
+
+prop_wt_nowt <- mean(res_flb_all$prop_estimate)
+pct_change_score <- function (score) {
+  100 * (res_flb_all$prop_estimate[res_flb_all$term == score] - 1)
+}
+```
+
+We also weighted data for women with children only, by age, education and age 
+at first live birth. Weighting increased effect sizes on average by 
+`r 100 * (prop_wt_nowt - 1)`%. Figure \@ref(fig:plot-flb-weights) shows the results. There 
+are large changes for some variables, including EA3 
+(`r pct_change_score("EA3_excl_23andMe_UK")`%), cognitive
+ability (`r pct_change_score("cognitive_ability")`%) and
+waist-hip ratio (WHR; `r pct_change_score("whr_combined")`%).
+
 These weights are only basic attempts to correct for ascertainment bias. Effect
 sizes might be increased further by more precise weighting.
 
 
 ```{r plot-flb-weights, fig.cap = "Effect sizes on number of children, female respondents weighted by age at first live birth"}
-
-drake::loadd(res_flb_weights)
-drake::loadd(res_sex)
-
+  
 bind_rows(
         Weighted   = res_flb_weights, 
-        Unweighted = res_sex %>% filter(sex == "Female") %>% select(-subset, - sex),
+        Unweighted = res_flb_nowt %>% select(-subset),
         .id        = "Regression"
       ) %>% 
       mutate(
@@ -699,10 +719,19 @@ opp_signed <- sum(
 
 Figure \@ref(fig:plot-age-flb) shows the results of *children* regressions for 
 women only,
-controlling for age at first live birth. Effect sizes are greatly reduced.
-In `r opp_signed` out of `r length(score_names)` cases, they are of the 
-opposite sign. The correlation between effect sizes
+controlling for age at first live birth. Effect sizes are greatly reduced. Partly,
+this is because the regressions exclude childless women. However,
+in `r opp_signed` out of `r length(score_names)` cases, effect sizes actually
+change sign with the controls. The correlation between effect sizes
 controlling for age at first live birth, and raw effect sizes, is `r cor_raw_flb`.
+
+Figure \@ref(fig:plot-age-flb-cross) shows *children* regressions estimated
+separately for each tercile of age at first live birth. Several effects
+are strikingly different. ADHD is selected for amongst the youngest
+third of mothers, but selected against among the oldest two-thirds. Educational
+attainment is selected for among the oldest two-thirds of mothers, but is not
+significantly selected among the youngest third. Similarly, several PGS of
+body measurements are selected against only among older mothers.
 
 
 ```{r plot-age-flb, fig.cap = "Effect sizes on number of children, controlling for age at first live birth (women only). Effect sizes for women without controls are shown for comparison"}
@@ -722,6 +751,33 @@ res_combined %>%
         scale_fill_brewer(type = "qual", palette = 3) +
         my_labs()
 ```
+
+
+```{r plot-age-flb-cross, fig.cap = "Effect sizes on number of children, by age at first live birth terciles"}
+
+drake::loadd(res_age_flb_cross)
+
+# this counts each cross term as a separate test:
+n_regs <- as.double(nrow(res_age_flb_cross)) 
+
+res_age_flb_cross %>% 
+      mutate(
+        score_name = pretty_names(score_name),
+        score_name = fct_reorder(score_name, estimate, order_abs(1)),
+        term       = gsub("age_flb_cat(.*):.*", "\\1", term)
+      ) %>% 
+      ggplot(aes(estimate, score_name, fill = term, 
+        colour = p.value < 0.05/{{n_regs}})) +
+        my_vline +
+        pval_geom_point() +
+        pval_scale() +
+        my_fill_scale(n = 3, direction = -1, 
+          guide = guide_legend(title = "Age at FLB")) +
+        my_labs()
+
+
+```
+
 
 
 

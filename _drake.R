@@ -76,11 +76,13 @@ plan <- drake_plan(
                     famhist
                   ),
   
-  flb_weights = weight_by_ghs(
-                  ~ age_at_recruitment + age_flb, 
-                  ghs_subset, 
-                  famhist
-                ),
+  flb_weights = {
+    weight_by_ghs(
+            ~ age_at_recruitment + factor(flb_cat) + factor(edu_qual), 
+            ghs_subset, 
+            famhist
+          )
+  },
   
   mf_pairs     = target(
                    make_mf_pairs(file_in(!! mf_pairs_file), famhist), 
@@ -92,17 +94,16 @@ plan <- drake_plan(
   
   
   res_all      = {
-    res_sibs <- run_regs(
+    famhist <- join_famhist_resid_scores(famhist, resid_scores)
+    res_sibs <- run_regs_basic(
             dep_var     = "n_sibs", 
             score_names = score_names,
-            famhist     = famhist, 
-            pcs         = pcs
+            famhist     = famhist
           )
-    res_chn <- run_regs(
+    res_chn <- run_regs_basic(
             dep_var     = "n_children", 
             score_names = score_names, 
-            famhist     = famhist, 
-            pcs         = pcs
+            famhist     = famhist
           )
     dplyr::bind_rows(
             "N siblings" = res_sibs, 
@@ -144,7 +145,7 @@ plan <- drake_plan(
                       famhist = famhist, 
                       weight_data = flb_weights
                     ),
-  
+
   
   res_period   = {
     expand_grid(
@@ -174,15 +175,31 @@ plan <- drake_plan(
   res_age_flb = {
     res <- map_dfr(setNames(score_names, score_names), 
             ~run_regs_fml(
-              fml = "n_children ~ {score_name} + age_flb",
+              fml        = "n_children ~ {score_name} + age_flb",
               score_name = .x, 
-              famhist = famhist
+              famhist    = famhist
             ), 
             .id = "score_name"
           )
     res %<>% filter(term != "(Intercept)")
     
     res
+  },
+  
+  
+  res_age_flb_cross = {
+    famhist$age_flb_cat <- santoku::chop_equally(famhist$age_flb, 3, 
+          lbl_integer("-"))
+    res <- map_dfr(setNames(score_names, score_names), 
+            ~run_regs_fml(
+              fml        = "n_children ~ age_flb_cat + {score_name}:age_flb_cat",
+              score_name = .x,
+              famhist    = famhist
+            ),
+            .id = "score_name"
+          )
+    res %<>% filter(grepl(":", term))
+          
   },
   
   
@@ -222,26 +239,26 @@ plan <- drake_plan(
   },
   
   
-    res_age_birth_parents_dv = {
-      vars <- expand_grid(
-              score_name = score_names, 
-              dep.var    = c("fath_age_birth", "moth_age_birth")
-            )
-      res <- pmap_dfr(vars,
-              run_regs_fml,
-              fml = "{dep.var} ~ {score_name}",
-              subset = quote(n_older_sibs == 0),
-              famhist = famhist,
-              .id = "id"
-            )
-      
-      res$score_name <- vars$score_name[as.numeric(res$id)]
-      res$dep.var    <- vars$dep.var[as.numeric(res$id)]
-      res$id <- NULL
-      res %<>% filter(term != "(Intercept)")
-      
-      res
-    },
+  res_age_birth_parents_dv = {
+    vars <- expand_grid(
+            score_name = score_names, 
+            dep.var    = c("fath_age_birth", "moth_age_birth")
+          )
+    res <- pmap_dfr(vars,
+            run_regs_fml,
+            fml = "{dep.var} ~ {score_name}",
+            subset = quote(n_older_sibs == 0),
+            famhist = famhist,
+            .id = "id"
+          )
+    
+    res$score_name <- vars$score_name[as.numeric(res$id)]
+    res$dep.var    <- vars$dep.var[as.numeric(res$id)]
+    res$id <- NULL
+    res %<>% filter(term != "(Intercept)")
+    
+    res
+  },
   
   
   res_partners = {

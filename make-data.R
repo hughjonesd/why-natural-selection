@@ -174,6 +174,10 @@ edit_famhist <- function (famhist, score_names) {
   famhist$year_flb <- famhist$YOB + famhist$age_flb
   famhist$year_llb <- famhist$YOB + famhist$age_llb
   
+  famhist$flb_cat <- santoku::fillet(famhist$age_flb, c(13, 20, 23, 26, 30, 47))
+  famhist$flb_cat %<>% forcats::fct_expand("No children")
+  famhist$flb_cat[famhist$sex == 0 &  famhist$n_children == 0] <- "No children"
+  
   famhist$urbrur <- car::recode(famhist$f.20118.0.0,
           "c(1, 5, 11, 12) = 'urban';
           c(2, 6, 13, 14, 15)  = 'town';
@@ -245,13 +249,13 @@ make_ghs_subset <- function(ghs_file) {
       ethnic == 1, sex %in% 1:2, edage < age, age %in% c(40:71),
       chbnbm1 < age
     ) %>% 
-    select(sex, age, edage, weight06, ten1, llord, chbnbm1, edlev00) 
+    select(sex, age, edage, weight06, ten1, llord, chbnbm1, edlev00, chnbrnt) 
   
   ghs_subset$edlev00[ghs_subset$edlev00 == -9] <- 0 # "never went to school"
-  ghs_subset %<>% mutate(
-    across(c(edage, chbnbm1, ten1, llord, chbnbm1, edlev00), negative_to_na)
-  )
-  ghs_subset$chbnbm1[ghs_subset$chbnbm1 == 0] <- NA # "none", presumably no children
+  ghs_subset %<>% mutate(across(
+    c(edage, chbnbm1, ten1, llord, chbnbm1, edlev00, chnbrnt), 
+    negative_to_na
+  ))
   
   # create variables with the same meaning as in famhist
   # ghs: 1 male, 2 female; famhist: 0 female, 1 male
@@ -259,6 +263,7 @@ make_ghs_subset <- function(ghs_file) {
   ghs_subset$age_at_recruitment <- ghs_subset$age
   ghs_subset$age_fulltime_edu   <- ghs_subset$edage
   ghs_subset$age_flb            <- ghs_subset$chbnbm1
+
   # YearsEdu is 7, 10, 13, 15, 19 or 20. It maps from
   # edu_qual, which is:
   # 1	College or University degree
@@ -302,6 +307,14 @@ make_ghs_subset <- function(ghs_file) {
     "12"  = 0, # mostly "started an apprenticeship, not yet finished"
     "13"  = 0
   )
+  
+  # our calibration model for women will be: 
+  # age_at_recruitment, edu_qual, and categories including:
+  # never had a child + age_flb quantiles
+  # values below are 
+  ghs_subset$flb_cat <- santoku::fillet(ghs_subset$age_flb, c(13, 20, 23, 26, 30, 47))
+  ghs_subset$flb_cat %<>% forcats::fct_expand("No children")
+  ghs_subset$flb_cat[ghs_subset$sex == 0 & ghs_subset$chnbrnt == 0] <- "No children"
   
   ghs_subset
 }

@@ -7,7 +7,7 @@ suppressPackageStartupMessages({
 })
 
 
-run_regs <- function (dep_var, score_names, famhist, pcs) {
+run_regs_basic <- function (dep_var, score_names, famhist) {
   
   run_reg <- function (score_name) {
     fml <- as.formula(glue("{dep_var} ~ {score_name}"))
@@ -15,16 +15,17 @@ run_regs <- function (dep_var, score_names, famhist, pcs) {
   }
   basic_res <- map_dfr(score_names, run_reg, .id = "score_name")
   
-  famhist <- join_famhist_pcs(famhist, pcs)
-  pc_names <- grep("PC", names(pcs), value = TRUE)
   run_resid_reg <- function (score_name) {
-    fml_resid <- as.formula(glue("{dep_var} ~ {score_name} + {pc_names}"))
-    reg_resid <- tidy(lm(fml_resid, famhist), conf.int = TRUE)  
+    score_resid <- paste0(score_name, "_resid")
+    fml_resid <- as.formula(glue("{dep_var} ~ {score_resid}"))
+    reg_resid <- tidy(lm(fml_resid, famhist), conf.int = TRUE) 
+    reg_resid <- mutate(reg_resid, term = gsub("_resid", "", term))
+    reg_resid
   }
   resid_res <- map_dfr(score_names, run_resid_reg, .id = "score_name")
   
   res <- bind_rows(raw = basic_res, controlled = resid_res, .id = "reg.type")
-  res %<>% filter(term != "(Intercept)", ! grepl("^PC", term))
+  res %<>% filter(term != "(Intercept)")
   
   return(res)
 }
