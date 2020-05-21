@@ -46,10 +46,10 @@ run_regs_pcs <- function (dep_var, famhist, pcs) {
 }
 
 
-run_regs_weighted <- function (score_name, famhist, weight_data) {
+run_regs_weighted <- function (score_name, famhist, weight_data, dep.var) {
   famhist <- inner_join(famhist, weight_data, by = "f.eid")
 
-  fml <- as.formula(glue("n_children ~ {score_name}"))
+  fml <- as.formula(glue("{dep.var} ~ {score_name}"))
   mod <- lm(fml, data = famhist, weights = weights, na.action = na.exclude)
   regs <- tidy(mod, conf.int = TRUE)
   regs %<>% filter(term != "(Intercept)")
@@ -60,7 +60,9 @@ run_regs_weighted <- function (score_name, famhist, weight_data) {
 
 run_regs_period <- function (children, score_name, famhist) {
   dep_var  <- if (children) "n_children" else "n_sibs"
-  famhist$year_split <- famhist$YOB >= median(famhist$YOB, na.rm = TRUE)
+  famhist$year_split <- famhist$YOB >= 1950
+  # evaluates to 1950:
+  # median(famhist$YOB, na.rm = TRUE)
   famhist$year_split <- factor(famhist$year_split, labels = c("early", "late"))
   fml <- as.formula(glue("{dep_var} ~ year_split + {score_name}:year_split"))
   mod <- lm(fml, famhist)

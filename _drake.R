@@ -135,15 +135,25 @@ plan <- drake_plan(
   
   res_weighted =  map_dfr(score_names, 
                     run_regs_weighted, 
-                    famhist = famhist, 
-                    weight_data = ghs_weights
+                    famhist     = famhist, 
+                    weight_data = ghs_weights,
+                    dep.var     = "n_children"
                   ),
+  
+  
+  res_sibs_weighted = map_dfr(score_names, 
+                        run_regs_weighted, 
+                        famhist     = famhist, 
+                        weight_data = ghs_weights,
+                        dep.var     = "n_sibs"
+                      ),
   
   
   res_flb_weights = map_dfr(score_names, 
                       run_regs_weighted, 
-                      famhist = famhist, 
-                      weight_data = flb_weights
+                      famhist     = famhist, 
+                      weight_data = flb_weights,
+                      dep.var     = "n_children"
                     ),
 
   
