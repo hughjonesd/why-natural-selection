@@ -8,6 +8,7 @@ suppressPackageStartupMessages({
   library(haven)
   loadNamespace("car") # very annoying if it overwrites recode
   loadNamespace("matrixStats")
+  loadNamespace("mlogit")
 })
 
 # utility function:
@@ -189,6 +190,15 @@ edit_famhist <- function (famhist, score_names) {
   famhist[score_names] <- scale(famhist[score_names])
   
   return(famhist)
+}
+
+
+make_famhist_long_mlogit <- function (famhist, score_names) {
+  famhist$n_ch_fac <- santoku::chop(famhist$n_children, 
+        brk_left(0:5, close_end = FALSE), lbl_integer())
+  fh_subset <- famhist %>% select(n_ch_fac, all_of(score_names))
+  mlogit::mlogit.data(fh_subset, choice = "n_ch_fac", shape = "wide", 
+        alt.levels = levels(fh_subset$n_ch_fac))
 }
 
 

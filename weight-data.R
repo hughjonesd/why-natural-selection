@@ -33,3 +33,22 @@ weight_by_ghs <- function (fml, ghs_subset, famhist) {
   
   data.frame(f.eid = famhist$f.eid, weights = calibrate_weights)
 }
+
+
+weight_parents <- function (famhist, ghs_weights) {
+  famhist <- inner_join(famhist, ghs_weights, by = "f.eid")
+  n_sibs_are_up_to_8 <- ! is.na(famhist$n_sibs) & famhist$n_sibs <= 8
+  n_sibs_up_to_8 <- famhist$n_sibs[n_sibs_are_up_to_8]
+  wts <- famhist$weights[n_sibs_are_up_to_8]
+  # weighted table:
+  tbl <- xtabs(wts ~ n_sibs_up_to_8)
+  respondent_props <- proportions(tbl)
+  respondent_props <- as.vector(respondent_props)
+  parent_props <- respondent_props * 1:8
+  parent_props <- parent_props/sum(parent_props)
+  parent_weights <- rep(NA_real_, nrow(famhist))
+  
+  parent_weights[n_sibs_are_up_to_8] <- parent_props[n_sibs_up_to_8]
+  
+  data.frame(f.eid = famhist$f.eid, weights = parent_weights)
+}

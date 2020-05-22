@@ -28,7 +28,6 @@ ghs_file      <- file.path(data_dir, "UKDA-5804-stata8/stata8/Ghs06client.dta")
 
 plan <- drake_plan(
   
-  
   score_names  = {
     sub(
       ".*UKB\\.AMC\\.(.*?)\\..*", 
@@ -37,7 +36,6 @@ plan <- drake_plan(
       perl = TRUE
     )
   },
-  
   
   famhist_raw  = target(
                    make_famhist( 
@@ -51,24 +49,21 @@ plan <- drake_plan(
                     format = "fst"
                   ),
   
-  
   pcs          = read_table2(file_in(!! pcs_file)),
   
+  famhist      =  target(
+                   edit_famhist(famhist_raw, score_names), 
+                   format = "fst"
+                  ),
   
-  famhist      = target(
-                  edit_famhist(famhist_raw, score_names), 
-                  format = "fst"
-                 ),
-  
+  fhl_mlogit   =  make_famhist_long_mlogit(famhist, score_names),
   
   resid_scores = target(
                    make_resid_scores(famhist, pcs, score_names), 
                    format = "fst"
                  ),
 
-  
   ghs_subset   = target(make_ghs_subset(file_in(!! ghs_file)), format = "fst"),
-  
   
   ghs_weights  =  weight_by_ghs(
                     ~ factor(sex) + age_at_recruitment + factor(edu_qual), 
@@ -84,14 +79,14 @@ plan <- drake_plan(
           )
   },
   
+  parent_weights = weight_parents(famhist, ghs_weights),
+  
   mf_pairs     = target(
                    make_mf_pairs(file_in(!! mf_pairs_file), famhist), 
                    format = "fst"
                  ), 
   
-  
   rgs          = make_rgs(file_in(!! rgs_file)),
-  
   
   res_all      = {
     famhist <- join_famhist_resid_scores(famhist, resid_scores)
@@ -112,7 +107,6 @@ plan <- drake_plan(
           )
   },
   
-  
   res_pcs     = {
     pc_names <- grep("PC", names(pcs), value = TRUE)
     res_sibs_pcs <- run_regs_pcs( 
@@ -132,7 +126,6 @@ plan <- drake_plan(
     ) 
   },
   
-  
   res_weighted =  map_dfr(score_names, 
                     run_regs_weighted, 
                     famhist     = famhist, 
@@ -140,24 +133,21 @@ plan <- drake_plan(
                     dep.var     = "n_children"
                   ),
   
-  
-  res_sibs_weighted = map_dfr(score_names, 
-                        run_regs_weighted, 
-                        famhist     = famhist, 
-                        weight_data = ghs_weights,
-                        dep.var     = "n_sibs"
-                      ),
-  
+  res_sibs_parent_weights = map_dfr(score_names, 
+          run_regs_weighted, 
+          famhist     = famhist, 
+          weight_data = parent_weights,
+          dep.var     = "n_sibs"
+        ),
   
   res_flb_weights = map_dfr(score_names, 
-                      run_regs_weighted, 
-                      famhist     = famhist, 
-                      weight_data = flb_weights,
-                      dep.var     = "n_children"
-                    ),
+          run_regs_weighted, 
+          famhist     = famhist, 
+          weight_data = flb_weights,
+          dep.var     = "n_children"
+        ),
 
-  
-  res_period   = {
+  res_period = {
     expand_grid(
             children = c(TRUE, FALSE),
             score_name = score_names
@@ -165,8 +155,7 @@ plan <- drake_plan(
           pmap_dfr(run_regs_period, famhist = famhist)
   },
   
-  
-  res_sex      = {
+  res_sex = {
     sexes <- rlang::exprs(
             sex == 0, 
             sex == 1
@@ -181,7 +170,6 @@ plan <- drake_plan(
     res_sex
   },
   
-  
   res_age_flb = {
     res <- map_dfr(setNames(score_names, score_names), 
             ~run_regs_fml(
@@ -195,7 +183,6 @@ plan <- drake_plan(
     
     res
   },
-  
   
   res_age_flb_cross = {
     famhist$age_flb_cat <- santoku::chop_equally(famhist$age_flb, 3, 
@@ -212,7 +199,6 @@ plan <- drake_plan(
           
   },
   
-  
   res_age_flb_dv = {
     res <- map_dfr(score_names,
             ~run_regs_fml(
@@ -225,7 +211,6 @@ plan <- drake_plan(
     
     res
   },
-  
   
   res_age_birth_parents = {
     vars <- expand_grid(
@@ -248,7 +233,6 @@ plan <- drake_plan(
     res
   },
   
-  
   res_age_birth_parents_dv = {
     vars <- expand_grid(
             score_name = score_names, 
@@ -270,7 +254,6 @@ plan <- drake_plan(
     res
   },
   
-  
   res_partners = {
     sexes <- rlang::exprs(sex == 0, sex == 1)
     pars <- expand_grid(score_name = score_names, subset = sexes)
@@ -290,7 +273,6 @@ plan <- drake_plan(
           mutate(sex = ifelse(subset == "sex == 1", "Male", "Female")) %>%
           select(-combo, -subset)
   }, 
-  
   
   res_edu = {
     subsets <- rlang::exprs(
@@ -316,7 +298,6 @@ plan <- drake_plan(
           ) %>% 
           select(-row_number, -subset)
   },
-  
   
   res_income = {
     subsets = rlang::exprs(
@@ -345,7 +326,6 @@ plan <- drake_plan(
           select(-row_number, -subset)
   },
   
-  
   res_income_controlled = {
     res <- map_dfr(score_names, 
             ~run_regs_fml(
@@ -357,7 +337,6 @@ plan <- drake_plan(
     res %>% filter(grepl(":income_cat", term))
   },
   
-  
   res_edu_controlled = {
     res <- map_dfr(score_names, 
       ~run_regs_fml(
@@ -368,7 +347,6 @@ plan <- drake_plan(
     )
     res %>% filter(grepl(":.*age_fte_cat", term))
   },
-  
   
   res_together = {
     most_score_names <- setdiff(score_names, 
@@ -395,12 +373,14 @@ plan <- drake_plan(
           filter(term != "(Intercept)", ! grepl("^PC", term))
   },
   
+  # crashes out of memory if we run the loop within the plan?
+  # res_mnl = run_regs_mnlogit(score_names, fhl_mlogit),
   
-  report       =  rmarkdown::render(
-                    input       = knitr_in("why-negative-selection.Rmd"), 
-                    output_file = file_out("why-negative-selection.pdf"), 
-                    quiet       = TRUE
-                  )
+  report = rmarkdown::render(
+          input       = knitr_in("why-negative-selection.Rmd"), 
+          output_file = file_out("why-negative-selection.pdf"), 
+          quiet       = TRUE
+        )
   
 )
 

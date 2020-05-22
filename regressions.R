@@ -100,3 +100,16 @@ run_regs_fml <- function(fml, ..., subset = NULL, famhist) {
   res
 }
 
+
+run_regs_mnlogit <- function(score_names, fhl_mlogit) {
+  loadNamespace("mnlogit")
+  run_1_mnlogit <- function(score_name) {
+    fml <- as.formula(glue::glue("n_ch_fac ~ 1 | {score_name}"))
+    res <- try(mod <- mnlogit::mnlogit(fml, fhl_mlogit, ncores = 2))
+    if (inherits(res, "try-error")) return(res)
+    mod$model <- NULL # otherwise it stores a copy of the entire data 8-(
+    return(mod)
+  }
+  lapply(score_names, run_1_mnlogit)
+}
+

@@ -42,7 +42,40 @@ huxtable::set_default_properties(latex_float = "h!")
 theme_set(theme_minimal())
 my_hline <- geom_hline(yintercept = 0, colour = "grey20", linetype = "dotted")
 my_vline <- geom_vline(xintercept = 0, colour = "grey20", linetype = "dotted")
-pval_palette <- c("FALSE" = "grey50", "TRUE" = "orange2")
+pval_palette <- c("FALSE" = "grey65", "TRUE" = "orange2")
+
+
+standard_ggplot <- function (
+        dfr, 
+        fill_col, 
+        n_regs, 
+        ...,
+        score_col = quo(term), 
+        order_idx = 1, 
+        n_cats    = NULL
+      ) {
+  if (! missing(score_col)) score_col <- enquo(score_col)
+  fill_col <- if (! missing(fill_col)) enquo(fill_col) else quo(NULL)
+  if (missing(n_cats)) {
+    n_cats <- if (missing(fill_col)) 1 else length(unique(pull(dfr, 
+                {{fill_col}})))
+  }
+  
+  n_regs <- as.double(n_regs)
+  
+  dfr %>% mutate(
+          !! score_col := pretty_names(!! score_col),
+          !! score_col := fct_reorder(!! score_col, estimate, order_abs(order_idx))
+        ) %>% 
+        ggplot(aes(estimate, {{score_col}}, fill = {{fill_col}}, ...,
+          colour = p.value < 0.05/{{n_regs}})) +
+          pval_geom_point() +
+          my_vline + 
+          pval_scale() +
+          my_fill_scale(n = n_cats) +
+          my_labs() +
+          my_theme()
+}
 
 
 my_theme <- function (...) theme(axis.text.y = element_text(size = 7), ...)
@@ -58,7 +91,9 @@ pval_geom_point <- function (size = 1.5, stroke = 0.7, ...) {
 
 my_fill_scale <- function (n, aesthetics = "fill", ...) {
   if (n == 2) {
-    scale_color_brewer(type = "qual", palette = 3, aesthetics = aesthetics, ...)
+    scale_colour_manual(values = c("steelblue4", "indianred2"), 
+          aesthetics = aesthetics, ...)
+    # scale_color_brewer(type = "qual", palette = 3, aesthetics = aesthetics, ...)
   } else {
     scale_color_brewer(aesthetics = aesthetics, ...)
   }
@@ -90,6 +125,24 @@ pretty_names <- function (names) {
   }
   
   return(names)
+}
+
+
+# from https://github.com/dgrtwo/drlib/blob/master/R/reorder_within.R
+# for ordering within facets
+reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
+  new_x <- paste(x, within, sep = sep)
+  stats::reorder(new_x, by, FUN = fun)
+}
+
+scale_x_reordered <- function(..., sep = "___") {
+  reg <- paste0(sep, ".+$")
+  ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
+}
+
+scale_y_reordered <- function(..., sep = "___") {
+  reg <- paste0(sep, ".+$")
+  ggplot2::scale_y_discrete(labels = function(x) gsub(reg, "", x), ...)
 }
 
 ```
@@ -188,12 +241,13 @@ pgs_over_time <- famhist %>%
 ```
 
 
-```{r plot-means-over-time, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Lines are means for 5-year intervals"}
+```{r plot-means-over-time, fig.height = 5, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Lines are means for 5-year intervals"}
 pgs_over_time %>% 
       mutate(score_name = pretty_names(score_name)) %>% 
       ggplot(aes(YOB, score, group = score_name)) + 
-      geom_line() +
+      geom_line(colour = "steelblue4") +
       facet_wrap(~score_name) +
+      my_hline +
       theme(
         strip.text  = element_text(size = 7), 
         axis.text.x = element_text(size = 7)
@@ -251,7 +305,7 @@ res_all %>%
       pval_geom_point() +
       my_labs() +
       pval_scale() +
-      my_fill_scale(n = 2, direction = -1, guide = guide_legend(title = "")) +
+      my_fill_scale(n = 2, guide = guide_legend(title = "")) +
       my_theme()
 
 ```
@@ -288,7 +342,7 @@ res_sex %>%
         my_vline +
         pval_geom_point() +
         pval_scale() +
-        my_fill_scale(n = 2, direction = -1) +
+        my_fill_scale(n = 2) +
         my_labs() +
         my_theme()
 
@@ -435,113 +489,163 @@ res_age_flb_cross %>%
 ```
 
 
-```{r plot-n-partners, fig.cap = "Effect sizes on number of children by lnumber of sexual partners", fig.height = 4}
+```{r plot-n-partners, fig.cap = "Effect sizes on number of children by number of sexual partners", fig.height = 4}
+
 
 drake::loadd(res_partners)
 res_partners %<>%       
       filter(term != "(Intercept)", term != "lo_partnersTRUE") %>% 
       mutate(`N partners` = ifelse(grepl(":", term), "<= 3", "> 3")) 
 
+
 n_regs <- as.double(nrow(res_partners))
 res_partners %>% 
       mutate(
-        score_name = pretty_names(score_name),
-        score_name = fct_reorder(score_name, estimate, order_abs(1))
+        score_name = pretty_names(score_name)
       ) %>% 
-      ggplot(aes(y = score_name, x = estimate, fill = `N partners`, 
+      ggplot(aes(y = reorder_within(score_name, estimate, sex, fun = order_abs(1)), x = estimate, fill = `N partners`, 
         colour = p.value < 0.05/{{n_regs}})) + 
         my_vline +
         pval_geom_point() +
-        facet_wrap(vars(sex)) +
+        facet_wrap(vars(sex), scales = "free_y") +
         my_fill_scale(n = 2) +
         pval_scale() +
         my_theme(legend.position = "bottom") +
-        my_labs(x = "", y = "")
+        my_labs(x = "", y = "") + 
+        scale_y_reordered()
 
 ```
 
 
 # Accounting for ascertainment bias
 
+Our results are subject to two kinds of ascertainment bias. First, Biobank is
+not a random sample of the UK population: for example, it overrepresents
+educated people and high income households. Second, sampling parents of
+respondents inherently overweights parents who have many children. For instance,
+parents of three children will have three times more children as respondents in
+UK Biobank than parents of one child, on average. Parents of no children will,
+by definition, not be represented at all.
+
 
 ```{r calc-res-weighted}
 
 drake::loadd(res_weighted)
-res_weighted_all <- res_weighted %>% 
-      left_join(
-        res_all %>% 
-              filter(dep.var == "N children", reg.type == "raw") %>% 
-              select(term, estimate),
-        by = "term",
-        suffix = c("_weighted", "_unweighted")
-      ) %>% 
-      mutate(
-        prop_wtd_unwtd = estimate_weighted/estimate_unweighted
+drake::loadd(res_sibs_parent_weights)
+drake::loadd(res_all)
+res_weighted_all <- bind_rows(
+        "N children" = res_weighted, 
+        "N siblings" = res_sibs_parent_weights, 
+      .id = "dep.var") 
+res_weighted_all$reg.type <- "weighted"
+res_weighted_all <- bind_rows(
+        res_weighted_all,
+        res_all %>% filter(reg.type == "raw") %>% select(-score_name)
       )
 
-mean_prop_wtd_unwtd <- mean(res_weighted_all$prop_wtd_unwtd)
+res_w_wide <- full_join(
+        res_weighted,
+        res_sibs_parent_weights,
+        by = "term",
+        suffix = c(".children", ".sibs")
+      ) 
+# barbaric but it works:
+res_uw_wide <- left_join(
+  res_all %>% filter(dep.var == "N children", reg.type == "raw"),
+  res_all %>% filter(dep.var == "N siblings", reg.type == "raw"),
+  by = "term",
+  suffix = c(".children", ".sibs")
+)
+
+res_wide <- left_join(res_w_wide, res_uw_wide, by = "term", 
+      suffix = c(".wtd", ".uwtd"))
+
+res_wide %<>% mutate(
+        prop_children = estimate.children.wtd/estimate.children.uwtd,
+        prop_sibs     = estimate.sibs.wtd/estimate.sibs.uwtd
+      )
 
 ```
 
 
-As a fix for ascertainment bias in the UK Biobank sample, we weight participants
+To compensate for ascertainment bias in the UK Biobank sample, we weight participants
 by sex, age (within the 40-71 age group), and education. Our sample weights are
-calibrated based on the 2006 General Household Survey. We then rerun the basic
-*children* regressions. Figure \@ref(fig:plot-weighted) shows the results, with
-unweighted estimates plotted for comparison. Weighting increases effect sizes on
-average by `r 100 * (mean_prop_wtd_unwtd - 1)` per cent.
+calibrated based on the 2006 General Household Survey. We then calculate the 
+proportions of respondents within each sibling group size, based on the respondent
+weights, and use this to create weights for the sibling regressions.
+
+We rerun the basic regressions for both children and siblings, using the new
+weights. Figure \@ref(fig:plot-res-weighted) shows the results. The weightings
+are fairly successful at reconciling the overall size of effects from
+siblings and children regressions. Tables \@ref(tab:tbl-sibs-weights) and
+\@ref(tab:tbl-children-weights) show the largest and smallest changes due to 
+weighting in siblings and children regressions.
+
+```{r tbl-sibs-weights}
+
+stars <- function (x) ifelse(x < 0.05/33, "*", "")
+  
+top_bottom_5 <- function (x, caption) {
+  x %>% 
+      slice(c(1:5, nrow(.) - 0:4)) %>% 
+      as_hux() %>% 
+      insert_row(rep("...", 4), after = 6) %>% 
+      set_number_format(-1, -1, 3) %>% 
+      set_number_format(-1, 4, 0) %>% 
+      set_align(-1, -1, ".") %>% 
+      theme_basic() %>% 
+      set_font_size(8) %>% 
+      set_caption(caption) %>% 
+      set_caption_pos("bottom") %>% 
+      set_caption_width(1) %>% 
+      add_footnote("Insignificant effects not shown", font_size = 7) %>% 
+      set_all_padding(0) 
+}  
+
+res_wide %>% 
+      arrange(desc(prop_sibs)) %>% 
+      select(term, matches("estimate.sibs"), matches("p.value.sibs"), 
+        prop_sibs) %>% 
+      filter(p.value.sibs.uwtd < 0.05/33) %>% 
+      transmute(
+        Score = pretty_names(term),
+        `Weighted estimate` = estimate.sibs.wtd,
+        `Unweighted estimate` = estimate.sibs.uwtd,
+        `Proportion (%)` = prop_sibs * 100
+      ) %>% 
+      top_bottom_5(caption = "Effects of weighting on sibling regressions: top and bottom 5 changes")
+```
+
+```{r tbl-children-weights}
+
+res_wide %>% 
+      arrange(desc(prop_children)) %>% 
+      select(term, matches("estimate.children"), matches("p.value.children"), 
+        prop_children) %>% 
+      filter(p.value.children.uwtd < 0.05/33) %>% 
+      transmute(
+        Score = pretty_names(term),
+        `Weighted estimate` = estimate.children.wtd,
+        `Unweighted estimate` = estimate.children.uwtd,
+        `Proportion (%)` = prop_children * 100
+      ) %>% 
+      top_bottom_5(caption = "Effects of weighting on children regressions: top and bottom 5 changes")
+```
 
 
-```{r plot-weighted, fig.cap = "Effects of polygenic scores on number of children, regressions weighted by education levels within age categories"}
-
-n_regs <- as.double(nrow(res_weighted_all))
+```{r plot-res-weighted, fig.cap = "Effects of polygenic scores on number of children/siblings. Weighted regressions."}
 
 res_weighted_all %>% 
-      mutate(
-        term    = pretty_names(term),
-        term    = fct_reorder(term, estimate_weighted, order_abs(1))
+      rename(
+        "Dependent variable" = dep.var, 
       ) %>% 
-      pivot_longer(cols = c(estimate_weighted, estimate_unweighted), 
-        names_to = "Regression", values_to = "estimate") %>% 
-      mutate(
-        Regression = sub("estimate_", "", Regression)
-      ) %>% 
-      ggplot(aes(y = term, x = estimate, shape = Regression,
-        colour = p.value < 0.05/{{n_regs}})) +
-      my_vline + 
-      geom_point(size = 1.5, stroke = 0.7, fill = "steelblue") +
-      labs(x = "Effect size", y = "") +
-      scale_shape_manual(values = c("weighted" = 22, "unweighted" = 21)) +
-      pval_scale(aesthetics = "colour") +
-      my_theme()
-
+      filter(reg.type == "weighted") %>% 
+      standard_ggplot(fill = `Dependent variable`, n_regs = 33, order_idx = 1, 
+        shape = reg.type) + 
+        scale_shape_manual(values = c(21, 4))
 
 ```
 
-
-```{r plot-sibs-weighted, eval = FALSE}
-
-# what this shows is that even after weighting, sibling effect sizes are
-# still stronger. In fact weighting hasn't changed things much.
-drake::loadd(res_weighted, res_sibs_weighted)
-n_regs <- as.double(nrow(res_weighted))
-# bind_rows(children = res_weighted, sibs = res_sibs_weighted, .id = "Dep. Var.") %>% 
-res_all %>% 
-      filter(reg.type == "raw") %>% 
-      mutate(
-        term    = pretty_names(term),
-        term    = fct_reorder(term, estimate, order_abs(1))
-      ) %>% 
-      ggplot(aes(y = term, x = estimate, fill = `dep.var`,
-        colour = p.value < 0.05/{{n_regs}})) +
-      my_vline + 
-      pval_geom_point() +
-      labs(x = "Effect size", y = "") +
-      my_fill_scale(n = 2) +
-      pval_scale(aesthetics = "colour")
-
-
-```
 
 
 ```{r calc-flb-weights}
@@ -596,7 +700,7 @@ bind_rows(
 
 
 These results suggest that previous work may have underestimated the level of
-selection occurring in the population. [XXX who?]
+selection occurring in the population. [TODO: who?]
 
 
 ```{r calc-corr-age-flb}
@@ -640,7 +744,7 @@ population. In particular, why are selection effects *oppositely* signed in
 certain subgroups -- for example, in older and younger mothers (by age at first
 live birth) or in those with more and fewer lifetime sexual partners?
 
-A possible answer is given by the economic theory of fertility [XXX cite Becker 1960].
+A possible answer is given by the economic theory of fertility [TODO cite Becker 1960].
 According to this, increases in potential earned income affect fertility via two opposing channels. There is an "income effect" by which children become more
 affordable, like any other good. Since childrearing has a cost in time, there is
 also a substitution effect: the opportunity cost of childrearing increases if
@@ -855,7 +959,7 @@ res_age_birth_parents_dv %>%
         my_vline +
         pval_geom_point() +
         pval_scale() +
-        my_fill_scale(n = 2, direction = -1) +
+        my_fill_scale(n = 2) +
         my_labs()
 
 ```
@@ -869,7 +973,7 @@ Polygenic scores could capture effects that are really due to population
 stratification, although would not change our results for natural selection of
 the scores. In \@ref(fig:plot-regs-controlled) we show results for selection on
 polygenic scores residualized for the top 100 principal components of the
-genetic data, calculated within the UK Biobank population. (XXX Abdel details.)
+genetic data, calculated within the UK Biobank population. (TODO Abdel details.)
 
 
 
@@ -914,7 +1018,7 @@ consistently signed across all four regressions (on children and siblings, and
 with and without residualization).
 
 
-```{r plot-regs-controlled, fig.cap = "Effects of residualized polygenic scores on number of siblings/children.", fig.height = 7}
+```{r plot-regs-controlled, fig.cap = "Effects of residualized polygenic scores on number of siblings/children."}
 
 drake::loadd(res_all)
 
@@ -922,17 +1026,19 @@ n_regs <- as.double(nrow(res_all))
 res_all %>% 
       mutate(
         term    = pretty_names(term),
-        term    = fct_reorder(term, estimate, order_abs(1)),
+        term    = reorder_within(term, estimate, dep.var, order_abs(1)),
         dep.var = fct_inorder(dep.var) 
       ) %>% 
       ggplot(aes(y = term, x = estimate, fill = reg.type, 
         colour = p.value < 0.05/{{n_regs}})) +
-      my_vline + 
-      facet_wrap(vars(dep.var)) +
-      pval_geom_point(alpha = .7) +
-      my_labs() +
-      pval_scale() +
-      my_fill_scale(n = 2, guide = guide_legend(title = ""))
+        my_vline + 
+        facet_wrap(vars(dep.var), scales = "free_y") +
+        pval_geom_point(position = position_dodge(0.4)) +
+        my_labs() +
+        pval_scale() +
+        my_fill_scale(n = 2, guide = guide_legend(title = "")) +
+        my_theme() +
+        scale_y_reordered()
 
 ```
 
@@ -1074,7 +1180,50 @@ summary_period %>%
 
 
 
-## Causality
+
+## Genetic correlations with EA3
+
+
+Another way to examine the "earnings" theory of natural selection is to compare
+effect sizes of PGS with their genetic correlation with educational attainment
+(EA3). Since EA3 strongly predicts earnings, if earnings drives differences
+in fertility, we'd expect a correlation between the two sets of results. Figure
+\@ref(fig:plot-rgs-by-effect-size) shows this is so.
+
+TODO: ref source of data.
+
+```{r plot-rgs-by-effect-size, fig.cap = "Effect size on n siblings by genetic correlation with EA3"}
+
+drake::loadd(rgs)
+drake::loadd(res_all)
+
+rgs <- left_join(rgs, 
+        res_all %>% filter(reg.type == "raw", dep.var == "N children"), 
+        by = c("p2" = "term"))
+
+rgs %>% 
+      filter(p2 != "EA3_excl_23andMe_UK", p2 != "EA2_noUKB") %>% 
+      ggplot(aes(rg, estimate)) + 
+        geom_point() +
+        my_vline +
+        my_hline +
+        labs(x = "rG with EA3", y = "Effect on number of children")
+          
+```
+
+```{r correlate-effect-sizes, eval = FALSE}
+combined_results <- res %>% 
+      mutate(PCs = ifelse(reg.type=="raw", "no", "yes")) %>% 
+      dplyr::select(-reg.type) %>% 
+      {bind_rows(bivariate = ., multivariate = all_res, .id = "reg.type")} %>% 
+      arrange(term, reg.type, PCs) %>% 
+      dplyr::select(term, reg.type, PCs, estimate) %>% 
+      pivot_wider(names_from = c(reg.type, PCs), values_from = estimate)
+
+cor(combined_results[-1], use = "complete")
+
+```
+
 
 ## Number of children
 
@@ -1105,48 +1254,15 @@ famhist %>%
 ```
 
 
-
-```{r plot-sd-years, eval = FALSE}
-# inequality over time. Nothing to see, almost everything is flat.
-grid <- expand_grid(score_name = score_names, YOB = 1940:1965)  
-grid$sd <- pmap_dbl(grid, ~sd(famhist[famhist$YOB==.y, ][[.x]], na.rm = TRUE))
-ggplot(grid, aes(YOB, sd)) + 
-      geom_line() + 
-      facet_wrap(~score_name, scales = "free_y", ncol = 4)
-```
+## Causality
 
 
-```{r rgs-by-effect-size, eval = FALSE, fig.cap = "Genetic correlations with EA3 by effect size on n siblings."}
-rgs <- left_join(rgs, res %>% filter(reg.type == "residualized"), by = c("p2" = "term"))
-
-rgs %>% 
-      filter(p2 != "EA3_excl_23andMe_UK", p2 != "EA2_noUKB") %>% 
-      ggplot(aes(rg, estimate)) + 
-        geom_smooth(method = lm) +
-        geom_point(colour = "red2") + 
-        geom_label(aes(label = p2, hjust = "left", vjust = "middle"), 
-          size = 3, nudge_x = 0.02, alpha = 0.5, 
-          label.padding = unit(0.1, "lines")) +
-        labs(x = "rG", y = "Effect size", 
-          title = "rG with EA3 vs. effect size on # siblings")
-```
-
-```{r correlate-effect-sizes, eval = FALSE}
-combined_results <- res %>% 
-      mutate(PCs = ifelse(reg.type=="raw", "no", "yes")) %>% 
-      dplyr::select(-reg.type) %>% 
-      {bind_rows(bivariate = ., multivariate = all_res, .id = "reg.type")} %>% 
-      arrange(term, reg.type, PCs) %>% 
-      dplyr::select(term, reg.type, PCs, estimate) %>% 
-      pivot_wider(names_from = c(reg.type, PCs), values_from = estimate)
-
-cor(combined_results[-1], use = "complete")
-
-```
-
-
-
-
+Different polygenic scores are correlated. Table \@ref(tab:tbl-pgs-corrs) shows the top
+correlations in the sample. Because of this, bivariate correlations between
+PGS and number of children might be driven by other genetic scores. To explore which polygenic scores are driving negative selection, we run a single
+omnibus regression of *number of children* on all the PGS. We exclude EA2, 
+waist-hip ratio, waist-circumference, and "Hip combined" since they are 
+highly correlated with other scores, which could make our estimates unstable. Figure \@ref(fig:plot-together) shows the results. Interestingly, several PGS remain independently significant, although effect sizes are reduced.
 
 
 ```{r tbl-pgs-corrs}
@@ -1169,12 +1285,7 @@ as_hux(cor_tbl, add_colnames = TRUE) %>%
 
 ```
 
-Different polygenic scores are correlated. Table \@ref(tab:tbl-pgs-corrs) shows the top
-correlations in the sample. Because of this, bivariate correlations between
-PGS and number of children might be driven by other genetic scores. To explore which polygenic scores are driving negative selection, we run a single
-omnibus regression of *number of children* on all the PGS. We exclude EA2, 
-waist-hip ratio, waist-circumference, and "Hip combined" since they are 
-highly correlated with other scores, which could make our estimates unstable. Figure \@ref(fig:plot-together) shows the results. Interestingly, several PGS remain independently significant, although effect sizes are reduced.
+
 
 ```{r plot-together, fig.cap = "Partial correlations with number of children"}
 
@@ -1194,7 +1305,7 @@ res_together %>%
         my_vline +
         facet_wrap(vars(dep.var)) +
         pval_scale() +
-        my_fill_scale(n = 2, direction = -1) +
+        my_fill_scale(n = 2) +
         my_labs() +
         theme(legend.position = "bottom")
 ```
