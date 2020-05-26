@@ -454,6 +454,10 @@ example, EA is selected against; among those with 3 or fewer sexual partners, it
 is selected for. Selection is broadly negative (positive) among those 
 with more (less) partners.
 
+Lastly Figure \@ref(fig:plot-with-partner) splits respondents up by whether they
+were living with a spouse or partner at the time of interview. Effects are 
+generally the same sign in both groups, but are much larger among those not
+living with a spouse or partner.
 
 
 ```{r plot-age-flb-cross, fig.cap = "Effect sizes on number of children, by age at first live birth terciles"}
@@ -510,6 +514,20 @@ res_partners %>%
 
 ```
 
+
+```{r plot-with-partner, fig.cap = "Effect sizes on number of children by household type"}
+
+drake::loadd(res_with_partner)
+res_with_partner %<>% filter(grepl(":", term)) 
+
+n_regs <- nrow(res_with_partner)
+
+res_with_partner %>% 
+      mutate(
+        Household = ifelse(grepl("TRUE", term), "With partner", "Without partner")
+      ) %>% 
+      standard_ggplot(fill = Household, n_regs = n_regs, score_col = score_name)
+```
 
 # Accounting for ascertainment bias
 

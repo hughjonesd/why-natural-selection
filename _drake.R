@@ -272,7 +272,20 @@ plan <- drake_plan(
     left_join(res, pars, by = "combo") %>%
           mutate(sex = ifelse(subset == "sex == 1", "Male", "Female")) %>%
           select(-combo, -subset)
-  }, 
+  },
+  
+  res_with_partner = {
+    res <- map_dfr(setNames(score_names, score_names),
+            ~run_regs_fml(
+              "n_children ~ with_partner + {score_name}:with_partner",
+              score_name = .x,
+              famhist    = famhist
+            ),
+            .id = "score_name"
+          )
+    res %<>% filter(term != "(Intercept)")
+    res
+  },
   
   res_edu = {
     subsets <- rlang::exprs(

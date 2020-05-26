@@ -46,7 +46,7 @@ make_resid_scores <- function (famhist, pcs, score_names) {
     resid_scores[[paste0(score_name, "_resid")]] <- resid_score
   }
   
-  resid_score$dummy <- NULL
+  resid_scores$dummy <- NULL
   resid_scores
 }
 
@@ -151,7 +151,13 @@ edit_famhist <- function (famhist, score_names) {
     na.rm = TRUE
   )
   
+  
   famhist$n_in_household <- famhist$f.709.0.0
+  
+  famhist$with_partner   <- famhist$f.6141.0.0 == 1
+  # Many NAs, almost all from people living alone i.e. f.709 == 1
+  famhist$with_partner[famhist$n_in_household == 1] <- FALSE
+  famhist$with_partner[famhist$f.6141.0.0 == -3] <- NA
   
   famhist$age_fte_cat <- santoku::chop(famhist$age_fulltime_edu, 
     c(16, 18), 
