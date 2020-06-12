@@ -26,6 +26,7 @@ library(huxtable)
 
 drake::loadd(rgs)
 drake::loadd(score_names)
+drake::loadd(famhist)
 
 options(digits = 2)
 options(dplyr.summarise.inform = FALSE) # shut up about summarize
@@ -42,7 +43,7 @@ huxtable::set_default_properties(latex_float = "h!")
 theme_set(theme_minimal())
 my_hline <- geom_hline(yintercept = 0, colour = "grey20", linetype = "dotted")
 my_vline <- geom_vline(xintercept = 0, colour = "grey20", linetype = "dotted")
-pval_palette <- c("FALSE" = "grey65", "TRUE" = "orange2")
+pval_palette <- c("FALSE" = "grey65", "TRUE" = "#FAC32D")
 
 
 standard_ggplot <- function (
@@ -91,7 +92,7 @@ pval_geom_point <- function (size = 1.5, stroke = 0.7, ...) {
 
 my_fill_scale <- function (n, aesthetics = "fill", ...) {
   if (n == 2) {
-    scale_colour_manual(values = c("steelblue4", "indianred2"), 
+    scale_colour_manual(values = c("steelblue4", "#D63C3C"), 
           aesthetics = aesthetics, ...)
     # scale_color_brewer(type = "qual", palette = 3, aesthetics = aesthetics, ...)
   } else {
@@ -108,23 +109,66 @@ order_abs <- function (n = 1) {
   function (x) x[n] 
 }
 
-pretty_names <- function (names) {
-  names <- gsub("_", " ", names)
-  names %<>% 
-        strsplit(" ") %>% 
-        map_chr(~paste0(
-          toupper(substring(.x, 1, 1)), 
-          substring(.x, 2),
-          collapse = " "
-        ))
 
-  acronyms <- c("WHR", "BMI", "DPW", "CPD", "SI", "AI", "WC")
-  for (acronym in acronyms) {
-    regex <- paste0("\\b", acronym, "\\b")
-    names <- gsub(regex, toupper(acronym), names, ignore.case = TRUE)
-  }
+pretty_names <- function (names) {
+  pretty <- c(
+    ADHD_2017               = "ADHD",
+    age_at_menarche         = "Age at menarche",
+    age_at_menopauze        = "Age at menopause",
+    agreeableness           = "Agreeableness",
+    ai_substance_use        = "Age at smoking initiation",
+    alcohol_schumann        = "Alcohol use",
+    alzheimer               = "Alzheimer",
+    autism_2017             = "Autism",
+    bipolar                 = "Bipolar",
+    bmi_combined            = "BMI",
+    body_fat                = "Body Fat",
+    caffeine                = "Caffeine",
+    cannabis                = "Cannabis (ever vs. never)",
+    cognitive_ability       = "Cognitive Ability",
+    conscientiousness       = "Conscientiousness",
+    coronary_artery_disease = "Coronary Artery Disease",
+    cpd_substance_use       = "Cigarettes per day",
+    diagram_T2D             = "Type 2 Diabetes",
+    dpw_substance_use       = "Drinks per week",
+    EA2_noUKB               = "Educ. attainment 2 (no UK)",
+    EA3_excl_23andMe_UK     = "Educ. attainment 3 (no UK)",
+    eating_disorder         = "Eating disorder",
+    extraversion            = "Extraversion",
+    height_combined         = "Height",
+    hip_combined            = "Hip circumference",
+    MDD_PGC2_noUKB          = "Major Depressive Disorder",
+    neuroticism             = "Neuroticism",
+    openness                = "Openness",
+    sc_substance_use        = "Smoking cessation",
+    SCZ2                    = "Schizophrenia",
+    si_substance_use        = "Smoking initiation",
+    wc_combined             = "Waist circumference",
+    whr_combined            = "Waist-hip ratio"
+  )
   
-  return(names)
+  pretty[names]
+}
+
+
+n_in_regs <- function (var, dv = "n_children") {
+  # all PGS have the same NA pattern, so we just use one
+  tbl <- table(famhist[
+                  ! is.na(famhist[dv]) & ! is.na(famhist$whr_combined), 
+                  var
+                ])
+  c(tbl)
+}
+
+
+add_n <- function (var, famhist_var = var, dv = "n_children") {
+  var <- as.factor(var)
+  n <- n_in_regs(famhist_var, dv)
+  levels(var) <- sprintf("%s (N = %s)", levels(var), 
+                         prettyNum(n[levels(var)], big.mark = ","))
+  # var_n <- sprintf("%s (N = %s)", var, prettyNum(n[var], big.mark = ","))
+  # var_n[is.na(var)] <- NA
+  var
 }
 
 
@@ -134,6 +178,7 @@ reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
   new_x <- paste(x, within, sep = sep)
   stats::reorder(new_x, by, FUN = fun)
 }
+
 
 scale_x_reordered <- function(..., sep = "___") {
   reg <- paste0(sep, ".+$")
@@ -223,30 +268,38 @@ famhist <- left_join(famhist, ghs_weights, by = "f.eid")
 pgs_over_time <- famhist %>% 
       group_by(
         YOB = santoku::chop(YOB, 
-          brk_left(seq(1940, 1970, 5), close_end = FALSE), 
-          seq(40, 65, 5),
-          extend = FALSE
+          seq(1940, 1970, 5), 
+          labels    = seq(40, 65, 5),
+          extend    = FALSE
         ) 
       ) %>% 
       filter(! is.na(YOB)) %>% 
-      summarize(across(all_of(score_names), mean, na.rm = TRUE)) %>% 
-      pivot_longer(-YOB, names_to = "score_name", values_to = "score") 
+      summarize(across(all_of(score_names), ggplot2::mean_cl_normal, na.rm = TRUE)) %>% 
+      pivot_longer(-YOB, names_to = "score_name", values_to = "score") %>% 
+      mutate(
+        score_lo = score$ymin,
+        score_hi = score$ymax,
+        score    = score$y
+      )
  
 ```
 
 
-```{r plot-means-over-time, fig.height = 5, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Lines are means for 5-year intervals"}
+```{r plot-means-over-time, fig.height = 5, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Points are means for 5-year intervals. Lines are 95% confidence intervals."}
+
 pgs_over_time %>% 
       mutate(score_name = pretty_names(score_name)) %>% 
-      ggplot(aes(YOB, score, group = score_name)) + 
-      geom_line(colour = "steelblue4") +
+      ggplot(aes(YOB, group = score_name)) + 
+      geom_pointrange(aes(ymin = score_lo, y = score, ymax = score_hi), 
+        colour = "steelblue4", fatten = 2) +
       facet_wrap(~score_name) +
       my_hline +
       theme(
-        strip.text  = element_text(size = 7), 
+        strip.text  = element_text(size = 6), 
         axis.text.x = element_text(size = 7)
       ) +
       labs(y = "PGS", x = "Birth year (5 year intervals)")
+
 ```
 
 We run bivariate regressions on two dependent variables:
@@ -277,8 +330,8 @@ deviation shift in each polygenic score.
 
 Estimates are broadly consistent across generations. However, effect sizes are 
 much larger for *siblings* than for *children* 
-regressions. Among consistently-signed estimates, the effect size for
-siblings is `r 100*median_prop_gens` per cent at the median.
+regressions. Among consistently-signed estimates, at the median, the proportion between
+effect sizes for siblings and for children is `r 100 * median_prop_gens` per cent.
 
 
 ```{r plot-basic-regs, fig.cap = "Effects of polygenic scores on number of siblings/children."}
@@ -313,6 +366,7 @@ could affect our basic results, and to learn more about the causes of natural
 selection in the UK population. Because we have more data on respondents than on
 their parents, we focus on *children* regressions.
 
+
 ## Sex, income and education
 
 Figure \@ref(fig:plot-sexes) shows effect sizes of PGS on number of children
@@ -321,19 +375,39 @@ educational attainment, height and MDD. There is no overall pattern in
 differences of effect size, however.
 
 
-```{r plot-sexes, fig.cap = "Effect sizes on number of children by sex"}
+```{r plot-sexes, fig.cap = "Effect sizes on number of children by sex. Lines show significant differences"}
 
 drake::loadd(res_sex)
 n_regs <- as.double(nrow(res_sex))
 
+res_sex_wide <- res_sex %>% 
+      select(term, estimate, sex, diff.p.value) %>% 
+      pivot_wider(names_from = "sex", values_from = "estimate") %>% 
+      mutate(
+        min_est = pmin(Female, Male),
+        max_est = pmax(Female, Male),
+        term = pretty_names(term),
+        term = fct_reorder(term, Female)
+      ) 
+  
+
 res_sex %>% 
       mutate(
         term = pretty_names(term),
-        term = fct_reorder(term, estimate, order_abs(1))
       ) %>% 
       ggplot(aes(y = term, x = estimate, fill = sex, 
             colour = p.value < 0.05/{{n_regs}})) +
         my_vline +
+        geom_linerange(data = res_sex_wide, 
+          aes(
+            y      = term,
+            x      = NULL,
+            fill   = NULL,
+            xmin   = min_est, 
+            xmax   = max_est, 
+            colour = diff.p.value < 0.05/{{n_regs}}
+          ), 
+        group = "") +
         pval_geom_point() +
         pval_scale() +
         my_fill_scale(n = 2) +
@@ -354,11 +428,14 @@ larger for those in the poorest income category.
 
 drake::loadd(res_edu)
 n_regs <- as.double(nrow(res_edu))
+
+
 res_edu %>% 
       mutate(
         term = pretty_names(term), 
         term = fct_reorder(term, estimate, order_abs(1)),
-        "Age left FTE" = fct_relevel(age_fte_cat, "< 16", "16-18", "> 18")
+        "Age left FTE" = fct_relevel(age_fte_cat, "< 16", "16-18", "> 18"),
+        "Age left FTE" = add_n(`Age left FTE`, "age_fte_cat")
       ) %>% 
       ggplot(aes(y = term, x = estimate, colour = p.value < 0.05/{{n_regs}}, 
         fill = `Age left FTE`)) +
@@ -384,7 +461,8 @@ res_income %>%
         term = fct_reorder(term, estimate, order_abs(1)),
         Income = factor(income_cat, 
           labels = c("< £18K", "£18-30K", "£31-51K", "£52-100K", "> £100K")
-        )
+        ),
+        Income = add_n(Income, "income_cat")
       ) %>% 
       ggplot(aes(y = term, x = estimate, fill = Income, 
         colour = p.value < 0.05/{{n_regs}})) +
@@ -471,7 +549,8 @@ res_age_flb_cross %>%
       mutate(
         score_name = pretty_names(score_name),
         score_name = fct_reorder(score_name, estimate, order_abs(1)),
-        term       = gsub("age_flb_cat(.*):.*", "\\1", term)
+        term       = gsub("age_flb_cat(.*):.*", "\\1", term),
+        term       = add_n(term, "age_flb_cat")
       ) %>% 
       ggplot(aes(estimate, score_name, fill = term, 
         colour = p.value < 0.05/{{n_regs}})) +
@@ -479,7 +558,7 @@ res_age_flb_cross %>%
         pval_geom_point() +
         pval_scale() +
         my_fill_scale(n = 3, direction = -1, 
-          guide = guide_legend(title = "Age at FLB")) +
+          guide = guide_legend(title = "Age at first live birth")) +
         my_labs() +
         my_theme()
 
@@ -501,8 +580,12 @@ res_partners %>%
       mutate(
         score_name = pretty_names(score_name)
       ) %>% 
-      ggplot(aes(y = reorder_within(score_name, estimate, sex, fun = order_abs(1)), x = estimate, fill = `N partners`, 
-        colour = p.value < 0.05/{{n_regs}})) + 
+      ggplot(aes(
+        y      = reorder_within(score_name, estimate, sex, fun = order_abs(1)), 
+        x      = estimate, 
+        fill   = `N partners`, 
+        colour = p.value < 0.05/{{n_regs}}
+      )) + 
         my_vline +
         pval_geom_point() +
         facet_wrap(vars(sex), scales = "free_y") +
@@ -521,13 +604,19 @@ drake::loadd(res_with_partner)
 res_with_partner %<>% filter(grepl(":", term)) 
 
 n_regs <- nrow(res_with_partner)
+hhtype_n <- n_in_regs("with_partner")
 
 res_with_partner %>% 
       mutate(
-        Household = ifelse(grepl("TRUE", term), "With partner", "Without partner")
+        Household = ifelse(grepl("TRUE", term), "With partner", 
+                      "Without partner"),
+        with_p    = as.character(grepl("TRUE", term)),
+        Household = sprintf("%s (N = %s)", Household, 
+                      prettyNum(hhtype_n[with_p], big.mark = ","))
       ) %>% 
       standard_ggplot(fill = Household, n_regs = n_regs, score_col = score_name)
 ```
+
 
 # Accounting for ascertainment bias
 
@@ -1168,8 +1257,7 @@ famhist %>%
       select(n_children, EA3_excl_23andMe_UK, sex) %>% 
       mutate(
         "EA3 Ventile" = chop_equally(EA3_excl_23andMe_UK, 20, labels = 1:20),
-        "N Children"  = santoku::chop(n_children, brk_left(0:4, FALSE), 
-                          labels = c(0:3, "4+")),
+        "N Children"  = santoku::chop(n_children, 0:4, labels = c(0:3, "4+")),
         Sex           = factor(sex, levels = 0:1, labels = c("Female", "Male"))
         ) %>% 
       filter(! is.na(`EA3 Ventile`), ! is.na(`N Children`)) %>% 

@@ -119,7 +119,8 @@ edit_famhist <- function (famhist, score_names) {
       negative_to_na
     )
   )
-  
+# TEMPORARY hack. TODO: use f.6138
+famhist$age_fulltime_edu[is.na(famhist$age_fulltime_edu)]  <- 21 
   famhist$income_cat <- famhist$f.738.0.0
   
   # roughly speaking, these are ages in 2007-10
@@ -173,6 +174,8 @@ edit_famhist <- function (famhist, score_names) {
           famhist$f.2754.0.0, famhist$f.2754.1.0, famhist$f.2754.2.0,
           na.rm = TRUE
         )
+  famhist$age_flb_cat <- santoku::chop_equally(famhist$age_flb, 3, 
+                                               labels = lbl_discrete("-"))
   famhist$age_llb <- pmax(
           famhist$f.2764.0.0, famhist$f.2764.1.0, famhist$f.2764.2.0,
           na.rm = TRUE
@@ -200,11 +203,11 @@ edit_famhist <- function (famhist, score_names) {
 
 
 make_famhist_long_mlogit <- function (famhist, score_names) {
-  famhist$n_ch_fac <- santoku::chop(famhist$n_children, 
-        brk_left(0:5, close_end = FALSE), lbl_integer())
+  famhist$n_ch_fac <- santoku::chop(famhist$n_children, 0:5, 
+                                      labels = santoku::lbl_discrete())
   fh_subset <- famhist %>% select(n_ch_fac, all_of(score_names))
   mlogit::mlogit.data(fh_subset, choice = "n_ch_fac", shape = "wide", 
-        alt.levels = levels(fh_subset$n_ch_fac))
+                        alt.levels = levels(fh_subset$n_ch_fac))
 }
 
 

@@ -51,10 +51,11 @@ run_regs_weighted <- function (score_name, famhist, weight_data, dep.var) {
 
   fml <- as.formula(glue("{dep.var} ~ {score_name}"))
   mod <- lm(fml, data = famhist, weights = weights, na.action = na.exclude)
-  regs <- tidy(mod, conf.int = TRUE)
-  regs %<>% filter(term != "(Intercept)")
+  res <- tidy(mod, conf.int = TRUE)
+  res %<>% filter(term != "(Intercept)")
+  attr(res, "call") <- mod$call
   
-  return(regs)
+  return(res)
 }
 
 
@@ -75,6 +76,7 @@ run_regs_period <- function (children, score_name, famhist) {
   res$diff.p.value <- pval[2]
   
   res$children <- children
+  attr(res, "call") <- mod$call
   
   res
 }
@@ -86,6 +88,7 @@ run_regs_subset <- function(score_name, subset, famhist) {
   res <- tidy(mod, conf.int = TRUE)
   res <- filter(res, term == {{score_name}})
   res$subset <- list(subset)
+  attr(res, "call") <- mod$call
 
   res
 }
@@ -96,7 +99,7 @@ run_regs_fml <- function(fml, ..., subset = NULL, famhist) {
   fml <- as.formula(glue::glue_data(fml, .x = glue_args))
   mod <- lm(fml, famhist, subset = eval(subset))
   res <- tidy(mod, conf.int = TRUE)
-  
+  attr(res, "call") <- mod$call
   res
 }
 

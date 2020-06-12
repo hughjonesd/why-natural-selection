@@ -29,12 +29,13 @@ ghs_file      <- file.path(data_dir, "UKDA-5804-stata8/stata8/Ghs06client.dta")
 plan <- drake_plan(
   
   score_names  = {
-    sub(
+    score_names <- sub(
       ".*UKB\\.AMC\\.(.*?)\\..*", 
       "\\1", 
       list.files(file_in(!! pgs_dir), pattern = "csv$"), 
       perl = TRUE
     )
+    setNames(score_names, score_names)
   },
   
   famhist_raw  = target(
@@ -167,11 +168,22 @@ plan <- drake_plan(
             pmap_dfr(run_regs_subset, famhist = famhist)
     res_sex$sex <- ifelse(res_sex$subset == "sex == 0", "Female", "Male") 
     
+    int_pval <- map_dfr(score_names, ~ run_regs_fml(
+                    fml        = "n_children ~ {score_name}*I(sex==0)",
+                    score_name = .x,
+                    famhist    = famhist
+                  ),
+                  .id = "score_name"
+                ) %>% 
+                filter(grepl(":", term)) %>% 
+                select(score_name, diff.p.value = p.value)
+    
+    res_sex %<>% left_join(int_pval, by = c("term" = "score_name"))
     res_sex
   },
   
   res_age_flb = {
-    res <- map_dfr(setNames(score_names, score_names), 
+    res <- map_dfr(score_names, 
             ~run_regs_fml(
               fml        = "n_children ~ {score_name} + age_flb",
               score_name = .x, 
@@ -185,9 +197,7 @@ plan <- drake_plan(
   },
   
   res_age_flb_cross = {
-    famhist$age_flb_cat <- santoku::chop_equally(famhist$age_flb, 3, 
-          lbl_integer("-"))
-    res <- map_dfr(setNames(score_names, score_names), 
+    res <- map_dfr(score_names, 
             ~run_regs_fml(
               fml        = "n_children ~ age_flb_cat + {score_name}:age_flb_cat",
               score_name = .x,
@@ -214,7 +224,7 @@ plan <- drake_plan(
   
   res_age_birth_parents = {
     vars <- expand_grid(
-            score_name = score_names, 
+            score_name = unname(score_names), # just easier to avoid hassle... 
             control    = c("fath_age_birth", "moth_age_birth")
           )
     res <- pmap_dfr(vars,
@@ -235,7 +245,7 @@ plan <- drake_plan(
   
   res_age_birth_parents_dv = {
     vars <- expand_grid(
-            score_name = score_names, 
+            score_name = unname(score_names), 
             dep.var    = c("fath_age_birth", "moth_age_birth")
           )
     res <- pmap_dfr(vars,
@@ -256,26 +266,26 @@ plan <- drake_plan(
   
   res_partners = {
     sexes <- rlang::exprs(sex == 0, sex == 1)
-    pars <- expand_grid(score_name = score_names, subset = sexes)
+    pars <- expand_grid(subset = sexes, score_name = score_names)
     res <- pmap_dfr(pars,
             ~ run_regs_fml(
               fml        =
                 "n_children ~ {score_name}*lo_partners",
-              score_name = .x,
+              score_name = .y,
               famhist    = famhist,
-              subset     = .y
+              subset     = .x
             ),
-              .id = "combo"
+              .id = "row_number"
           )
-    pars$combo <- as.character(seq_len(nrow(pars)))
+    pars$row_number <- as.character(seq_len(nrow(pars)))
     
-    left_join(res, pars, by = "combo") %>%
+    left_join(res, pars, by = "row_number") %>%
           mutate(sex = ifelse(subset == "sex == 1", "Male", "Female")) %>%
-          select(-combo, -subset)
+          select(-row_number, -subset)
   },
   
   res_with_partner = {
-    res <- map_dfr(setNames(score_names, score_names),
+    res <- map_dfr(score_names,
             ~run_regs_fml(
               "n_children ~ with_partner + {score_name}:with_partner",
               score_name = .x,
@@ -293,12 +303,13 @@ plan <- drake_plan(
             age_fte_cat == "16-18",
             age_fte_cat == "> 18"
           )
-    pars <- expand_grid(score_name = score_names, subset = subsets) 
+    # putting subset first matters below, because it is unnamed:
+    pars <- expand_grid(subset = subsets, score_name = score_names) 
     res_edu <- pmap_dfr(pars,
             ~ run_regs_fml(
               "n_children ~ {score_name}", 
-              score_name = .x, 
-              subset     = .y,
+              score_name = .y, 
+              subset     = .x,
               famhist    = famhist
             ),
             .id = "row_number"
@@ -320,12 +331,13 @@ plan <- drake_plan(
             income_cat == 4,
             income_cat == 5
           ) 
-    pars <- expand_grid(score_name = score_names, subset = subsets) 
+    # keep variables in this order (it matters to .id):
+    pars <- expand_grid(subset = subsets, score_name = score_names) 
     res_income <- pmap_dfr(pars,
             ~ run_regs_fml(
               "n_children ~ {score_name}", 
-              score_name = .x, 
-              subset     = .y,
+              score_name = .y, 
+              subset     = .x,
               famhist    = famhist
             ),
             .id = "row_number"
