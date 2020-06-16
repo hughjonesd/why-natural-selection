@@ -52,3 +52,8 @@ weight_parents <- function (famhist, ghs_weights) {
   
   data.frame(f.eid = famhist$f.eid, weights = parent_weights)
 }
+
+
+weight_census_age_qual <- function (famhist, census_age_qual) {
+  
+}

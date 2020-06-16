@@ -205,26 +205,24 @@ Natural selection is taking place on most polygenic scores, and is broadly
 "negative" in that characteristics that most people would consider undesirable
 are being selected for. Effect sizes are larger for number of siblings than for
 number of children. This is not because the strength of natural selection has
-changed over time: effect sizes do not differ between early- and late-born
-respondents, within either children or siblings. Instead, the difference is
-probably due to ascertainment bias in UK Biobank. Indeed, natural selection is
-concentrated among population subgroups that are under-represented in the
-sample, including less-educated people and poorer households. When we weight 
-the sample to correct for ascertainment bias, many effect sizes are considerably 
-larger.
+changed over time. Instead, the difference is probably due to ascertainment bias
+in UK Biobank. Indeed, natural selection is concentrated among population
+subgroups that are under-represented in the sample, including less-educated
+people and poorer households. When we weight the sample to correct for
+ascertainment bias, many effect sizes are considerably larger.
 
 Among mothers who were older at first birth, and among parents with fewer sexual
-partners, effect signs are reversed so that natural selection is broadly
-"positive". The effects of PGS can be decomposed into two channels: an effect on
-age at first live birth, and an opposite-signed effect on number of children
-conditional on age at first live birth. This pattern may be explained by
-economic theories of fertility. In these, higher potential earnings have two
-opposite effects on fertility: a fertility-increasing income effect (higher
-income makes children more affordable), and a fertility-lowering substitution
-effect (time spent on childrearing has a higher cost in foregone earnings).
-Among couples who can take advantage of coordination in childcare activities,
-the income effect dominates; among single parents or those in unstable
-relationships, the substitution effect dominates.
+partners, effect signs are reversed. The effects of PGS can be decomposed into
+two channels: an effect on age at first live birth, and an opposite-signed
+effect on number of children conditional on age at first live birth. This
+pattern may be explained by economic theories of fertility. In these, higher
+potential earnings have two opposite effects on fertility: a
+fertility-increasing income effect (higher income makes children more
+affordable), and a fertility-lowering substitution effect (time spent on
+childrearing has a higher cost in foregone earnings). Among couples who can take
+advantage of coordination in childcare activities, the income effect dominates;
+among single parents, or those in unstable relationships, the substitution effect
+dominates.
 
 # Open questions/TODO
 
@@ -239,6 +237,8 @@ relationships, the substitution effect dominates.
   - Investigate "MRP" (Gelman 2005)
   - Understand reweighting on subsets of survey data.
   - Check for existing work
+  - Chris Hanretty suggested using 2011 census. Household size/type would also
+    be good.
 * Reweight other regressions (e.g. the omnibus regression in the appendix)
 * Could be useful: f.2139 - age first had sex (includes "never had sex" 
   which may explain some of the many NAs for f.2141, num sex partners)
@@ -843,6 +843,7 @@ n_regs <- as.double(nrow(res_age_flb))
 
 res_combined %>% 
       mutate(
+        score_name = pretty_names(score_name),
         score_name = fct_reorder(score_name, estimate, order_abs(2)),
         Regression = ifelse(reg.type == "raw", "Bivariate", "Controlled for age FLB")
       ) %>% 

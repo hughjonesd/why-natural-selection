@@ -25,6 +25,8 @@ rgs_file      <- file.path(data_dir, "EA3_rgs.10052019.rgs.csv")
 mf_pairs_file <- file.path(data_dir, "spouse_pair_info/UKB_out.mf_pairs_rebadged.csv")
 nomis_file    <- file.path(data_dir, "nomis-2011-statistics.csv")
 ghs_file      <- file.path(data_dir, "UKDA-5804-stata8/stata8/Ghs06client.dta")
+DC1108EW_file <- file.path(data_dir, "DC1108EW.csv")
+DC5202SC_file <- file.path(data_dir, "DC5202SC.csv")
 
 plan <- drake_plan(
   
@@ -72,6 +74,14 @@ plan <- drake_plan(
                     famhist
                   ),
   
+  census_age_qual = target(
+                      make_census_age_qual(
+                        file_in(!! DC1108EW_file),
+                        file_in(!! DC5202SC_file)
+                      ), 
+                      format = "fst"
+                    ),
+  
   flb_weights = {
     weight_by_ghs(
             ~ age_at_recruitment + factor(flb_cat) + factor(edu_qual), 
@@ -82,14 +92,14 @@ plan <- drake_plan(
   
   parent_weights = weight_parents(famhist, ghs_weights),
   
-  mf_pairs     = target(
-                   make_mf_pairs(file_in(!! mf_pairs_file), famhist), 
-                   format = "fst"
-                 ), 
+  mf_pairs = target(
+                     make_mf_pairs(file_in(!! mf_pairs_file), famhist), 
+                     format = "fst"
+                   ), 
   
-  rgs          = make_rgs(file_in(!! rgs_file)),
+  rgs = make_rgs(file_in(!! rgs_file)),
   
-  res_all      = {
+  res_all = {
     famhist <- join_famhist_resid_scores(famhist, resid_scores)
     res_sibs <- run_regs_basic(
             dep_var     = "n_sibs", 
@@ -108,7 +118,7 @@ plan <- drake_plan(
           )
   },
   
-  res_pcs     = {
+  res_pcs = {
     pc_names <- grep("PC", names(pcs), value = TRUE)
     res_sibs_pcs <- run_regs_pcs( 
       dep_var     = "n_sibs", 

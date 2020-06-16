@@ -338,3 +338,87 @@ make_ghs_subset <- function(ghs_file) {
   ghs_subset
 }
 
+
+make_census_age_qual <- function (DC1108EW_file, DC5202SC_file) {
+  ew_age_qual <- readr::read_csv(DC1108EW_file, col_names = FALSE)
+  # cols 1-3 are date, geography and geography code. We only want 
+  # row 1: "England and Wales"
+  ew_age_qual <- t(ew_age_qual)
+  ew_age_qual %<>% 
+        as.data.frame(stringsAsFactors = FALSE) %>% 
+        select(name = 1, value = 2) %>% 
+        slice(-(1:3)) %>% 
+        filter(
+          ! grepl("All categories", name, fixed = TRUE)
+        ) %>% 
+        tidyr::separate(name, 
+          into = c("age_cat", "qual", "ethnic", "measure"), 
+          sep  = ";"
+        ) %>% 
+        select(-measure) %>% 
+        mutate(
+          age_cat = sub("Age: Age ", "", age_cat),
+          qual    = sub(".*: ", "", qual),
+          qual    = sub("(Level.*) qualifications", "\\1", qual),
+          ethnic  = sub("Ethnic Group: *", "", ethnic)
+        ) %>% 
+        filter(ethnic == " White: Total") %>% 
+        select(-ethnic) %>% 
+        mutate(
+          value = as.numeric(value)
+        )
+  
+  # alternatively, "Ethnic Group: White: English" would
+  # capture English/Welsh/Scottish/Northern Irish/British only
+  
+  # England splits up age categories to 65-74, 75+. Scotland doesn't.
+  ew_age_qual %<>% 
+        tidyr::pivot_wider(
+          id_cols     = qual,
+          names_from  = age_cat, 
+          values_from = value
+        ) %>% 
+        mutate(
+          `65 and over` = `65 to 74` + `75 and over`
+        ) %>% 
+        select(- `65 to 74`, - `75 and over`) %>% 
+        tidyr::pivot_longer(
+          -qual,
+          names_to  = "age_cat",
+          values_to = "value"
+        ) %>% 
+        mutate(
+          place = "England and Wales"
+        )
+  
+  sc_age_qual <- readr::read_csv(DC5202SC_file, skip = 12)
+  sc_age_qual %<>% 
+        select(
+          age_cat = `X1`,              # new names reflect values in the columns
+          qual    = `Ethnicity (Flat)`, 
+          value   = `White: Total`
+        ) %>% 
+        tidyr::fill(age_cat) %>% 
+        slice(-1) %>%                  # removes a second row of headings
+        filter(
+          ! grepl("All people", age_cat),
+          ! grepl("Total", qual),
+          ! is.na(qual)                # removes some notes at the bottom
+        ) %>% 
+        mutate(
+          age_cat = sub("Aged ", "", age_cat, fixed = TRUE),
+          age_cat = sub(":", "", age_cat, fixed = TRUE),
+          place = "Scotland"
+        )
+  
+  census_age_qual <- bind_rows(sc_age_qual, ew_age_qual)
+  # since 4.0.0 could use `proportions()`
+  
+  # merge the countries to form Great Britain
+  census_age_qual %<>% 
+        group_by(age_cat, qual) %>% 
+        summarize(value = sum(value)) %>% 
+        mutate(percent = value/sum(value))
+  
+  return(census_age_qual)
+}
