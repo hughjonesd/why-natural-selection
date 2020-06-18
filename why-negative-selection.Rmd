@@ -56,10 +56,10 @@ standard_ggplot <- function (
         n_cats    = NULL
       ) {
   if (! missing(score_col)) score_col <- enquo(score_col)
-  fill_col <- if (! missing(fill_col)) enquo(fill_col) else quo(NULL)
+  mfc <- missing(fill_col)
+  fill_col <- if (mfc) quo(NULL) else enquo(fill_col)
   if (missing(n_cats)) {
-    n_cats <- if (missing(fill_col)) 1 else length(unique(pull(dfr, 
-                {{fill_col}})))
+    n_cats <- if (mfc) 1 else length(unique(pull(dfr, {{fill_col}})))
   }
   
   n_regs <- as.double(n_regs)
@@ -231,19 +231,9 @@ dominates.
   increases over time. Could this be because the sample includes many
   relatively educated older people? If so, then mean effects are *overestimated*
   by figure 1. 
-* Need to make the weighting very watertight. 
-  - Include income? 
-  - Interact age and other variables?
-  - Investigate "MRP" (Gelman 2005)
-  - Understand reweighting on subsets of survey data.
-  - Check for existing work
-  - Chris Hanretty suggested using 2011 census. Household size/type would also
-    be good.
 * Reweight other regressions (e.g. the omnibus regression in the appendix)
 * Could be useful: f.2139 - age first had sex (includes "never had sex" 
   which may explain some of the many NAs for f.2141, num sex partners)
-*  Need f.6138 to correctly calculate `age_fulltime_edu` including
-  those who went to college.
 * Look at geography, esp. in siblings regressions.
 * control for age in n_partners regressions.
 
@@ -631,11 +621,66 @@ by definition, not be represented at all.
 
 ```{r calc-res-weighted}
 
-drake::loadd(res_weighted)
+drake::loadd(res_wt_ghs_weights)
+drake::loadd(res_wt_flb_weights)
+drake::loadd(res_wt_msoa_weights)
+drake::loadd(res_wt_age_qual_weights)
 drake::loadd(res_sibs_parent_weights)
 drake::loadd(res_all)
+
+res_wt_combined <- bind_rows(
+  None                     = res_all %>% 
+                               filter(reg.type == "raw", dep.var == "N children") %>% 
+                               select(-reg.type, -dep.var, -score_name),
+  Geographical             = res_wt_msoa_weights,
+  `Age/Qualification`      = res_wt_age_qual_weights,
+  `Age/Qual/FLB`  = res_wt_flb_weights,
+  .id = "Weights"
+)
+
+res_wt_cb_wide <- res_wt_combined %>% 
+                    tidyr::pivot_wider(
+                      id_cols     = term,
+                      names_from  = Weights,
+                      values_from = estimate
+                    ) %>% 
+                    rowwise() %>% 
+                    mutate(
+                      consistent = all(c_across(-term) > 0) ||
+                        all(c_across(-term) < 0)
+                    ) %>% 
+                    ungroup() %>% 
+                    left_join(
+                      res_wt_combined %>% 
+                        filter(Weights == "None") %>% 
+                        select(term, p.value)
+                    )
+
+
+rel_sizes <- res_wt_cb_wide %>% 
+                filter(
+                  consistent, 
+                  p.value < 0.05/length(score_names)
+                ) %>% 
+                mutate(
+                  across(Geographical:`Age/Qual/FLB`, ~ .x/None)
+                ) %>% 
+                select(- consistent, - None, - p.value) %>% 
+                mutate(
+                  term = pretty_names(term)
+                )
+
+rel_sizes_summary <- rel_sizes %>% 
+                summarize(
+                  across(Geographical:`Age/Qual/FLB`, ~ c(mean(.x), median(.x)))
+                ) %>% 
+                mutate(
+                  term = c("Mean", "Median")
+                )
+
+# TODO: move later
 res_weighted_all <- bind_rows(
-        "N children" = res_weighted, 
+        "N children" = res_wt_ghs_weights, 
         "N siblings" = res_sibs_parent_weights, 
       .id = "dep.var") 
 res_weighted_all$reg.type <- "weighted"
@@ -645,7 +690,7 @@ res_weighted_all <- bind_rows(
       )
 
 res_wide <- full_join(
-        res_weighted,
+        res_wt_ghs_weights,
         res_sibs_parent_weights,
         by = "term",
         suffix = c(".children", ".sibs")
@@ -657,20 +702,67 @@ chn_larger <- with(res_wide, estimate.children > estimate.sibs)
 ```
 
 
-To compensate for ascertainment bias in the UK Biobank sample, we weight participants
-by sex, age (within the 40-71 age group), and education. Our sample weights are
-calibrated based on the 2006 General Household Survey. We then calculate the 
-proportions of respondents within each sibling group size, based on the respondent
-weights, and use this to create weights for the sibling regressions.
+To compensate for ascertainment bias in the UK Biobank sample, we weight 
+participants using data from the 2011 Census and from the 2006 General Household
+Survey (GHS). We try three alternative weighting schemes:
 
-We rerun the basic regressions for both children and siblings, using the new
-weights. Figure \@ref(fig:plot-res-weighted) shows the results. The weightings
-are fairly successful at reconciling the overall size of effects from siblings
-and children regressions. Among weighted scores that are significant (at p <
-0.05/33) in either regression, `r sum(chn_larger)` estimates are
-higher for children and `r length(chn_larger) - sum(chn_larger)` are
-lower. However, some estimates differ widely or change
-sign across the generations.
+* Geographical weighting by census MSOA, age and presence/absence of a partner;
+* Weighting by age and highest educational qualification;
+* Weighting by age, highest qualification, and age at first live birth, using
+  GHS data.
+  
+Figure \@ref(fig:plot-res-wt) shows the results. Effect sizes are significantly
+larger in absolute value. Table \@ref(tab:tbl-res-wt) gives effect sizes as a 
+proportion of unweighted effect sizes.
+
+```{r tbl-res-wt}
+rel_sizes %>% 
+      arrange(desc(`Age/Qual/FLB`)) %>% 
+      bind_rows(rel_sizes_summary) %>% 
+      rename(PGS = term) %>% 
+      as_hux() %>% 
+      set_caption(
+        "Weighted effect sizes as a proportion of unweighted"
+      ) %>% 
+      insert_row("", "Weighting", fill = "") %>% 
+      merge_cells(1, 2:4) %>% 
+      set_align(1, 2, "centre") %>% 
+      set_header_rows(1, TRUE) %>% 
+      theme_compact() %>% 
+      style_headers(bold = TRUE) %>% 
+      set_bottom_border(1, 2:4) %>% 
+      set_bottom_border(2, everywhere) %>% 
+      set_background_color(final(2), everywhere, "grey80") %>% 
+      add_footnote(
+        "Only consistent and significant (when unweighted) estimates are shown",
+        font_size   = 8, 
+        top_padding = 2
+      )
+      
+```
+
+```{r plot-res-wt, fig.cap = "Effects of polygenic scores on fertility. Weighted regressions."}
+
+res_wt_combined %>% 
+  mutate(
+    Weights  = fct_relevel(Weights, "Geographical", "Age/Qualification",
+                "Age/Qual/FLB", "None"),
+    term     = pretty_names(term),
+    term     = fct_reorder(term, estimate, order_abs(4))
+  ) %>% 
+  ggplot(aes(x = estimate, y = term, shape = Weights, colour = Weights)) +
+  geom_point(size = 2) +
+  my_vline +
+  scale_colour_manual(values = c(
+    "None"              = "grey25", 
+    "Geographical"      = "darkgreen",
+    "Age/Qualification" = "chocolate4",
+    "Age/Qual/FLB"      = "midnightblue"
+  )) +
+  scale_shape_manual(values = c("None" = "square", "Geographical" = "circle",
+        "Age/Qualification" = "circle", "Age/Qual/FLB" = "circle"))
+
+```
 
 
 ```{r plot-res-weighted, fig.cap = "Effects of polygenic scores on number of children/siblings. Regressions weighted by sex, age and education."}
@@ -687,13 +779,27 @@ res_weighted_all %>%
 ```
 
 
+We then calculate the 
+proportions of respondents within each sibling group size, based on the respondent
+weights, and use this to create weights for the sibling regressions.
+
+We rerun the basic regressions for both children and siblings, using the new
+weights. Figure \@ref(fig:plot-res-weighted) shows the results. The weightings
+are fairly successful at reconciling the overall size of effects from siblings
+and children regressions. Among weighted scores that are significant (at p <
+0.05/33) in either regression, `r sum(chn_larger)` estimates are
+higher for children and `r length(chn_larger) - sum(chn_larger)` are
+lower. However, some estimates differ widely or change
+sign across the generations.
+
+
 
 ```{r calc-flb-weights}
 
-drake::loadd(res_flb_weights)
+drake::loadd(res_wt_flb_weights)
 drake::loadd(res_sex)
 res_flb_all <- left_join(
-        res_flb_weights, 
+        res_wt_flb_weights, 
         res_sex %>% filter(sex=="Female") %>% select(-subset, -sex), 
         by = "term", 
         suffix = c(".wt", ".nowt")
@@ -723,7 +829,7 @@ selection occurring in the population. [TODO: who?]
 ```{r plot-flb-weights, fig.cap = "Effect sizes on number of children, female respondents weighted by age at first live birth"}
   
 bind_rows(
-        Weighted   = res_flb_weights, 
+        Weighted   = res_wt_flb_weights, 
         Unweighted = res_sex %>% filter(sex == "Female") %>% select(-subset, -sex),
         .id        = "Regression"
       ) %>% 

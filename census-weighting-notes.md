@@ -31,6 +31,9 @@ Since many of our couples have non-dependent children, it probably makes sense
 to use census variables comparing simply living with partner/not, rather than
 using presence or absence of children in the cells.
 
+Household type makes a *huge* difference in the GHS weighting, so we probably
+want to confirm this via LARPUK in the census data.
+
 # Existing tables that would be useful:
 
 DC1101EW - marital status by sex by age, England and Wales

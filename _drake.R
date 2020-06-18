@@ -9,27 +9,37 @@ suppressPackageStartupMessages({
 
 
 source("make-data.R")
+source("make-census-weights.R")
 source("regressions.R")
 source("weight-data.R")
 
-data_dir      <- "../negative-selection-data"
-pgs_dir       <- file.path(data_dir, "polygenic_scores/")
-ph_file       <- file.path(data_dir, "UKB.EA_pheno.coordinates.QC.david.csv")
-pcs_file      <- file.path(data_dir, "UKB.HM3.100PCs.40310.txt")
-famhist_file  <- file.path(data_dir, "david.family_history.traits.out.csv")
-famhist2_file <- file.path(data_dir, "david.family_history.traits.20042020.out.csv")
-famhist3_file <- file.path(data_dir, "david.family_history.traits.05052020.out.csv")
-famhist4_file <- file.path(data_dir, "david.family_history.traits.16052020.out.csv")
-famhist5_file <- file.path(data_dir, "david.family_history.traits.18052020.out.csv")
-rgs_file      <- file.path(data_dir, "EA3_rgs.10052019.rgs.csv")
-mf_pairs_file <- file.path(data_dir, "spouse_pair_info/UKB_out.mf_pairs_rebadged.csv")
-nomis_file    <- file.path(data_dir, "nomis-2011-statistics.csv")
-ghs_file      <- file.path(data_dir, "UKDA-5804-stata8/stata8/Ghs06client.dta")
-DC1108EW_file <- file.path(data_dir, "DC1108EW.csv")
-DC5202SC_file <- file.path(data_dir, "DC5202SC.csv")
+data_dir           <- "../negative-selection-data"
+pgs_dir            <- file.path(data_dir, "polygenic_scores/")
+ph_file            <- file.path(data_dir, "UKB.EA_pheno.coordinates.QC.david.csv")
+pcs_file           <- file.path(data_dir, "UKB.HM3.100PCs.40310.txt")
+famhist_file       <- file.path(data_dir, "david.family_history.traits.out.csv")
+famhist2_file      <- file.path(data_dir, "david.family_history.traits.20042020.out.csv")
+famhist3_file      <- file.path(data_dir, "david.family_history.traits.05052020.out.csv")
+famhist4_file      <- file.path(data_dir, "david.family_history.traits.16052020.out.csv")
+famhist5_file      <- file.path(data_dir, "david.family_history.traits.18052020.out.csv")
+famhist6_file      <- file.path(data_dir, "david.family_history.traits.17062020.out.csv")
+rgs_file           <- file.path(data_dir, "EA3_rgs.10052019.rgs.csv")
+mf_pairs_file      <- file.path(data_dir, "spouse_pair_info", 
+                        "UKB_out.mf_pairs_rebadged.csv")
+nomis_file         <- file.path(data_dir, "nomis-2011-statistics.csv")
+ghs_file           <- file.path(data_dir, "UKDA-5804-stata8", "stata8", 
+                        "Ghs06client.dta")
+DC1108EW_file      <- file.path(data_dir, "DC1108EW.csv")
+DC1108EW_msoa_file <- file.path(data_dir, "DC1108EW-msoas.csv")
+DC5202SC_file      <- file.path(data_dir, "DC5202SC.csv")
+msoa_shapefile     <- file.path(data_dir, "infuse_msoa_lyr_2011_clipped", 
+                        "infuse_msoa_lyr_2011_clipped.shp")
+
+
+weighting_schemes <- rlang::syms(c("flb_weights", "age_qual_weights", 
+                        "msoa_weights"))
 
 plan <- drake_plan(
-  
   score_names  = {
     score_names <- sub(
       ".*UKB\\.AMC\\.(.*?)\\..*", 
@@ -47,6 +57,8 @@ plan <- drake_plan(
                       file_in(!! famhist2_file),
                       file_in(!! famhist3_file),
                       file_in(!! famhist4_file),
+                      file_in(!! famhist5_file),
+                      file_in(!! famhist6_file),
                       file_in(!! pgs_dir)
                     ), 
                     format = "fst"
@@ -59,6 +71,11 @@ plan <- drake_plan(
                    format = "fst"
                   ),
   
+  famhist_msoa = target(
+                   find_containing_msoas(famhist, msoa_shapefile), 
+                   format = "fst"
+                 ),
+  
   fhl_mlogit   =  make_famhist_long_mlogit(famhist, score_names),
   
   resid_scores = target(
@@ -68,12 +85,6 @@ plan <- drake_plan(
 
   ghs_subset   = target(make_ghs_subset(file_in(!! ghs_file)), format = "fst"),
   
-  ghs_weights  =  weight_by_ghs(
-                    ~ factor(sex) + age_at_recruitment + factor(edu_qual), 
-                    ghs_subset, 
-                    famhist
-                  ),
-  
   census_age_qual = target(
                       make_census_age_qual(
                         file_in(!! DC1108EW_file),
@@ -81,6 +92,19 @@ plan <- drake_plan(
                       ), 
                       format = "fst"
                     ),
+  
+  census_msoa = target(
+                  make_census_msoa(file_in(!! DC1108EW_msoa_file)), 
+                  format = "fst"
+                ),
+  
+  # ghs_weights  =  {
+  #   weight_by_ghs(
+  #     ~ factor(sex) + age_at_recruitment + factor(edu_qual), 
+  #     ghs_subset, 
+  #     famhist
+  #   )
+  # },
   
   flb_weights = {
     weight_by_ghs(
@@ -90,7 +114,11 @@ plan <- drake_plan(
           )
   },
   
-  parent_weights = weight_parents(famhist, ghs_weights),
+  age_qual_weights = weight_by_census_age_qual(famhist, census_age_qual),
+  
+  parent_weights = weight_parents(famhist, input_weights = age_qual_weights),
+  
+  msoa_weights = weight_by_census_msoa(famhist, census_msoa, famhist_msoa),
   
   mf_pairs = target(
                      make_mf_pairs(file_in(!! mf_pairs_file), famhist), 
@@ -137,27 +165,25 @@ plan <- drake_plan(
     ) 
   },
   
-  res_weighted =  map_dfr(score_names, 
-                    run_regs_weighted, 
-                    famhist     = famhist, 
-                    weight_data = ghs_weights,
-                    dep.var     = "n_children"
-                  ),
+  res_wt =  target(
+              map_dfr(score_names, 
+                run_regs_weighted,
+                famhist = famhist,
+                weight_data = weighting_scheme,
+                dep.var = "n_children"
+              ),
+              transform = map(
+                weighting_scheme = !! weighting_schemes
+              )
+            ),
   
   res_sibs_parent_weights = map_dfr(score_names, 
-          run_regs_weighted, 
-          famhist     = famhist, 
-          weight_data = parent_weights,
-          dep.var     = "n_sibs"
-        ),
+                              run_regs_weighted, 
+                              famhist     = famhist, 
+                              weight_data = parent_weights,
+                              dep.var     = "n_sibs"
+                            ),
   
-  res_flb_weights = map_dfr(score_names, 
-          run_regs_weighted, 
-          famhist     = famhist, 
-          weight_data = flb_weights,
-          dep.var     = "n_children"
-        ),
-
   res_period = {
     expand_grid(
             children = c(TRUE, FALSE),

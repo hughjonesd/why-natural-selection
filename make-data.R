@@ -6,6 +6,7 @@ suppressPackageStartupMessages({
   library(rlang)
   library(santoku)
   library(haven)
+  library(sf)
   loadNamespace("car") # very annoying if it overwrites recode
   loadNamespace("matrixStats")
   loadNamespace("mlogit")
@@ -57,6 +58,8 @@ make_famhist <- function (
         famhist2_file,
         famhist3_file,
         famhist4_file,
+        famhist5_file,
+        famhist6_file,
         pgs_dir
       ) {
   ph <- read_csv(ph_file, col_types = cols(
@@ -70,6 +73,7 @@ make_famhist <- function (
   famhist3 <- read_csv(famhist3_file)
   famhist4 <- read_csv(famhist4_file, col_types = strrep("d", 33))
   famhist5 <- read_csv(famhist5_file, col_types = strrep("d", 4))
+  famhist6 <- read_csv(famhist6_file, col_types = strrep("d", 22))
   names(famhist) <- paste0("f.", names(famhist))
   names(famhist) <- gsub("\\-", ".", names(famhist))
   names(famhist2) <- paste0("f.", names(famhist2))
@@ -80,12 +84,15 @@ make_famhist <- function (
   names(famhist4) <- gsub("\\-", ".", names(famhist4))
   names(famhist5) <- paste0("f.", names(famhist5))
   names(famhist5) <- gsub("\\-", ".", names(famhist5))
+  names(famhist6) <- paste0("f.", names(famhist6))
+  names(famhist6) <- gsub("\\-", ".", names(famhist6))
   
   famhist %<>% left_join(ph, by = c("f.eid" = "eid"))
   famhist %<>% left_join(famhist2, by = "f.eid")
   famhist %<>% left_join(famhist3, by = "f.eid")
   famhist %<>% left_join(famhist4, by = "f.eid")
   famhist %<>% left_join(famhist5, by = "f.eid")
+  famhist %<>% left_join(famhist6, by = "f.eid")
   
   # only "genetic" whites
   famhist %<>% filter(! is.na(genetic_ethnic_grouping))
@@ -114,13 +121,17 @@ edit_famhist <- function (famhist, score_names) {
       c(age_fulltime_edu, starts_with(c(
         "f.2946", "f.1845", "f.2754", "f.738",  "f.2764", "f.2405", "f.2734",
         "f.2149", "f.1873", "f.1883", "f.2784", "f.2794", "f.709",  "f.3872",
-        "f.5057"
+        "f.5057", "f.6138"
       ))), 
       negative_to_na
     )
   )
-# TEMPORARY hack. TODO: use f.6138
-famhist$age_fulltime_edu[is.na(famhist$age_fulltime_edu)]  <- 21 
+
+  # "Field 845 was collected from all participants except those who indicated 
+  # they have a College or University degree, as defined by their answers to 
+  # Field 6138". So, we impute this to be 21.
+  famhist$age_fulltime_edu[is.na(famhist$age_fulltime_edu) & famhist$edu_qual == 1] <- 21
+  
   famhist$income_cat <- famhist$f.738.0.0
   
   # roughly speaking, these are ages in 2007-10
@@ -144,6 +155,9 @@ famhist$age_fulltime_edu[is.na(famhist$age_fulltime_edu)]  <- 21
   
   famhist$n_partners <- pmax(famhist$f.2149.0.0, famhist$f.2149.1.0, 
     famhist$f.2149.2.0, na.rm = TRUE)
+  # f.2139 is age at first sexual intercourse. -2 means "never had sex";
+  # the question about number of partners was then not asked.
+  famhist$n_partners[famhist$f.2139 == -2] <- 0
   famhist$lo_partners <- famhist$n_partners <= 3
   
   famhist$n_children <- pmax(famhist$f.2405.0.0, famhist$f.2405.1.0,
@@ -163,6 +177,7 @@ famhist$age_fulltime_edu[is.na(famhist$age_fulltime_edu)]  <- 21
   famhist$age_fte_cat <- santoku::chop(famhist$age_fulltime_edu, 
     c(16, 18), 
     c("< 16", "16-18", "> 18"))
+  
   # -7 means never went to school. We recode to 0 for simpliciy
   famhist$edu_qual[famhist$edu_qual == -7] <- 0
   famhist$edu_qual[famhist$edu_qual == -3] <- NA
@@ -339,86 +354,3 @@ make_ghs_subset <- function(ghs_file) {
 }
 
 
-make_census_age_qual <- function (DC1108EW_file, DC5202SC_file) {
-  ew_age_qual <- readr::read_csv(DC1108EW_file, col_names = FALSE)
-  # cols 1-3 are date, geography and geography code. We only want 
-  # row 1: "England and Wales"
-  ew_age_qual <- t(ew_age_qual)
-  ew_age_qual %<>% 
-        as.data.frame(stringsAsFactors = FALSE) %>% 
-        select(name = 1, value = 2) %>% 
-        slice(-(1:3)) %>% 
-        filter(
-          ! grepl("All categories", name, fixed = TRUE)
-        ) %>% 
-        tidyr::separate(name, 
-          into = c("age_cat", "qual", "ethnic", "measure"), 
-          sep  = ";"
-        ) %>% 
-        select(-measure) %>% 
-        mutate(
-          age_cat = sub("Age: Age ", "", age_cat),
-          qual    = sub(".*: ", "", qual),
-          qual    = sub("(Level.*) qualifications", "\\1", qual),
-          ethnic  = sub("Ethnic Group: *", "", ethnic)
-        ) %>% 
-        filter(ethnic == " White: Total") %>% 
-        select(-ethnic) %>% 
-        mutate(
-          value = as.numeric(value)
-        )
-  
-  # alternatively, "Ethnic Group: White: English" would
-  # capture English/Welsh/Scottish/Northern Irish/British only
-  
-  # England splits up age categories to 65-74, 75+. Scotland doesn't.
-  ew_age_qual %<>% 
-        tidyr::pivot_wider(
-          id_cols     = qual,
-          names_from  = age_cat, 
-          values_from = value
-        ) %>% 
-        mutate(
-          `65 and over` = `65 to 74` + `75 and over`
-        ) %>% 
-        select(- `65 to 74`, - `75 and over`) %>% 
-        tidyr::pivot_longer(
-          -qual,
-          names_to  = "age_cat",
-          values_to = "value"
-        ) %>% 
-        mutate(
-          place = "England and Wales"
-        )
-  
-  sc_age_qual <- readr::read_csv(DC5202SC_file, skip = 12)
-  sc_age_qual %<>% 
-        select(
-          age_cat = `X1`,              # new names reflect values in the columns
-          qual    = `Ethnicity (Flat)`, 
-          value   = `White: Total`
-        ) %>% 
-        tidyr::fill(age_cat) %>% 
-        slice(-1) %>%                  # removes a second row of headings
-        filter(
-          ! grepl("All people", age_cat),
-          ! grepl("Total", qual),
-          ! is.na(qual)                # removes some notes at the bottom
-        ) %>% 
-        mutate(
-          age_cat = sub("Aged ", "", age_cat, fixed = TRUE),
-          age_cat = sub(":", "", age_cat, fixed = TRUE),
-          place = "Scotland"
-        )
-  
-  census_age_qual <- bind_rows(sc_age_qual, ew_age_qual)
-  # since 4.0.0 could use `proportions()`
-  
-  # merge the countries to form Great Britain
-  census_age_qual %<>% 
-        group_by(age_cat, qual) %>% 
-        summarize(value = sum(value)) %>% 
-        mutate(percent = value/sum(value))
-  
-  return(census_age_qual)
-}
