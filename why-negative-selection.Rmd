@@ -224,6 +224,8 @@ advantage of coordination in childcare activities, the income effect dominates;
 among single parents, or those in unstable relationships, the substitution effect
 dominates.
 
+
+```
 # Open questions/TODO
 
 * If we weight with the GHS, and plot the means of figure 1 using this w
@@ -232,11 +234,13 @@ dominates.
   relatively educated older people? If so, then mean effects are *overestimated*
   by figure 1. 
 * Reweight other regressions (e.g. the omnibus regression in the appendix)
-* Could be useful: f.2139 - age first had sex (includes "never had sex" 
-  which may explain some of the many NAs for f.2141, num sex partners)
 * Look at geography, esp. in siblings regressions.
 * control for age in n_partners regressions.
-
+* can we weight men by age at first child, using GHS? If not, may need
+  to plot the age_flb weighted regressions separately, against unweighted
+  women-only regressions.
+* Can we find representative data for weights by n_partners?
+```
 
 # Data
 
@@ -244,10 +248,6 @@ Data is taken from UK Biobank. Polygenic scores were  normalized to mean 0,
 variance 1. 
 
 # Results
-
-Figure \@ref(fig:plot-means-over-time) plots mean polygenic scores by 5-year
-birth intervals, for the entire sample. Several scores show consistent increases
-or declines over this 30-year period, of the order of 5% of a standard deviation.
 
 
 ```{r calc-means-over-time}
@@ -275,6 +275,11 @@ pgs_over_time <- famhist %>%
 ```
 
 
+Figure \@ref(fig:plot-means-over-time) plots mean polygenic scores by 5-year
+birth intervals, for the entire sample. Several scores show consistent increases
+or declines over this 30-year period, of the order of 5% of a standard deviation.
+
+
 ```{r plot-means-over-time, fig.height = 5, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Points are means for 5-year intervals. Lines are 95% confidence intervals."}
 
 pgs_over_time %>% 
@@ -292,72 +297,103 @@ pgs_over_time %>%
 
 ```
 
-We run bivariate regressions on two dependent variables:
 
-* *siblings*, the number of full siblings in the respondent's sib (including
-  himself or herself).
-* The number of *children* ever born to/fathered by the respondent.
+These estimates may suffer from ascertainment bias within the UK Biobank sample.
+Respondents are higher income and better educated than the UK population, and
+they may also differ on other unobserved characteristics.
 
+To examine the effects of sampling, we regress respondents' polygenic
+scores on their number of children:
 
-```{r calc-regs-all}
+\[
+y_i = \alpha + \beta\mathrm{PGS}_i + \varepsilon_i
+\]
 
-drake::loadd(res_all)
+The effect size $\beta$ measures the strength of natural selection within the
+sample (or a given subgroup). In fact, since polygenic scores are normalized to
+mean 0, $\beta$ is the expected polygenic score among children of the sample.
 
-res_all_wide <- res_all %>% 
-  filter(reg.type == "raw") %>% 
-  select(dep.var, term, estimate) %>% 
-  pivot_wider(names_from = dep.var, values_from = estimate)
-
-n_pgs  <- as.double(nrow(res_all_wide))
-
-prop_gens <- res_all_wide[["N siblings"]]/res_all_wide[["N children"]]
-median_prop_gens <- median(prop_gens[prop_gens > 0])
-```
-
-
-Figure \@ref(fig:plot-basic-regs) shows effect sizes of a one-standard
-deviation shift in each polygenic score. 
-
-Estimates are broadly consistent across generations. However, effect sizes are 
-much larger for *siblings* than for *children* 
-regressions. Among consistently-signed estimates, at the median, the proportion between
-effect sizes for siblings and for children is `r 100 * median_prop_gens` per cent.
+Figures \@ref(fig:plot-educ-level) and \@ref(fig:plot-income) plot effect sizes
+for each polygenic score among different subgroups of the sample. Figure
+\@ref(fig:plot-educ-level) groups respondents by age of completing full-time
+education. Figure \@ref(fig:plot-income) groups respondents by household income.
+Effect sizes are larger and more significant for the lowest income category, and
+for the lowest education category. Note that the overall effect is not a simple
+average of the effect among the different subgroups, because polygenic scores 
+may also shift respondents between the subgroups. For example, a high 
+PGS for educational attainment will increase the age at which a respondent 
+leaves school.
 
 
-```{r plot-basic-regs, fig.cap = "Effects of polygenic scores on number of siblings/children."}
+```{r plot-educ-level, fig.cap = "Effect sizes on number of children by age left full-time education"}
 
-drake::loadd(res_all)
+drake::loadd(res_edu)
+n_regs <- as.double(nrow(res_edu))
 
-n_regs <- as.double(nrow(res_all))
-res_all %>% 
-      filter(reg.type == "raw") %>% 
+
+res_edu %>% 
       mutate(
-        term    = pretty_names(term),
-        term    = fct_reorder(term, estimate, order_abs(1)),
-        dep.var = fct_inorder(dep.var) 
+        term = pretty_names(term), 
+        term = fct_reorder(term, estimate, order_abs(1)),
+        "Age left FTE" = fct_relevel(age_fte_cat, "< 16", "16-18", "> 18"),
+        "Age left FTE" = add_n(`Age left FTE`, "age_fte_cat")
       ) %>% 
-      ggplot(aes(y = term, x = estimate, fill = dep.var, 
-        colour = p.value < 0.05/{{n_regs}})) +
-      my_vline + 
-      pval_geom_point() +
-      my_labs() +
-      pval_scale() +
-      my_fill_scale(n = 2, guide = guide_legend(title = "")) +
-      my_theme()
-
+      ggplot(aes(y = term, x = estimate, colour = p.value < 0.05/{{n_regs}}, 
+        fill = `Age left FTE`)) +
+        my_vline +
+        pval_geom_point() + 
+        pval_scale() +
+        my_fill_scale(n = 3, direction = -1) +
+        my_labs() +
+        my_theme()
+        
 ```
 
 
-# Subgroups
+```{r plot-income, fig.cap = "Effect sizes on number of children by household income"}
 
-We next examine how different subgroups of the population contribute to natural 
-selection. These analyses have two goals: to get a sense of how ascertainment bias
-could affect our basic results, and to learn more about the causes of natural 
-selection in the UK population. Because we have more data on respondents than on
-their parents, we focus on *children* regressions.
+drake::loadd(res_income)
+
+n_regs <- as.double(nrow(res_income))
+res_income %>% 
+      mutate(
+        term = pretty_names(term), 
+        term = fct_reorder(term, estimate, order_abs(1)),
+        Income = factor(income_cat, 
+          labels = c("< £18K", "£18-30K", "£31-51K", "£52-100K", "> £100K")
+        ),
+        Income = add_n(Income, "income_cat")
+      ) %>% 
+      ggplot(aes(y = term, x = estimate, fill = Income, 
+        colour = p.value < 0.05/{{n_regs}})) +
+        my_vline +
+        pval_geom_point(alpha = 0.8) + 
+        my_fill_scale(n = 5, direction = -1) +
+        pval_scale() +
+        my_labs() +
+        my_theme()
+```
 
 
-## Sex, income and education
+```{r calc-income-edu-controlled}
+drake::loadd(res_income_controlled, res_edu_controlled)
+n_regs_ic <- nrow(res_income_controlled)
+n_sig_ic <- sum(res_income_controlled$p.value < 0.05/n_regs_ic)
+
+n_regs_educ <- nrow(res_edu_controlled)
+n_sig_educ <- sum(res_edu_controlled$p.value < 0.05/n_regs_educ)
+```
+
+
+These results could be driven by age, if older respondents are poorer and less
+educated, and also more subject to selection on polygenic scores. However, if we
+rerun the regressions, interacting the polygenic score with income category and
+also with a quadratic in age, the interaction with income remains significant at
+0.05/`r n_regs_ic` for `r n_sig_ic` out of `r n_regs_ic` regressions. Similarly
+if we interact the PGS with age of leaving full time education and a quadratic
+in age, the interaction with age leaving FTE remains significant at 
+0.05/`r n_regs_educ` for `r n_sig_educ` out of `r n_regs_educ` regressions.
+
 
 Figure \@ref(fig:plot-sexes) shows effect sizes of PGS on number of children
 separately for males and females. Differences are particularly large for
@@ -407,89 +443,9 @@ res_sex %>%
 ```
 
 
-Figure \@ref(fig:plot-educ-level) splits respondents up by education levels.
-Selection effects are typically larger and more significant for those who left
-school before 16.  Figure \@ref(fig:plot-income) splits respondents by household
-income category. A very similar pattern holds, with selection effects being
-larger for those in the poorest income category.
-
-
-```{r plot-educ-level, fig.cap = "Effect sizes on number of children by age left full-time education"}
-
-drake::loadd(res_edu)
-n_regs <- as.double(nrow(res_edu))
-
-
-res_edu %>% 
-      mutate(
-        term = pretty_names(term), 
-        term = fct_reorder(term, estimate, order_abs(1)),
-        "Age left FTE" = fct_relevel(age_fte_cat, "< 16", "16-18", "> 18"),
-        "Age left FTE" = add_n(`Age left FTE`, "age_fte_cat")
-      ) %>% 
-      ggplot(aes(y = term, x = estimate, colour = p.value < 0.05/{{n_regs}}, 
-        fill = `Age left FTE`)) +
-        my_vline +
-        pval_geom_point() + 
-        pval_scale() +
-        my_fill_scale(n = 3, direction = -1) +
-        my_labs() +
-        my_theme()
-        
-```
-
-
-
-```{r plot-income, fig.cap = "Effect sizes on number of children by household income"}
-
-drake::loadd(res_income)
-
-n_regs <- as.double(nrow(res_income))
-res_income %>% 
-      mutate(
-        term = pretty_names(term), 
-        term = fct_reorder(term, estimate, order_abs(1)),
-        Income = factor(income_cat, 
-          labels = c("< £18K", "£18-30K", "£31-51K", "£52-100K", "> £100K")
-        ),
-        Income = add_n(Income, "income_cat")
-      ) %>% 
-      ggplot(aes(y = term, x = estimate, fill = Income, 
-        colour = p.value < 0.05/{{n_regs}})) +
-        my_vline +
-        pval_geom_point(alpha = 0.8) + 
-        my_fill_scale(n = 5, direction = -1) +
-        pval_scale() +
-        my_labs() +
-        my_theme()
-```
-
-
-```{r calc-income-edu-controlled}
-drake::loadd(res_income_controlled, res_edu_controlled)
-n_regs_ic <- nrow(res_income_controlled)
-n_sig_ic <- sum(res_income_controlled$p.value < 0.05/n_regs_ic)
-
-n_regs_educ <- nrow(res_edu_controlled)
-n_sig_educ <- sum(res_edu_controlled$p.value < 0.05/n_regs_educ)
-```
-
-
-These results could be driven by age, if older respondents are poorer and less
-educated, and also more subject to selection on polygenic scores. However, if we
-rerun the regressions, interacting the polygenic score with income category and
-also with a quadratic in age, the interaction with income remains significant at
-0.05/`r n_regs_ic` for `r n_sig_ic` out of `r n_regs_ic` regressions. Similarly
-if we interact the PGS with age of leaving full time education and a quadratic
-in age, the interaction with age leaving FTE remains significant at 
-0.05/`r n_regs_educ` for `r n_sig_educ` out of `r n_regs_educ` regressions.
-
-
-The UK Biobank sample overrepresents highly educated people and high-income
-households. This suggests that statistics from the sample may underestimate
-the level of natural selection in the population.
-
-## Age at first live birth
+When we split respondents up by other demographic variables, we get a more
+surprising result: the direction of natural selection is different among
+different subgroups. 
 
 
 ```{r calc-age-flb-cross}
@@ -503,26 +459,22 @@ cor_age_flb <- res_age_flb_cross %>%
 ```
 
 
-Age at first live birth correlates with number of children ever born. Figure
-\@ref(fig:plot-age-flb-cross) shows *children* regressions estimated separately
-for each tercile of age at first live birth. Several effects are strikingly
+Figure \@ref(fig:plot-age-flb-cross) shows effect sizes estimated separately for
+each tercile of age at first live birth. Several effects are strikingly
 different across terciles. ADHD and MDD are selected for amongst the youngest
 third of mothers, but selected against among the oldest two-thirds. Educational
 attainment is selected for among the oldest two-thirds of mothers, but is not
 significantly selected among the youngest third. Similarly, several PGS of body
 measurements are selected against only among older mothers. The correlation
 between effect sizes for the youngest and oldest terciles is `r cor_age_flb`.
-This is the first sign that selection may work in different directions across
-different subgroups.
 
 Figure \@ref(fig:plot-n-partners) splits males and females by lifetime number of
 sexual partners, at the median value of 3. Again, selection effects are reversed
 across the groups. Among men and women with more than 3 sexual partners, for
-example, EA is selected against; among those with 3 or fewer sexual partners, it
-is selected for. Selection is broadly negative (positive) among those 
-with more (less) partners.
+example, educational attainment is selected against; among those with 3 or fewer
+sexual partners, it is selected for.
 
-Lastly Figure \@ref(fig:plot-with-partner) splits respondents up by whether they
+Figure \@ref(fig:plot-with-partner) splits respondents up by whether they
 were living with a spouse or partner at the time of interview. Effects are 
 generally the same sign in both groups, but are much larger among those not
 living with a spouse or partner.
@@ -608,15 +560,70 @@ res_with_partner %>%
 ```
 
 
-# Accounting for ascertainment bias
+```{r calc-corr-age-flb}
 
-Our results are subject to two kinds of ascertainment bias. First, Biobank is
-not a random sample of the UK population: for example, it overrepresents
-educated people and high income households. Second, sampling parents of
-respondents inherently overweights parents who have many children. For instance,
-parents of three children will have three times more children as respondents in
-UK Biobank than parents of one child, on average. Parents of no children will,
-by definition, not be represented at all.
+drake::loadd(res_age_flb)
+drake::loadd(res_sex)
+
+res_sex_comparison <- res_sex %>% 
+      filter(sex == "Female") %>% 
+      mutate(score_name = term) %>% 
+      select(score_name, term, estimate:conf.high)
+
+res_age_flb %<>% filter(term != "age_flb") 
+
+res_combined <- bind_rows(
+        raw      = res_sex_comparison, 
+        with_age = res_age_flb %>% select(score_name, term, estimate:conf.high), 
+        .id      = "reg.type"
+      ) %>% 
+      arrange(score_name)
+
+raw_flb_comparison <- res_combined %>% 
+      pivot_wider(
+        id_cols     = score_name, 
+        names_from  = reg.type, 
+        values_from = estimate
+      )
+
+cor_raw_flb <- cor(raw_flb_comparison$raw, raw_flb_comparison$with_age)
+opp_signed <- sum(
+        sign(raw_flb_comparison$raw) != sign(raw_flb_comparison$with_age)
+      )
+
+```
+
+
+Figure \@ref(fig:plot-age-flb) shows the results of regressions for women only,
+controlling for age at first live birth. Effect sizes are greatly reduced.
+This could be because the regressions exclude childless women. However, in 
+`r opp_signed` out of `r length(score_names)` cases, effects actually change
+sign when controls are added. The correlation between effect sizes controlling for age
+at first live birth, and raw effect sizes, is `r cor_raw_flb`.
+
+
+```{r plot-age-flb, fig.cap = "Effect sizes on number of children, controlling for age at first live birth (women only). Effect sizes for women without controls are shown for comparison"}
+
+n_regs <- as.double(nrow(res_age_flb))
+
+res_combined %>% 
+      mutate(
+        score_name = pretty_names(score_name),
+        score_name = fct_reorder(score_name, estimate, order_abs(2)),
+        Regression = ifelse(reg.type == "raw", "Bivariate", "Controlled for age FLB")
+      ) %>% 
+      ggplot(aes(y = score_name, x = estimate, fill = Regression, 
+        color = p.value < 0.05/{{n_regs}})) + 
+        geom_vline(xintercept = 0, linetype = "dashed", color = "grey20") +
+        pval_geom_point() +
+        pval_scale() +
+        scale_fill_brewer(type = "qual", palette = 3) +
+        my_labs() +
+        my_theme()
+```
+
+
+## Weighted regressions
 
 
 ```{r calc-res-weighted}
@@ -627,6 +634,7 @@ drake::loadd(res_wt_msoa_weights)
 drake::loadd(res_wt_age_qual_weights)
 drake::loadd(res_sibs_parent_weights)
 drake::loadd(res_all)
+drake::loadd(res_sex)
 
 res_wt_combined <- bind_rows(
   None                     = res_all %>% 
@@ -653,7 +661,14 @@ res_wt_cb_wide <- res_wt_combined %>%
                     left_join(
                       res_wt_combined %>% 
                         filter(Weights == "None") %>% 
-                        select(term, p.value)
+                        select(term, p.value),
+                      by = "term"
+                    ) %>% 
+                    left_join(
+                      res_sex %>% 
+                        filter(sex == "Female") %>% 
+                        select(term, estimate_females = estimate),
+                      by = "term"
                     )
 
 
@@ -663,16 +678,18 @@ rel_sizes <- res_wt_cb_wide %>%
                   p.value < 0.05/length(score_names)
                 ) %>% 
                 mutate(
-                  across(Geographical:`Age/Qual/FLB`, ~ .x/None)
+                  Geographical = Geographical/None,
+                  `Age/Qualification` = `Age/Qualification`/None,
+                  `Age/Qual/FLB` = `Age/Qual/FLB`/estimate_females
                 ) %>% 
-                select(- consistent, - None, - p.value) %>% 
+                select(-consistent, -None, -p.value, -estimate_females) %>% 
                 mutate(
                   term = pretty_names(term)
                 )
 
 rel_sizes_summary <- rel_sizes %>% 
                 summarize(
-                  across(Geographical:`Age/Qual/FLB`, ~ c(mean(.x), median(.x)))
+                  across(-term, ~ c(mean(.x), median(.x)))
                 ) %>% 
                 mutate(
                   term = c("Mean", "Median")
@@ -709,22 +726,34 @@ Survey (GHS). We try three alternative weighting schemes:
 * Geographical weighting by census MSOA, age and presence/absence of a partner;
 * Weighting by age and highest educational qualification;
 * Weighting by age, highest qualification, and age at first live birth, using
-  GHS data.
+  GHS data (women only).
   
-Figure \@ref(fig:plot-res-wt) shows the results. Effect sizes are significantly
-larger in absolute value. Table \@ref(tab:tbl-res-wt) gives effect sizes as a 
-proportion of unweighted effect sizes.
+Figure \@ref(fig:plot-res-wt) plots effect sizes among the entire sample, using
+these weighting schemes. We include unweighted regressions for comparison.
+Weighted effect sizes are significantly larger in absolute value. Table
+\@ref(tab:tbl-res-wt) gives effect sizes as a proportion of unweighted effect
+sizes for the census-based weightings.
+
+
+Effect sizes are reasonably consistent across the geographical and
+age/qualification weights. But they are increased again when we weight by age at
+first live birth.This suggests that estimates might be increased still more by
+weighting on other relevant demographic variables. Overall, these results
+suggest that previous work may have underestimated the level of selection
+occurring in the population. [TODO: who?]
+
 
 ```{r tbl-res-wt}
+
 rel_sizes %>% 
-      arrange(desc(`Age/Qual/FLB`)) %>% 
+      arrange(desc(Geographical)) %>% 
       bind_rows(rel_sizes_summary) %>% 
       rename(PGS = term) %>% 
       as_hux() %>% 
+      insert_row("", "Weighting", fill = "") %>% 
       set_caption(
         "Weighted effect sizes as a proportion of unweighted"
       ) %>% 
-      insert_row("", "Weighting", fill = "") %>% 
       merge_cells(1, 2:4) %>% 
       set_align(1, 2, "centre") %>% 
       set_header_rows(1, TRUE) %>% 
@@ -732,37 +761,86 @@ rel_sizes %>%
       style_headers(bold = TRUE) %>% 
       set_bottom_border(1, 2:4) %>% 
       set_bottom_border(2, everywhere) %>% 
-      set_background_color(final(2), everywhere, "grey80") %>% 
-      add_footnote(
-        "Only consistent and significant (when unweighted) estimates are shown",
-        font_size   = 8, 
-        top_padding = 2
+      set_italic(final(2), 1) %>% 
+      set_font_size(8) %>% 
+      set_width(0.7) %>% # ensures line wrapping below
+      set_col_width(c(.34, .22, .22, .22)) %>% 
+      add_footnote(paste0(
+        "Only consistent and significant (when unweighted) estimates ",
+        "are shown.\n",
+        "Age/Qual/FLB as a proportion of unweighted regressions ",
+        "for females only."),
+        font_size    = 6, 
+        top_padding  = 0,
+        left_padding = 0
       )
       
 ```
 
+
 ```{r plot-res-wt, fig.cap = "Effects of polygenic scores on fertility. Weighted regressions."}
 
+n_regs <- length(score_names)
 res_wt_combined %>% 
   mutate(
     Weights  = fct_relevel(Weights, "Geographical", "Age/Qualification",
                 "Age/Qual/FLB", "None"),
     term     = pretty_names(term),
-    term     = fct_reorder(term, estimate, order_abs(4))
+    term     = fct_reorder(term, estimate, order_abs(1))
   ) %>% 
-  ggplot(aes(x = estimate, y = term, shape = Weights, colour = Weights)) +
-  geom_point(size = 2) +
+  ggplot(aes(x = estimate, y = term, shape = Weights, fill = Weights, colour = p.value < 0.05/{{n_regs}})) +
+  geom_point(size = 1.5, stroke = 0.5) +
   my_vline +
-  scale_colour_manual(values = c(
-    "None"              = "grey25", 
-    "Geographical"      = "darkgreen",
-    "Age/Qualification" = "chocolate4",
-    "Age/Qual/FLB"      = "midnightblue"
+  pval_scale() +
+  scale_fill_manual(values = c(
+    "None"              = "grey15", 
+    "Geographical"      = "dodgerblue4",
+    "Age/Qualification" = "steelblue2",
+    "Age/Qual/FLB"      = "darkseagreen4"
   )) +
-  scale_shape_manual(values = c("None" = "square", "Geographical" = "circle",
-        "Age/Qualification" = "circle", "Age/Qual/FLB" = "circle"))
+  scale_shape_manual(values = c(
+    "None" = "square filled", 
+    "Geographical" = "circle filled",
+    "Age/Qualification" = "circle filled", 
+    "Age/Qual/FLB" = "circle filled"
+  ))
+
 
 ```
+
+
+## Change over time
+
+The UK Biobank data contains information on respondents' number of siblings.
+Since respondents' polygenic scores are equal in expectation to their parents' 
+mean scores, we can use this to look at natural selection in the parents'
+generation. The dependent variable is now *number of siblings* (including
+the respondent him- or herself).
+
+The parents' generation has a second source of ascertainment bias, beyond the
+sampling bias of the survey. Sampling parents of respondents inherently
+overweights parents who have many children. For instance, parents of three
+children will have, on average, three times more children as respondents in UK
+Biobank than parents of one child. Parents of no children will
+not be represented at all, by definition.
+
+To compensate for this, we reweight our preferred weightings by the inverse of
+*number of siblings*. 
+
+TODO: 
+- weight regressions using "best effort" weights
+- look at change over time to confirm your "no change" hypothesis
+- look at siblings, again using "best" weights
+
+
+We rerun the basic regressions for both children and siblings, using the new
+weights. Figure \@ref(fig:plot-res-weighted) shows the results. The weightings
+are fairly successful at reconciling the overall size of effects from siblings
+and children regressions. Among weighted scores that are significant (at p <
+0.05/33) in either regression, `r sum(chn_larger)` estimates are
+higher for children and `r length(chn_larger) - sum(chn_larger)` are
+lower. However, some estimates differ widely or change
+sign across the generations.
 
 
 ```{r plot-res-weighted, fig.cap = "Effects of polygenic scores on number of children/siblings. Regressions weighted by sex, age and education."}
@@ -779,68 +857,10 @@ res_weighted_all %>%
 ```
 
 
-We then calculate the 
-proportions of respondents within each sibling group size, based on the respondent
-weights, and use this to create weights for the sibling regressions.
+## Mechanisms behind modern natural selection
 
-We rerun the basic regressions for both children and siblings, using the new
-weights. Figure \@ref(fig:plot-res-weighted) shows the results. The weightings
-are fairly successful at reconciling the overall size of effects from siblings
-and children regressions. Among weighted scores that are significant (at p <
-0.05/33) in either regression, `r sum(chn_larger)` estimates are
-higher for children and `r length(chn_larger) - sum(chn_larger)` are
-lower. However, some estimates differ widely or change
-sign across the generations.
-
-
-
-```{r calc-flb-weights}
-
-drake::loadd(res_wt_flb_weights)
-drake::loadd(res_sex)
-res_flb_all <- left_join(
-        res_wt_flb_weights, 
-        res_sex %>% filter(sex=="Female") %>% select(-subset, -sex), 
-        by = "term", 
-        suffix = c(".wt", ".nowt")
-      ) %>% 
-      mutate(prop_estimate = estimate.wt/estimate.nowt)
-
-prop_wt_nowt <- mean(res_flb_all$prop_estimate)
-pct_change_score <- function (score) {
-  100 * (res_flb_all$prop_estimate[res_flb_all$term == score] - 1)
-}
-```
-
-
-We also weighted data for women with children only, by age, education and age 
-at first live birth.  Figure \@ref(fig:plot-flb-weights) 
-shows the results. There 
-are large changes for some variables, including EA3 
-(`r pct_change_score("EA3_excl_23andMe_UK")` per cent), cognitive
-ability (`r pct_change_score("cognitive_ability")` per cent) and
-waist-hip ratio (WHR; `r pct_change_score("whr_combined")` percent).
-
-
-Overall, these results suggest that previous work may have underestimated the level of
-selection occurring in the population. [TODO: who?]
-
-
-```{r plot-flb-weights, fig.cap = "Effect sizes on number of children, female respondents weighted by age at first live birth"}
-  
-bind_rows(
-        Weighted   = res_wt_flb_weights, 
-        Unweighted = res_sex %>% filter(sex == "Female") %>% select(-subset, -sex),
-        .id        = "Regression"
-      ) %>% 
-      standard_ggplot(Regression, n_regs = 66)
-```
-
-
-## Mechanisms behind natural selection
-
-Why are selection effects *oppositely* signed in certain subgroups -- for
-example, in older and younger mothers (by age at first live birth) or in those
+Why do selection effects have *opposite* signs across certain subgroups -- for
+example, across older and younger mothers by age at first live birth, or across those
 with more and fewer lifetime sexual partners? A possible answer is given by the
 economic theory of fertility [TODO cite Becker 1960]. According to this,
 increases in potential earned income affect fertility via two opposing channels.
@@ -857,42 +877,59 @@ specialization.
 If so, then genetic characteristics which affect one's earnings potential in the
 labour market may lead to opposing effects on fertility. Genetic
 variants which improve one's earnings may increase fertility among couples, but
-decrease fertility among single parents.
+decrease fertility among single parents. They may also decrease the likelihood
+of becoming a young mother, if this is correlated with single motherhood. Lastly,
+if lifetime number of sexual partners predicts single parent versus 
+two-parent status, the theory could also explain the differently-signed
+effects across people with more and fewer sexual partners.
 
 This explanation predicts that the strength of polygenic scores' effects on
 fertility will correlate with the strength of their relationship with earnings.
 We measure the correlation of each PGS with household income, as well as with
-education level, a phenotypic variable which is likely to predict earnings. We
+education level, a phenotype which predicts earnings. We
 then relate these measurements to effect sizes on number of children.
-Across scores, there is a clear negative relationship between effect on
-fertility, and the correlation with income and/or education (Figure \@ref(fig:plot-cors-income-educ).
+There is a clear negative relationship between a score's effect on
+fertility, and its correlation with income or education (Figure \@ref(fig:plot-cors-income-educ)). If we control for age at first live birth,
+the relationship changes sign and becomes positive.
 
 
-```{r plot-cors-income-educ, fig.cap="Effect sizes on number of children and correlations with income and education"}
+```{r plot-cors-income-educ, fig.cap="Effect sizes on number of children, with and without controls for age at first live birth, by correlations with income and education"}
 
 drake::loadd(res_all)
-cors_income <- cor(famhist[c(score_names)], famhist$income_cat, use = "pairwise")
-# TODO: use age_left_edu when this includes college
-cors_educ <-   cor(famhist[c(score_names)], famhist$edu_qual, use = "pairwise")
+drake::loadd(res_age_flb)
 
-effect_size <- res_all %>% 
-      filter(dep.var == "N children", reg.type == "raw") %>% 
-      pull(estimate)
+cors_income <- cor(famhist[score_names], famhist$income_cat, use = "pairwise")
+# TODO: use age_left_edu when this includes college
+cors_educ <-   cor(famhist[score_names], famhist$edu_qual, use = "pairwise")
+
+effect_size <-  res_all %>% 
+                  filter(dep.var == "N children", reg.type == "raw") %>% 
+                  pull(estimate)
+
+effect_size_flb <-  res_age_flb %>% 
+                      filter(term != "age_flb") %>% 
+                      pull(estimate)
 
 dfr <- data.frame(
-      type = rep(c("Cor. with income", "Cor. with educ"), each = 33),
-      cor = c(cors_income[,1], cors_educ[,1]),
-      effect_size = rep(effect_size, 2)
-)
+        Correlation  = rep(c("Income", "Education"), each = 33, 2),
+        cor          = rep(c(cors_income[,1], cors_educ[,1]), 2),
+        effect_size  = c(rep(effect_size, 2), rep(effect_size_flb, 2)),
+        Controls     = rep(c("None", 
+                        "Age at first live birth"), each = 66)
+      )
 
-ggplot(dfr, aes(effect_size, cor, colour = type)) + 
-      geom_point() +
-      facet_wrap(vars(type)) + 
-      my_vline + 
-      my_hline +
-      labs(x = "Effect on n children", y = "Correlation") +
-      scale_colour_manual(values = c("darkblue", "darkgreen")) +
-      theme(legend.position = "none")
+dfr %>% 
+      mutate(
+        Controls = fct_relevel(Controls, "None")
+      ) %>% 
+      ggplot(aes(effect_size, cor, colour = Correlation)) + 
+        geom_point() +
+        facet_grid(Correlation ~ Controls, labeller = label_both) + 
+        my_vline + 
+        my_hline +
+        labs(x = "Effect on number of children", y = "Correlation") +
+        scale_colour_brewer(type = "qual", palette = 2) +
+        theme(legend.position = "none")
 
 ```
 
@@ -901,67 +938,6 @@ ggplot(dfr, aes(effect_size, cor, colour = type)) +
 
 
 
-```{r calc-corr-age-flb}
-
-drake::loadd(res_age_flb)
-drake::loadd(res_sex)
-
-res_sex_comparison <- res_sex %>% 
-      filter(sex == "Female") %>% 
-      mutate(score_name = term) %>% 
-      select(score_name, term, estimate:conf.high)
-
-res_age_flb %<>% filter(term != "age_flb") 
-
-res_combined <- bind_rows(
-        raw      = res_sex_comparison, 
-        with_age = res_age_flb %>% select(score_name, term, estimate:conf.high), 
-        .id      = "reg.type"
-      ) %>% 
-      arrange(score_name)
-
-raw_flb_comparison <- res_combined %>% 
-      pivot_wider(
-        id_cols     = score_name, 
-        names_from  = reg.type, 
-        values_from = estimate
-      )
-
-cor_raw_flb <- cor(raw_flb_comparison$raw, raw_flb_comparison$with_age)
-opp_signed <- sum(
-        sign(raw_flb_comparison$raw) != sign(raw_flb_comparison$with_age)
-      )
-
-```
-
-
-Figure \@ref(fig:plot-age-flb) shows the results of *children* regressions for 
-women only,
-controlling for age at first live birth. Effect sizes are greatly reduced. Partly,
-this is because the regressions exclude childless women. However,
-in `r opp_signed` out of `r length(score_names)` cases, effect sizes actually
-change sign with the controls. The correlation between effect sizes
-controlling for age at first live birth, and raw effect sizes, is `r cor_raw_flb`.
-
-```{r plot-age-flb, fig.cap = "Effect sizes on number of children, controlling for age at first live birth (women only). Effect sizes for women without controls are shown for comparison"}
-
-n_regs <- as.double(nrow(res_age_flb))
-
-res_combined %>% 
-      mutate(
-        score_name = pretty_names(score_name),
-        score_name = fct_reorder(score_name, estimate, order_abs(2)),
-        Regression = ifelse(reg.type == "raw", "Bivariate", "Controlled for age FLB")
-      ) %>% 
-      ggplot(aes(y = score_name, x = estimate, fill = Regression, 
-        color = p.value < 0.05/{{n_regs}})) + 
-        geom_vline(xintercept = 0, linetype = "dashed", color = "grey20") +
-        pval_geom_point() +
-        pval_scale() +
-        scale_fill_brewer(type = "qual", palette = 3) +
-        my_labs() +
-        my_theme()
-```
 
 
 ```{r calc-age-birth-parents}
