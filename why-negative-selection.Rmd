@@ -2,6 +2,7 @@
 title: "Negative Selection in the 20th Century"
 author: "David Hugh-Jones, Abdel Abdellaoui"
 date: "April 2020"
+bibliography: "negative-selection.bib"
 output: 
   bookdown::pdf_document2:
     toc: false
@@ -85,7 +86,7 @@ my_theme <- function (...) theme(axis.text.y = element_text(size = 7), ...)
 pval_scale <- function (...) scale_color_manual(values = pval_palette, ...)
 
 
-pval_geom_point <- function (size = 1.5, stroke = 0.7, ...) {
+pval_geom_point <- function (size = 1.5, stroke = 0.5, ...) {
   geom_point(shape = 21, size = size, stroke = stroke, ...)
 }
 
@@ -165,7 +166,7 @@ add_n <- function (var, famhist_var = var, dv = "n_children") {
   var <- as.factor(var)
   n <- n_in_regs(famhist_var, dv)
   levels(var) <- sprintf("%s (N = %s)", levels(var), 
-                         prettyNum(n[levels(var)], big.mark = ","))
+                         prettyNum(n[seq_len(nlevels(var))], big.mark = ","))
   # var_n <- sprintf("%s (N = %s)", var, prettyNum(n[var], big.mark = ","))
   # var_n[is.na(var)] <- NA
   var
@@ -192,30 +193,26 @@ scale_y_reordered <- function(..., sep = "___") {
 
 ```
 
+
 # Introduction
 
 Existing work suggests that natural selection is taking place in modern populations,
 but that effect sizes are small. In this paper we investigate natural selection
 in the UK over the twentieth century, using data from UK Biobank. We use
 questions on number of children and number of siblings to reconstruct two
-generations of family size per respondent. We then relate these to polygenic
-scores for several different characteristics. 
+generations of family size per respondent. We then relate these to 33 different
+polygenic scores for a variety of  characteristics. 
 
-Natural selection is taking place on most polygenic scores, and is broadly
-"negative" in that characteristics that most people would consider undesirable
-are being selected for. Effect sizes are larger for number of siblings than for
-number of children. This is not because the strength of natural selection has
-changed over time. Instead, the difference is probably due to ascertainment bias
-in UK Biobank. Indeed, natural selection is concentrated among population
-subgroups that are under-represented in the sample, including less-educated
-people and poorer households. When we weight the sample to correct for
-ascertainment bias, many effect sizes are considerably larger.
+Natural selection is taking place on most polygenic scores, and is concentrated
+among population subgroups that are under-represented in the sample, including
+less-educated people and poorer households. When we weight the sample to correct
+for ascertainment bias, many effect sizes are considerably larger.
 
 Among mothers who were older at first birth, and among parents with fewer sexual
 partners, effect signs are reversed. The effects of PGS can be decomposed into
 two channels: an effect on age at first live birth, and an opposite-signed
 effect on number of children conditional on age at first live birth. This
-pattern may be explained by economic theories of fertility. In these, higher
+pattern can be explained by economic theories of fertility. In these, higher
 potential earnings have two opposite effects on fertility: a
 fertility-increasing income effect (higher income makes children more
 affordable), and a fertility-lowering substitution effect (time spent on
@@ -225,7 +222,7 @@ among single parents, or those in unstable relationships, the substitution effec
 dominates.
 
 
-```
+```{r, eval = FALSE}
 # Open questions/TODO
 
 * If we weight with the GHS, and plot the means of figure 1 using this w
@@ -236,10 +233,13 @@ dominates.
 * Reweight other regressions (e.g. the omnibus regression in the appendix)
 * Look at geography, esp. in siblings regressions.
 * control for age in n_partners regressions.
-* can we weight men by age at first child, using GHS? If not, may need
-  to plot the age_flb weighted regressions separately, against unweighted
-  women-only regressions.
-* Can we find representative data for weights by n_partners?
+* Beauchamp 2016 used the HRS. He reckons it's representative. Is it? How do
+  his effect sizes compare?
+  - he also worries about the quality/quantity tradeoff, which might mean that
+    people with fewer children have more grandchildren (than you'd expect). 
+    As we have the two generations, we can test this. (Actually, there's a 
+    positive correlation of about 0.1)
+
 ```
 
 # Data
@@ -253,8 +253,7 @@ variance 1.
 ```{r calc-means-over-time}
 
 drake::loadd(famhist)
-drake::loadd(ghs_weights)
-famhist <- left_join(famhist, ghs_weights, by = "f.eid")
+
 pgs_over_time <- famhist %>% 
       group_by(
         YOB = santoku::chop(YOB, 
@@ -321,7 +320,7 @@ Effect sizes are larger and more significant for the lowest income category, and
 for the lowest education category. Note that the overall effect is not a simple
 average of the effect among the different subgroups, because polygenic scores 
 may also shift respondents between the subgroups. For example, a high 
-PGS for educational attainment will increase the age at which a respondent 
+PGS for educational attainment may increase the age at which a respondent 
 leaves school.
 
 
@@ -397,8 +396,12 @@ in age, the interaction with age leaving FTE remains significant at
 
 Figure \@ref(fig:plot-sexes) shows effect sizes of PGS on number of children
 separately for males and females. Differences are particularly large for
-educational attainment, height and MDD. There is no overall pattern in
-differences of effect size, however.
+educational attainment, height and MDD. Several PGS for mental illness and
+personality traits are more selected for (or less against) among women, including 
+major depressive disorder (MDD), schizophrenia and neuroticism, while 
+extraversion is more selected for among men. Waist circumference and waist-hip 
+ratio are less selected for among women, and educational attainment is more
+selected against, though the difference is only significant for EA3.
 
 
 ```{r plot-sexes, fig.cap = "Effect sizes on number of children by sex. Lines show significant differences"}
@@ -628,7 +631,6 @@ res_combined %>%
 
 ```{r calc-res-weighted}
 
-drake::loadd(res_wt_ghs_weights)
 drake::loadd(res_wt_flb_weights)
 drake::loadd(res_wt_msoa_weights)
 drake::loadd(res_wt_age_qual_weights)
@@ -695,27 +697,6 @@ rel_sizes_summary <- rel_sizes %>%
                   term = c("Mean", "Median")
                 )
 
-# TODO: move later
-res_weighted_all <- bind_rows(
-        "N children" = res_wt_ghs_weights, 
-        "N siblings" = res_sibs_parent_weights, 
-      .id = "dep.var") 
-res_weighted_all$reg.type <- "weighted"
-res_weighted_all <- bind_rows(
-        res_weighted_all,
-        res_all %>% filter(reg.type == "raw") %>% select(-score_name)
-      )
-
-res_wide <- full_join(
-        res_wt_ghs_weights,
-        res_sibs_parent_weights,
-        by = "term",
-        suffix = c(".children", ".sibs")
-      ) %>% 
-      filter(p.value.children < 0.05/33 | p.value.sibs < 0.05/33) 
-
-chn_larger <- with(res_wide, estimate.children > estimate.sibs)
-
 ```
 
 
@@ -736,11 +717,11 @@ sizes for the census-based weightings.
 
 
 Effect sizes are reasonably consistent across the geographical and
-age/qualification weights. But they are increased again when we weight by age at
-first live birth.This suggests that estimates might be increased still more by
-weighting on other relevant demographic variables. Overall, these results
-suggest that previous work may have underestimated the level of selection
-occurring in the population. [TODO: who?]
+age/qualification weights, but they are increased again when we weight by age at
+first live birth. This suggests that estimates might be further affected by
+weighting on other demographic variables. Given that the Biobank sample
+seems to be ascertained in ways that reduce estimates of natural selection, 
+we view our estimates as likely to be conservative.
 
 
 ```{r tbl-res-wt}
@@ -824,37 +805,37 @@ children will have, on average, three times more children as respondents in UK
 Biobank than parents of one child. Parents of no children will
 not be represented at all, by definition.
 
-To compensate for this, we reweight our preferred weightings by the inverse of
-*number of siblings*. 
+To compensate for this, we reweight our preferred weightings (Age/Qualification)
+by the inverse of *number of siblings*. We then regress this on PGS.
+Figure \@ref(fig:plot-res-sibs) shows the results. For comparison, we show
+regressions on *number of children*, where we have excluded respondents with no 
+children. 
 
-TODO: 
-- weight regressions using "best effort" weights
-- look at change over time to confirm your "no change" hypothesis
-- look at siblings, again using "best" weights
-
-
-We rerun the basic regressions for both children and siblings, using the new
-weights. Figure \@ref(fig:plot-res-weighted) shows the results. The weightings
-are fairly successful at reconciling the overall size of effects from siblings
-and children regressions. Among weighted scores that are significant (at p <
-0.05/33) in either regression, `r sum(chn_larger)` estimates are
-higher for children and `r length(chn_larger) - sum(chn_larger)` are
-lower. However, some estimates differ widely or change
-sign across the generations.
+Effect sizes appear larger in the parents' generation, i.e.
+for *number of siblings*. However, we treat this result cautiously, because
+when we split respondents up by year of birth, we find few differences in
+effect sizes between early- and late-born respondents, whether our 
+dependent variable is *number of siblings* or *number of children*. In other words,
+since estimated effect sizes change when we change the dependent variable,
+but do not change over time within either dependent variable, the explanation
+may be due to remaining ascertainment bias within our sample.
 
 
-```{r plot-res-weighted, fig.cap = "Effects of polygenic scores on number of children/siblings. Regressions weighted by sex, age and education."}
+```{r plot-res-sibs, fig.cap = "Effects of polygenic scores on fertility, respondents' parents vs. respondents"}
+drake::loadd(res_sibs_parent_weights)
+drake::loadd(res_children_comparison)
 
-res_weighted_all %>% 
-      rename(
-        "Dependent variable" = dep.var, 
-      ) %>% 
-      filter(reg.type == "weighted") %>% 
-      standard_ggplot(fill = `Dependent variable`, n_regs = 33, order_idx = 1, 
-        shape = reg.type) + 
-        scale_shape_manual(values = c(21, 4))
+res_sibs_kids <-  bind_rows(
+                    Siblings = res_sibs_parent_weights, 
+                    Children = res_children_comparison,
+                    .id = "Dep. var."
+                  )
 
+standard_ggplot(res_sibs_kids, `Dep. var.`, n_regs = length(score_names))
 ```
+
+
+
 
 
 ## Mechanisms behind modern natural selection
@@ -862,7 +843,7 @@ res_weighted_all %>%
 Why do selection effects have *opposite* signs across certain subgroups -- for
 example, across older and younger mothers by age at first live birth, or across those
 with more and fewer lifetime sexual partners? A possible answer is given by the
-economic theory of fertility [TODO cite Becker 1960]. According to this,
+economic theory of fertility [@becker1960economic]. According to this,
 increases in potential earned income affect fertility via two opposing channels.
 There is an "income effect" by which children become more affordable, like any
 other good. Since childrearing has a cost in time, there is also a substitution
@@ -934,137 +915,38 @@ dfr %>%
 ```
 
 
-# Bits to integrate
+# Conclusion
 
+Natural selection is taking place in modern populations on variants underlying
+many polygenic scores. In a loose sense, phenotypes relating to scores which are
+selected for (against) would be seen as undesirable (desirable) by many people.
+For example, most people would probably prefer to have high educational
+attainment, a low risk of major depressive disorder, and a low risk of coronary
+artery disease, but PGS underlying these traits are being selected for.
+Potentially, natural selection could increase the health burden on modern
+societies, but that depends on effect sizes. Existing work argues that these are
+small. However, as we show, estimates can be crucially affected by ascertainment
+bias in population samples. In addition, we do not know whether estimated effect
+sizes of natural selection will increase or decrease as more accurate polygenic
+scores are produced. We are also unsure about whether polygenic scores for new
+phenotypes will show a similar pattern of natural selection as existing ones. In
+short, it is probably too early to tell whether modern natural selection is
+substantively important or not.
 
-
-
-
-```{r calc-age-birth-parents}
-
-drake::loadd(res_age_birth_parents)
-drake::loadd(res_all)
-
-res_sibs_raw <- filter(res_all, dep.var == "N siblings", reg.type == "raw")
-compare_abp_raw <- res_age_birth_parents %>% 
-      filter(! term %in% c("fath_age_birth", "moth_age_birth")) %>% 
-      left_join(res_sibs_raw, by = "term")
-
-cor_raw_fath <- with(
-  compare_abp_raw %>% filter(control == "fath_age_birth"), 
-  cor(estimate.x, estimate.y))
-cor_raw_moth <- with(
-  compare_abp_raw %>% filter(control == "moth_age_birth"), 
-  cor(estimate.x, estimate.y))
-```
-
-We can run similar regressions for the parents' generation, using the subsets of respondents who reported their mother's or father's age
-and who had no elder siblings. We run *sibling* regressions on these subsets,
-controlling for either parent's age at their birth.
-Figure \@ref(fig:plot-age-birth-parents) shows
-the results. Effect sizes are very similar, whether controlling for
-father's or mother's age at respondent's birth or mother's age at respondent's birth. Unlike for the respondents' generation, effect sizes are positively correlated with
-the effect sizes from bivariate regressions (father's age at birth: 
-$\rho$ `r cor_raw_fath`; mother's age at birth: $\rho$ `r cor_raw_moth`).
-
-
-```{r plot-age-birth-parents, fig.cap = "Effect sizes on number of siblings controlling for parents' age at birth, eldest siblings"}
-
-
-n_regs <- as.double(nrow(res_age_birth_parents)/2)
-
-res_age_birth_parents %>% 
-    filter(! term %in% c("fath_age_birth", "moth_age_birth")) %>% 
-    mutate(
-      term    = pretty_names(term),
-      term    = fct_reorder(term, estimate, order_abs(2)),
-      Control = ifelse(control == "fath_age_birth", 
-                  "Father's age at birth", 
-                  "Mother's age at birth"
-                )
-    ) %>% 
-    ggplot(aes(y = term, x = estimate, fill = Control, 
-      colour = p.value < 0.05/{{n_regs}})) + 
-      pval_geom_point(alpha = 0.8) +  
-      my_vline +
-      my_fill_scale(2) +
-      pval_scale() +
-      my_labs()
-
-```
-
-
-```{r calc-age-flb-dv}
-
-drake::loadd(res_age_flb_dv)
-drake::loadd(res_age_birth_parents_dv)
-
-compare_flb_dv <- left_join(
-        res_age_flb_dv           %>% select(term, estimate),
-        res_age_birth_parents_dv %>% select(term, estimate, dep.var),
-        by = "term"
-      )
-
-cor_flb_fath <- with(compare_flb_dv %>% filter(dep.var == "fath_age_birth"),
-        cor(estimate.x, estimate.y)
-      )
-cor_flb_moth <- with(compare_flb_dv %>% filter(dep.var == "moth_age_birth"),
-        cor(estimate.x, estimate.y)
-      )
-```
-
-
-These results suggest that polygenic scores may directly correlate with
-age at first live birth. Figure \@ref(fig:plot-age-flb-dv) plots
-estimated effect sizes from bivariate regressions for respondents, and
-Figure \@ref(fig:plot-age-birth-parents-dv) does the same for their parents. 
-Effect sizes are reasonably large. They are also very highly correlated across 
-generations. Effect sizes of PGS on father's age at own birth, and on own age
-at first live birth, have a correlation of `r cor_flb_fath`; for mother's age
-and own age it is `r cor_flb_moth`
-
-
-```{r plot-age-flb-dv, fig.cap = "Effects of polygenic scores on age at first live birth"}
-
-n_regs <- as.double(nrow(res_age_flb_dv))
-
-res_age_flb_dv %>% 
-      mutate(
-        term = pretty_names(term),
-        term = fct_reorder(term, estimate, order_abs(1))
-      ) %>% 
-      ggplot(aes(estimate, term, colour = p.value < 0.05 / {{n_regs}})) + 
-      my_vline +
-      pval_geom_point(fill = "steelblue4") +
-      pval_scale() + 
-      my_labs() +
-      my_theme()
-
-```
-
-
-```{r plot-age-birth-parents-dv, fig.cap = "Effects of polygenic scores on parents' age at own birth, eldest siblings"}
-
-n_regs <- as.double(nrow(res_age_birth_parents_dv))
-
-res_age_birth_parents_dv %>% 
-      mutate(
-        term = pretty_names(term),
-        term = fct_reorder(term, estimate, order_abs(1)),
-        "Dependent variable" = dplyr::recode(dep.var, 
-          "fath_age_birth" = "Father's age", 
-          "moth_age_birth" = "Mother's age"
-        )
-      ) %>% 
-      ggplot(aes(estimate, term, fill = `Dependent variable`, 
-        colour = p.value < 0.05 / {{n_regs}})) + 
-        my_vline +
-        pval_geom_point() +
-        pval_scale() +
-        my_fill_scale(n = 2) +
-        my_labs()
-
-```
+Previous work has documented natural selection in modern populations
+[@beauchamp2016genetic; @kong2017selection; @sanjak2018evidence] but has not
+explained its underlying causes. The economic theory of fertility provides a
+parsimonious explanation for which traits are selected, and for why the
+direction of selection is reversed among certain subgroups. An alternative
+theory is that traits selected for are linked to impulsivity and low time
+discount rates, via the channel of early sexual behaviour. The data here provide
+some support for this: scores which might plausibly be linked to
+impulsivity,like ADHD and age at smoking initiation, are selected for. However,
+the "impulsivity" theory is less good at explaining variation in selection
+across the full range of scores, including e.g. waist-hip ratio and BMI.
+Impulsivity also does not explain the reversed sign of selection among e.g.
+older parents. Overall, then, the economic theory is probably the leading
+explanation at present.
 
 
 # Appendix
@@ -1186,7 +1068,11 @@ res_pcs %>%
 
 ```{r calc-period-regs}
 
-drake::loadd(res_period)
+drake::loadd(res_period_parents)
+drake::loadd(res_period_children)
+
+res_period <- bind_rows(res_period_parents, res_period_children)
+
 res_period %<>% 
       tidyr::extract(term, c("period", "score_name"),
         regex="year_split(.*):(.*)")
@@ -1232,12 +1118,19 @@ summary_period <- res_period %>%
 
 
 To check whether effect sizes were changing over time, we ran regressions 
-interacting PGS with birth year, median split at 1950. 
+interacting PGS with birth year, median split at 1950 ("early born" versus "late born"). We use both 
+*number of children* and *number of siblings* as a dependent variable. We weight 
+using age/qualification cells, and further adjust for selection in the parents'
+generation (see above).
+
 Tables \@ref(tab:tbl-siblings-by-period) and \@ref(tab:tbl-children-by-period)
-summarize the results. Very few scores are significantly different. Only
-one score, EA3, changes significantly across time in both generations: the
-absolute size of the (negative) effect significantly increases in sibling 
-regressions, and significantly decreases in children regressions.
+summarize the results. There is no change in natural selection in the parents'
+generation. In the respondents' generation, effect sizes were larger in
+absolute size among the late born for five PGS: autism, cognitive ability,
+EA2, EA3 and extraversion. Three PGS showed significant changes in sign: 
+alcohol use (positive to negative); conscientiousness (negative to positive);
+and type II diabetes (negative to positive).
+
 
 
 ```{r tbl-siblings-by-period}
@@ -1264,7 +1157,7 @@ period_table <- function (tbl, caption) {
 summary_period %>% 
       group_by(Change_Parents) %>% 
       count() %>% 
-      period_table("Change in effect sizes between early and late born parents, 'sibling' regressions")
+      period_table("Change in effect sizes between parents of early and late born respondents (regressions on number of siblings)")
       
 ```
 
@@ -1274,12 +1167,143 @@ summary_period %>%
 summary_period %>% 
       group_by(Change_Respondents) %>% 
       count() %>% 
-      period_table("Change in effect sizes between early and late born respondents, 'children' regressions")
+      period_table("Change in effect sizes between early and late born respondents (regressions on number of children)")
 ```
 
 
+## Selection controlling for age at first live birth: respondents' parents
 
 
+```{r calc-age-birth-parents}
+
+drake::loadd(res_age_birth_parents)
+drake::loadd(res_all)
+
+res_sibs_raw <- filter(res_all, dep.var == "N siblings", reg.type == "raw")
+compare_abp_raw <- res_age_birth_parents %>% 
+      filter(! term %in% c("fath_age_birth", "moth_age_birth")) %>% 
+      left_join(res_sibs_raw, by = "term")
+
+cor_raw_fath <- with(
+  compare_abp_raw %>% filter(control == "fath_age_birth"), 
+  cor(estimate.x, estimate.y))
+cor_raw_moth <- with(
+  compare_abp_raw %>% filter(control == "moth_age_birth"), 
+  cor(estimate.x, estimate.y))
+```
+
+Among the parents' generation, we can control for age at first live birth using
+the subsets of respondents who reported their mother's or father's age, and who
+had no elder siblings. We run regressions on *number of siblings* on these
+subsets, controlling for either parent's age at their birth. Figure
+\@ref(fig:plot-age-birth-parents) shows the results. Effect sizes are very
+similar, whether controlling for father's or mother's age. Unlike for the
+respondents' generation, effect sizes are positively correlated with the effect
+sizes from bivariate regressions without the age at birth control (father's age
+at birth: $\rho$ `r cor_raw_fath`; mother's age at birth: $\rho$ `r
+cor_raw_moth`).
+
+
+```{r plot-age-birth-parents, fig.cap = "Effect sizes on number of siblings controlling for parents' age at birth, eldest siblings"}
+
+
+n_regs <- as.double(nrow(res_age_birth_parents)/2)
+
+res_age_birth_parents %>% 
+    filter(! term %in% c("fath_age_birth", "moth_age_birth")) %>% 
+    mutate(
+      term    = pretty_names(term),
+      term    = fct_reorder(term, estimate, order_abs(2)),
+      Control = ifelse(control == "fath_age_birth", 
+                  "Father's age at birth", 
+                  "Mother's age at birth"
+                )
+    ) %>% 
+    ggplot(aes(y = term, x = estimate, fill = Control, 
+      colour = p.value < 0.05/{{n_regs}})) + 
+      pval_geom_point(alpha = 0.8) +  
+      my_vline +
+      my_fill_scale(2) +
+      pval_scale() +
+      my_labs()
+
+```
+
+
+## Effects of PGS on age at first live birth
+
+
+```{r calc-age-flb-dv}
+
+drake::loadd(res_age_flb_dv)
+drake::loadd(res_age_birth_parents_dv)
+
+compare_flb_dv <- left_join(
+        res_age_flb_dv           %>% select(term, estimate),
+        res_age_birth_parents_dv %>% select(term, estimate, dep.var),
+        by = "term"
+      )
+
+cor_flb_fath <- with(compare_flb_dv %>% filter(dep.var == "fath_age_birth"),
+        cor(estimate.x, estimate.y)
+      )
+cor_flb_moth <- with(compare_flb_dv %>% filter(dep.var == "moth_age_birth"),
+        cor(estimate.x, estimate.y)
+      )
+```
+
+
+Our results suggest that polygenic scores may directly correlate with
+age at first live birth. Figure \@ref(fig:plot-age-flb-dv) plots
+estimated effect sizes from bivariate regressions for respondents, and
+Figure \@ref(fig:plot-age-birth-parents-dv) does the same for their parents. 
+Effect sizes are reasonably large. They are also very highly correlated across 
+generations. Effect sizes of PGS on father's age at own birth, and on own age
+at first live birth, have a correlation of `r cor_flb_fath`; for mother's age
+and own age it is `r cor_flb_moth`
+
+
+```{r plot-age-flb-dv, fig.cap = "Effects of polygenic scores on age at first live birth"}
+
+n_regs <- as.double(nrow(res_age_flb_dv))
+
+res_age_flb_dv %>% 
+      mutate(
+        term = pretty_names(term),
+        term = fct_reorder(term, estimate, order_abs(1))
+      ) %>% 
+      ggplot(aes(estimate, term, colour = p.value < 0.05 / {{n_regs}})) + 
+      my_vline +
+      pval_geom_point(fill = "steelblue4") +
+      pval_scale() + 
+      my_labs() +
+      my_theme()
+
+```
+
+
+```{r plot-age-birth-parents-dv, fig.cap = "Effects of polygenic scores on parents' age at own birth, eldest siblings"}
+
+n_regs <- as.double(nrow(res_age_birth_parents_dv))
+
+res_age_birth_parents_dv %>% 
+      mutate(
+        term = pretty_names(term),
+        term = fct_reorder(term, estimate, order_abs(1)),
+        "Dependent variable" = dplyr::recode(dep.var, 
+          "fath_age_birth" = "Father's age", 
+          "moth_age_birth" = "Mother's age"
+        )
+      ) %>% 
+      ggplot(aes(estimate, term, fill = `Dependent variable`, 
+        colour = p.value < 0.05 / {{n_regs}})) + 
+        my_vline +
+        pval_geom_point() +
+        pval_scale() +
+        my_fill_scale(n = 2) +
+        my_labs()
+
+```
 
 
 
@@ -1411,3 +1435,6 @@ res_together %>%
         theme(legend.position = "bottom")
 ```
 
+
+
+# References

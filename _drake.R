@@ -38,6 +38,7 @@ msoa_shapefile     <- file.path(data_dir, "infuse_msoa_lyr_2011_clipped",
 
 weighting_schemes <- rlang::syms(c("flb_weights", "age_qual_weights", 
                         "msoa_weights"))
+period_weight_syms <- rlang::syms((c("age_qual_weights", "parent_weights")))
 
 plan <- drake_plan(
   score_names  = {
@@ -98,14 +99,6 @@ plan <- drake_plan(
                   format = "fst"
                 ),
   
-  # ghs_weights  =  {
-  #   weight_by_ghs(
-  #     ~ factor(sex) + age_at_recruitment + factor(edu_qual), 
-  #     ghs_subset, 
-  #     famhist
-  #   )
-  # },
-  
   flb_weights = {
     weight_by_ghs(
             ~ age_at_recruitment + factor(flb_cat) + factor(edu_qual), 
@@ -120,10 +113,10 @@ plan <- drake_plan(
   
   msoa_weights = weight_by_census_msoa(famhist, census_msoa, famhist_msoa),
   
-  mf_pairs = target(
-                     make_mf_pairs(file_in(!! mf_pairs_file), famhist), 
-                     format = "fst"
-                   ), 
+  mf_pairs =  target(
+                make_mf_pairs(file_in(!! mf_pairs_file), famhist), 
+                format = "fst"
+              ), 
   
   rgs = make_rgs(file_in(!! rgs_file)),
   
@@ -184,14 +177,27 @@ plan <- drake_plan(
                               dep.var     = "n_sibs"
                             ),
   
-  res_period = {
-    expand_grid(
-            children = c(TRUE, FALSE),
-            score_name = score_names
-          ) %>% 
-          pmap_dfr(run_regs_period, famhist = famhist)
-  },
+  res_children_comparison = map_dfr(score_names,
+                              run_regs_weighted,
+                              famhist     = famhist %>% filter(n_children > 0),
+                              weight_data = age_qual_weights,
+                              dep.var     = "n_children"
+                            ),
   
+  res_period =  target(
+                  map_dfr(score_names, 
+                    run_regs_period,
+                    famhist     = famhist,
+                    weight_data = weight_data,
+                    children    = children
+                  ),
+                  transform = map(
+                    children    = !! (c(TRUE, FALSE)),
+                    weight_data = !! period_weight_syms,
+                    .names      = c("res_period_children", "res_period_parents")
+                  )
+                ),
+    
   res_sex = {
     sexes <- rlang::exprs(
             sex == 0, 
