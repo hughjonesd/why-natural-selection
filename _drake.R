@@ -15,7 +15,7 @@ source("weight-data.R")
 
 data_dir           <- "../negative-selection-data"
 pgs_dir            <- file.path(data_dir, "polygenic_scores/")
-ph_file            <- file.path(data_dir, "UKB.EA_pheno.coordinates.QC.david.csv")
+ph_file            <- file.path(data_dir, "UKB.EA_pheno.coordinates.QC.csv")
 pcs_file           <- file.path(data_dir, "UKB.HM3.100PCs.40310.txt")
 famhist_file       <- file.path(data_dir, "david.family_history.traits.out.csv")
 famhist2_file      <- file.path(data_dir, "david.family_history.traits.20042020.out.csv")
@@ -23,6 +23,7 @@ famhist3_file      <- file.path(data_dir, "david.family_history.traits.05052020.
 famhist4_file      <- file.path(data_dir, "david.family_history.traits.16052020.out.csv")
 famhist5_file      <- file.path(data_dir, "david.family_history.traits.18052020.out.csv")
 famhist6_file      <- file.path(data_dir, "david.family_history.traits.17062020.out.csv")
+famhist7_file      <- file.path(data_dir, "david.birthinfo.traits.14072020.out.csv")
 rgs_file           <- file.path(data_dir, "EA3_rgs.10052019.rgs.csv")
 mf_pairs_file      <- file.path(data_dir, "spouse_pair_info", 
                         "UKB_out.mf_pairs_rebadged.csv")
@@ -60,6 +61,7 @@ plan <- drake_plan(
                       file_in(!! famhist4_file),
                       file_in(!! famhist5_file),
                       file_in(!! famhist6_file),
+                      file_in(!! famhist7_file),
                       file_in(!! pgs_dir)
                     ), 
                     format = "fst"
@@ -77,7 +79,9 @@ plan <- drake_plan(
                    format = "fst"
                  ),
   
-  fhl_mlogit   =  make_famhist_long_mlogit(famhist, score_names),
+  # mlogit now uses dfidx to create a "long" dataset, but mnlogit 
+  # (used below) doesn't update. Skipping for now.
+  # fhl_mlogit   =  make_famhist_long_mlogit(famhist, score_names),
   
   resid_scores = target(
                    make_resid_scores(famhist, pcs, score_names), 

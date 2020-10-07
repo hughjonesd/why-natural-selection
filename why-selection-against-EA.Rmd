@@ -1,7 +1,7 @@
 ---
 title: "Negative Selection in the 20th Century"
 author: "David Hugh-Jones"
-date: "April 2020"
+date: "July 2020"
 output: 
   bookdown::pdf_document2:
     toc: false

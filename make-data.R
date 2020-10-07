@@ -60,6 +60,7 @@ make_famhist <- function (
         famhist4_file,
         famhist5_file,
         famhist6_file,
+        famhist7_file,
         pgs_dir
       ) {
   ph <- read_csv(ph_file, col_types = cols(
@@ -68,31 +69,24 @@ make_famhist <- function (
     .default = col_double()
   ))
   
-  famhist <- read_csv(famhist_file, col_types = strrep("d", 40))
-  famhist2 <- read_csv(famhist2_file, col_types = strrep("d", 17))
-  famhist3 <- read_csv(famhist3_file)
-  famhist4 <- read_csv(famhist4_file, col_types = strrep("d", 33))
-  famhist5 <- read_csv(famhist5_file, col_types = strrep("d", 4))
-  famhist6 <- read_csv(famhist6_file, col_types = strrep("d", 22))
-  names(famhist) <- paste0("f.", names(famhist))
-  names(famhist) <- gsub("\\-", ".", names(famhist))
-  names(famhist2) <- paste0("f.", names(famhist2))
-  names(famhist2) <- gsub("\\-", ".", names(famhist2))
-  names(famhist3) <- paste0("f.", names(famhist3))
-  names(famhist3) <- gsub("\\-", ".", names(famhist3))
-  names(famhist4) <- paste0("f.", names(famhist4))
-  names(famhist4) <- gsub("\\-", ".", names(famhist4))
-  names(famhist5) <- paste0("f.", names(famhist5))
-  names(famhist5) <- gsub("\\-", ".", names(famhist5))
-  names(famhist6) <- paste0("f.", names(famhist6))
-  names(famhist6) <- gsub("\\-", ".", names(famhist6))
+  famhist <- list()
+  famhist[[1]] <- read_csv(famhist_file, col_types = strrep("d", 40))
+  famhist[[2]] <- read_csv(famhist2_file, col_types = strrep("d", 17))
+  famhist[[3]] <- read_csv(famhist3_file)
+  famhist[[4]] <- read_csv(famhist4_file, col_types = strrep("d", 33))
+  famhist[[5]] <- read_csv(famhist5_file, col_types = strrep("d", 4))
+  famhist[[6]] <- read_csv(famhist6_file, col_types = strrep("d", 22))
+  famhist[[7]] <- read_csv(famhist7_file, col_types = strrep("d", 3)) 
+  for (i in seq_along(famhist)) {
+    names(famhist[[i]]) <- paste0("f.", names(famhist[[i]]))
+    names(famhist[[i]]) <- gsub("\\-", ".", names(famhist[[i]]))  
+  }
   
-  famhist %<>% left_join(ph, by = c("f.eid" = "eid"))
-  famhist %<>% left_join(famhist2, by = "f.eid")
-  famhist %<>% left_join(famhist3, by = "f.eid")
-  famhist %<>% left_join(famhist4, by = "f.eid")
-  famhist %<>% left_join(famhist5, by = "f.eid")
-  famhist %<>% left_join(famhist6, by = "f.eid")
+  famhist[[1]] %<>% left_join(ph, by = c("f.eid" = "eid"))
+  for (fh in famhist[-1]) {
+    famhist[[1]] %<>% left_join(fh, by = "f.eid")  
+  }
+  famhist <- famhist[[1]]
   
   # only "genetic" whites
   famhist %<>% filter(! is.na(genetic_ethnic_grouping))
