@@ -1,5 +1,5 @@
 ---
-title: "Negative Selection in the 20th Century"
+title: "Natural Selection in the 20th Century"
 author: "David Hugh-Jones, Abdel Abdellaoui"
 date: "July 2020"
 bibliography: "negative-selection.bib"
@@ -196,30 +196,63 @@ scale_y_reordered <- function(..., sep = "___") {
 
 # Introduction
 
-Existing work suggests that natural selection is taking place in modern populations,
-but that effect sizes are small. In this paper we investigate natural selection
-in the UK over the twentieth century, using data from UK Biobank. We use
-questions on number of children and number of siblings to reconstruct two
-generations of family size per respondent. We then relate these to 33 different
-polygenic scores for a variety of  characteristics. 
+Geneticists have long hypothesized that natural selection is taking place in
+modern human populations. Recent work confirms this using genome-wide analysis
+[@Barban_2016; @beauchamp2016genetic; @kong2017selection; @sanjak2018evidence].
+In particular, genetic variants associated with higher educational attainment
+are being selected against, although effect sizes appear small.
 
-Natural selection is taking place on most polygenic scores, and is concentrated
-among population subgroups that are under-represented in the sample, including
-less-educated people and poorer households. When we weight the sample to correct
-for ascertainment bias, many effect sizes are considerably larger.
+Several gaps in our knowledge remain. First, while existing work examines
+contemporary populations, we would like to extend the analysis over time, since
+natural selection in the same direction over multiple generations
+could lead to significant effects in the long run. Second, there are concerns
+about ascertainment bias in the samples used. This could potentially bias
+estimates of the magnitude of natural selection. Lastly, we know little about
+the *mechanisms* behind natural selection in contemporary populations.
 
-Among mothers who were older at first birth, and among parents with fewer sexual
-partners, effect signs are reversed. The effects of PGS can be decomposed into
-two channels: an effect on age at first live birth, and an opposite-signed
-effect on number of children conditional on age at first live birth. This
-pattern can be explained by economic theories of fertility. In these, higher
-potential earnings have two opposite effects on fertility: a
-fertility-increasing income effect (higher income makes children more
-affordable), and a fertility-lowering substitution effect (time spent on
-childrearing has a higher cost in foregone earnings). Among couples who can take
-advantage of coordination in childcare activities, the income effect dominates;
-among single parents, or those in unstable relationships, the substitution effect
-dominates.
+Here we attempt to answer these questions, using data from UK Biobank. We use
+questions on respondents' number of children, and their number of siblings, to 
+reconstruct two generations of family size. We then relate these to 33 different
+polygenic scores for a variety of characteristics. This analysis provides a 
+broader picture of natural selection in the UK than has previously been available.
+
+Our key results are as follows. First, comparing natural selection across the
+two generations, there are few signs of change in size or direction over time.
+Most polygenic scores are selected in the same direction in both generations. We
+also see little evidence of changes across birth cohorts within either
+generation.
+
+Second, natural selection is concentrated among population subgroups which are
+under-represented in the sample, including less-educated people and poorer
+households. When we weight the sample to correct for ascertainment bias, many
+effect sizes are larger, sometimes much larger. We emphasize that our weights
+are only a partial solution to ascertainment bias in the sample. As a result,
+much uncertainty remains about the strength of natural selection in the UK
+population, but we can be reasonably sure that it is larger than naïve estimates
+suggest.
+
+Lastly, patterns in natural selection give us clues to the underlying
+mechanism. In particular, among mothers who were older at their first birth, and
+among parents with fewer sexual partners, the direction of natural selection is
+*reversed*: for example, among these subgroups, higher polygenic scores (PGS)
+for educational attainment are associated with having more offspring, rather
+than fewer. The effects of PGS can be decomposed into two channels: an effect on
+age at first live birth, and an opposite-signed effect on number of children
+conditional on age at first live birth. 
+
+This pattern can be explained by economic theories of fertility
+[@becker1960economic]. In these, higher potential earnings have two opposite
+effects on fertility: a fertility-increasing *income effect* (higher income
+makes children more affordable), and a fertility-lowering *substitution effect*
+(time spent on childrearing has a higher cost in foregone earnings). Among
+couples who can take advantage of coordination in childcare activities, the
+income effect dominates; among single parents, or those in unstable
+relationships, the substitution effect dominates. Supporting this explanation,
+polygenic scores' raw effects on fertility are negatively correlated with their
+effects on income; on the other hand, controlling for age at first live birth,
+scores' effects on fertility and on household income are *positively*
+correlated. These two results are compatible with the substitution effect and the
+income effect respectively.
 
 
 ```{r, eval = FALSE}
@@ -244,7 +277,7 @@ dominates.
 
 # Data
 
-Data is taken from UK Biobank. Polygenic scores were  normalized to mean 0,
+Data is taken from UK Biobank. Polygenic scores were normalized to mean 0,
 variance 1. 
 
 # Results
@@ -299,10 +332,11 @@ pgs_over_time %>%
 
 These estimates may suffer from ascertainment bias within the UK Biobank sample.
 Respondents are higher income and better educated than the UK population, and
-they may also differ on other unobserved characteristics.
+they may also differ on other unobserved characteristics [@10.1093/aje/kwx246].
 
-To examine the effects of sampling, we regress respondents' polygenic
-scores on their number of children:
+To examine the effects of sampling, we start by measuring the strength of
+natural selection within different subgroups. To do this we regress respondents' 
+polygenic scores on their number of children:
 
 \[
 y_i = \alpha + \beta\mathrm{PGS}_i + \varepsilon_i
@@ -310,18 +344,18 @@ y_i = \alpha + \beta\mathrm{PGS}_i + \varepsilon_i
 
 The effect size $\beta$ measures the strength of natural selection within the
 sample (or a given subgroup). In fact, since polygenic scores are normalized to
-mean 0, $\beta$ is the expected polygenic score among children of the sample.
+mean 0, $\beta$ is the expected polygenic score among children of the sample or
+subgroup.
 
 Figures \@ref(fig:plot-educ-level) and \@ref(fig:plot-income) plot effect sizes
-for each polygenic score among different subgroups of the sample. Figure
-\@ref(fig:plot-educ-level) groups respondents by age of completing full-time
-education. Figure \@ref(fig:plot-income) groups respondents by household income.
-Effect sizes are larger and more significant for the lowest income category, and
-for the lowest education category. Note that the overall effect is not a simple
-average of the effect among the different subgroups, because polygenic scores 
-may also shift respondents between the subgroups. For example, a high 
-PGS for educational attainment may increase the age at which a respondent 
-leaves school.
+for each polygenic score. Figure \@ref(fig:plot-educ-level) groups respondents
+by age of completing full-time education. Figure \@ref(fig:plot-income) groups
+respondents by household income. Effect sizes are larger and more significant
+for the lowest income category, and for the lowest education category. Note that
+the overall effect is not a simple average of the effect among the different
+subgroups, because polygenic scores may also shift respondents between the
+subgroups. For example, a high PGS for educational attainment may increase the
+age at which a respondent leaves school.
 
 
 ```{r plot-educ-level, fig.cap = "Effect sizes on number of children by age left full-time education"}
@@ -833,9 +867,6 @@ res_sibs_kids <-  bind_rows(
 
 standard_ggplot(res_sibs_kids, `Dep. var.`, n_regs = length(score_names))
 ```
-
-
-
 
 
 ## Mechanisms behind modern natural selection
