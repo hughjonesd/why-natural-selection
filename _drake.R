@@ -90,6 +90,8 @@ plan <- drake_plan(
 
   ghs_subset   = target(make_ghs_subset(file_in(!! ghs_file)), format = "fst"),
   
+  pgs_over_time = calc_pgs_over_time(famhist, score_names),
+  
   census_age_qual = target(
                       make_census_age_qual(
                         file_in(!! DC1108EW_file),
@@ -316,7 +318,7 @@ plan <- drake_plan(
     res <- pmap_dfr(pars,
             ~ run_regs_fml(
               fml        =
-                "n_children ~ {score_name}*lo_partners",
+                "n_children ~ lo_partners + {score_name}:lo_partners",
               score_name = .y,
               famhist    = famhist,
               subset     = .x
@@ -425,7 +427,7 @@ plan <- drake_plan(
     res <- pmap_dfr(pars,
             ~ run_regs_fml(
               fml        =
-                "n_children ~ {score_name}*(lo_partners + YOB + I(YOB^2))",
+                "n_children ~ lo_partners + lo_partners:({score_name} + YOB + I(YOB^2))",
               score_name = .y,
               famhist    = famhist,
               subset     = .x

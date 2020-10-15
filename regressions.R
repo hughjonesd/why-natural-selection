@@ -2,16 +2,56 @@
 suppressPackageStartupMessages({
   library(glue)
   library(broom)
+  library(magrittr)
+  library(santoku)
+  library(tidyr)
   library(dplyr)
   library(lmtest)
+  loadNamespace("ggplot2")
 })
+
+calc_pgs_over_time <- function (famhist, score_names) {
+  pgs_over_time <- famhist %>% 
+        group_by(
+          YOB = santoku::chop(YOB, 
+            seq(1940, 1970, 5), 
+            labels    = seq(40, 65, 5),
+            extend    = FALSE
+          ) 
+        ) %>% 
+        filter(! is.na(YOB)) %>% 
+        summarize(across(all_of(score_names), ggplot2::mean_cl_normal, na.rm = TRUE)) %>% 
+        pivot_longer(-YOB, names_to = "score_name", values_to = "score") %>% 
+        mutate(
+          score_lo = score$ymin,
+          score_hi = score$ymax,
+          score    = score$y
+        )
+  
+  run_reg <- function (score_name) {
+    fml <- as.formula(glue("{score_name} ~ YOB"))
+    tidy(lm(fml, famhist))  
+  }
+  time_regs <- map_dfr(score_names, run_reg, .id = "score_name")
+  time_regs %<>% 
+        filter(term != "(Intercept)") %>% 
+        select(score_name, p.value, statistic) %>% 
+        mutate(
+          Change = santoku::chop(statistic, c(-1.96, 1.96), labels = c("-", "o", "+"))
+        )
+  
+  pgs_over_time %<>% left_join(time_regs, by = "score_name")
+  
+  pgs_over_time
+}
 
 
 run_regs_basic <- function (dep_var, score_names, famhist) {
   
   run_reg <- function (score_name) {
     fml <- as.formula(glue("{dep_var} ~ {score_name}"))
-    reg_bv <- tidy(lm(fml, famhist), conf.int = TRUE)  
+    reg_bv <- tidy(lm(fml, famhist), conf.int = TRUE) 
+    reg_bv
   }
   basic_res <- map_dfr(score_names, run_reg, .id = "score_name")
   

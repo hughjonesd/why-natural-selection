@@ -265,7 +265,6 @@ income effect respectively.
   by figure 1. 
 * Reweight other regressions (e.g. the omnibus regression in the appendix)
 * Look at geography, esp. in siblings regressions.
-* control for age in n_partners regressions.
 * Beauchamp 2016 used the HRS. He reckons it's representative. Is it? How do
   his effect sizes compare?
   - he also worries about the quality/quantity tradeoff, which might mean that
@@ -282,70 +281,60 @@ variance 1.
 
 # Results
 
-
-```{r calc-means-over-time}
-
-drake::loadd(famhist)
-
-pgs_over_time <- famhist %>% 
-      group_by(
-        YOB = santoku::chop(YOB, 
-          seq(1940, 1970, 5), 
-          labels    = seq(40, 65, 5),
-          extend    = FALSE
-        ) 
-      ) %>% 
-      filter(! is.na(YOB)) %>% 
-      summarize(across(all_of(score_names), ggplot2::mean_cl_normal, na.rm = TRUE)) %>% 
-      pivot_longer(-YOB, names_to = "score_name", values_to = "score") %>% 
-      mutate(
-        score_lo = score$ymin,
-        score_hi = score$ymax,
-        score    = score$y
-      )
- 
-```
+We first show raw changes in polygenic scores over birth years, within the entire UK Biobank
+sample. Figure \@ref(fig:plot-means-over-time) plots mean polygenic scores by 5-year
+birth intervals. Several scores show consistent increases or declines over this 
+30-year period, of the order of 5% of a standard deviation.
 
 
-Figure \@ref(fig:plot-means-over-time) plots mean polygenic scores by 5-year
-birth intervals, for the entire sample. Several scores show consistent increases
-or declines over this 30-year period, of the order of 5% of a standard deviation.
+```{r plot-means-over-time, fig.height = 5, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Points are means for 5-year intervals. Lines are 95% confidence intervals. Green lines show a significant increase over time (p < 0.05). Red lines show a significant decrease."}
 
-
-```{r plot-means-over-time, fig.height = 5, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Points are means for 5-year intervals. Lines are 95% confidence intervals."}
+drake::loadd(pgs_over_time)
 
 pgs_over_time %>% 
       mutate(score_name = pretty_names(score_name)) %>% 
-      ggplot(aes(YOB, group = score_name)) + 
+      ggplot(aes(YOB, group = score_name, colour = Change)) + 
       geom_pointrange(aes(ymin = score_lo, y = score, ymax = score_hi), 
-        colour = "steelblue4", fatten = 2) +
-      facet_wrap(~score_name) +
+        fatten = 2) +
+      facet_wrap(~score_name, ncol = 5) +
       my_hline +
+      scale_color_manual(values = c("-" = "red", "+" = "darkgreen", "o" = "black")) +
       theme(
         strip.text  = element_text(size = 6), 
-        axis.text.x = element_text(size = 7)
+        axis.text.x = element_text(size = 7),
+        legend.position = "none"
       ) +
       labs(y = "PGS", x = "Birth year (5 year intervals)")
 
 ```
 
-
-These estimates may suffer from ascertainment bias within the UK Biobank sample.
+These changes could reflect either natural selection within the UK population,
+or ascertainment bias within the sample. 
 Respondents are higher income and better educated than the UK population, and
 they may also differ on other unobserved characteristics [@10.1093/aje/kwx246].
+Since richer and educated people also live longer, this bias might also increase
+with age.
 
 To examine the effects of sampling, we start by measuring the strength of
 natural selection within different subgroups. To do this we regress respondents' 
-polygenic scores on their number of children:
+polygenic scores on their number of children ($y_i$):
 
 \[
 y_i = \alpha + \beta\mathrm{PGS}_i + \varepsilon_i
 \]
 
+
+```{r calc-sex-ratio}
+female_ratio <- mean(famhist$sex == 0)
+```
+
 The effect size $\beta$ measures the strength of natural selection within the
-sample (or a given subgroup). In fact, since polygenic scores are normalized to
+sample or a given subgroup. In fact, since polygenic scores are normalized to
 mean 0, $\beta$ is the expected polygenic score among children of the sample or
-subgroup.
+subgroup [@beauchamp2016genetic]. We begin with basic demographic variables
+including education, income and sex. These are all potential sources of ascertainment
+bias: as well as the ascertainment for income and education, mentioned above, the
+sample sex ratio  skews `r female_ratio * 100`% female.
 
 Figures \@ref(fig:plot-educ-level) and \@ref(fig:plot-income) plot effect sizes
 for each polygenic score. Figure \@ref(fig:plot-educ-level) groups respondents
@@ -354,7 +343,8 @@ respondents by household income. Effect sizes are larger and more significant
 for the lowest income category, and for the lowest education category. Note that
 the overall effect is not a simple average of the effect among the different
 subgroups, because polygenic scores may also shift respondents between the
-subgroups. For example, a high PGS for educational attainment may increase the
+subgroups. For example, a high PGS for educational attainment may correlate
+with fewer children among early school leavers, but may also increase the
 age at which a respondent leaves school.
 
 
@@ -480,69 +470,20 @@ res_sex %>%
 ```
 
 
-When we split respondents up by other demographic variables, we get a more
-surprising result: the direction of natural selection is different among
-different subgroups. 
-
-
-```{r calc-age-flb-cross}
-
-drake::loadd(res_age_flb_cross)
-
-cor_age_flb <- res_age_flb_cross %>% 
-      mutate(category = gsub(":.*", "", term)) %>% 
-      pivot_wider(score_name, names_from = category, values_from = estimate) %>%              {cor(.$`age_flb_cat10-22`, .$`age_flb_cat28-52`)}
-
-```
-
-
-Figure \@ref(fig:plot-age-flb-cross) shows effect sizes estimated separately for
-each tercile of age at first live birth. Several effects are strikingly
-different across terciles. ADHD and MDD are selected for amongst the youngest
-third of mothers, but selected against among the oldest two-thirds. Educational
-attainment is selected for among the oldest two-thirds of mothers, but is not
-significantly selected among the youngest third. Similarly, several PGS of body
-measurements are selected against only among older mothers. The correlation
-between effect sizes for the youngest and oldest terciles is `r cor_age_flb`.
+These results show that ascertainment within UK Biobank could bias estimates
+of the size of natural selection towards zero. We now focus in on variables 
+specifically related to marriage markets and raising children. Whatever processes 
+give rise to natural selection, these variables are likely to be involved; at
+the same time, they may also be ascertained within the sample.
 
 Figure \@ref(fig:plot-n-partners) splits males and females by lifetime number of
-sexual partners, at the median value of 3. Again, selection effects are reversed
-across the groups. Among men and women with more than 3 sexual partners, for
-example, educational attainment is selected against; among those with 3 or fewer
-sexual partners, it is selected for.
-
-Figure \@ref(fig:plot-with-partner) splits respondents up by whether they
-were living with a spouse or partner at the time of interview. Effects are 
-generally the same sign in both groups, but are much larger among those not
-living with a spouse or partner.
-
-
-```{r plot-age-flb-cross, fig.cap = "Effect sizes on number of children, by age at first live birth terciles"}
-
-drake::loadd(res_age_flb_cross)
-
-# this counts each cross term as a separate test:
-n_regs <- as.double(nrow(res_age_flb_cross)) 
-
-res_age_flb_cross %>% 
-      mutate(
-        score_name = pretty_names(score_name),
-        score_name = fct_reorder(score_name, estimate, order_abs(1)),
-        term       = gsub("age_flb_cat(.*):.*", "\\1", term),
-        term       = add_n(term, "age_flb_cat")
-      ) %>% 
-      ggplot(aes(estimate, score_name, fill = term, 
-        colour = p.value < 0.05/{{n_regs}})) +
-        my_vline +
-        pval_geom_point() +
-        pval_scale() +
-        my_fill_scale(n = 3, direction = -1, 
-          guide = guide_legend(title = "Age at first live birth")) +
-        my_labs() +
-        my_theme()
-
-
-```
+sexual partners, at the median value of 3. For both sexes, effects are larger
+and more significant among those with more than 3 partners. Results are
+unchanged if we control for respondents' age (Figure
+\@ref(fig:plot-n-partners-controlled) in the appendix). Figure
+\@ref(fig:plot-with-partner) splits respondents up by whether they were living
+with a spouse or partner at the time of interview. Again, effects are larger
+among those not living with a spouse or partner.
 
 
 ```{r plot-n-partners, fig.cap = "Effect sizes on number of children by number of sexual partners", fig.height = 4}
@@ -550,8 +491,8 @@ res_age_flb_cross %>%
 
 drake::loadd(res_partners)
 res_partners %<>%       
-      filter(term != "(Intercept)", term != "lo_partnersTRUE") %>% 
-      mutate(`N partners` = ifelse(grepl(":", term), "<= 3", "> 3")) 
+      filter(grepl(":", term)) %>% 
+      mutate(`N partners` = ifelse(grepl("TRUE:", term), "<= 3", "> 3")) 
 
 
 n_regs <- as.double(nrow(res_partners))
@@ -597,6 +538,62 @@ res_with_partner %>%
 ```
 
 
+```{r calc-age-flb-cross}
+
+drake::loadd(res_age_flb_cross)
+
+cor_age_flb <- res_age_flb_cross %>% 
+      mutate(category = gsub(":.*", "", term)) %>% 
+      pivot_wider(score_name, names_from = category, values_from = estimate) %>%              {cor(.$`age_flb_cat10-22`, .$`age_flb_cat28-52`)}
+
+```
+
+Our final variable is age at first live birth (AFLB), for females only. There is evidence
+for genetic effects on AFLB [@Barban_2016]. There is also 
+a close link between this variable and number of children born.
+
+Figure \@ref(fig:plot-age-flb-cross) shows effect sizes estimated separately for
+each tercile of AFLB. Several effects are strikingly
+different across terciles. ADHD and MDD are selected for amongst the youngest
+third of mothers, but selected against among the oldest two-thirds. Educational
+attainment is selected for among the oldest two-thirds of mothers, but is not
+significantly selected among the youngest third. Similarly, several PGS of body
+measurements are selected against only among older mothers. The correlation
+between effect sizes for the youngest and oldest terciles is `r cor_age_flb`.
+As before, recall that PGS may have two effects: they may change the number of
+children within categories, but may also shift respondents between categories.
+
+
+
+```{r plot-age-flb-cross, fig.cap = "Effect sizes on number of children, by age at first live birth terciles"}
+
+drake::loadd(res_age_flb_cross)
+
+# this counts each cross term as a separate test:
+n_regs <- as.double(nrow(res_age_flb_cross)) 
+
+res_age_flb_cross %>% 
+      mutate(
+        score_name = pretty_names(score_name),
+        score_name = fct_reorder(score_name, estimate, order_abs(1)),
+        term       = gsub("age_flb_cat(.*):.*", "\\1", term),
+        term       = add_n(term, "age_flb_cat")
+      ) %>% 
+      ggplot(aes(estimate, score_name, fill = term, 
+        colour = p.value < 0.05/{{n_regs}})) +
+        my_vline +
+        pval_geom_point() +
+        pval_scale() +
+        my_fill_scale(n = 3, direction = -1, 
+          guide = guide_legend(title = "Age at first live birth")) +
+        my_labs() +
+        my_theme()
+
+
+```
+
+
+
 ```{r calc-corr-age-flb}
 
 drake::loadd(res_age_flb)
@@ -631,12 +628,16 @@ opp_signed <- sum(
 ```
 
 
-Figure \@ref(fig:plot-age-flb) shows the results of regressions for women only,
-controlling for age at first live birth. Effect sizes are greatly reduced.
-This could be because the regressions exclude childless women. However, in 
-`r opp_signed` out of `r length(score_names)` cases, effects actually change
-sign when controls are added. The correlation between effect sizes controlling for age
-at first live birth, and raw effect sizes, is `r cor_raw_flb`.
+To investigate this further, we regress number of children on PGS *controlling*
+for AFLB. Figure \@ref(fig:plot-age-flb) shows the results, along with raw
+effect sizes for comparison. Controlling for AFLB greatly reduces effect sizes.
+This could be because the controlled regressions exclude childless women.
+However, in `r opp_signed` out of `r length(score_names)` cases, effects
+actually change sign when controls are added. The correlation between effect
+sizes controlling for AFLB, and raw effect sizes, is `r cor_raw_flb`. So,
+natural selection "effects" seem to come through two channels: an effect on
+AFLB, and an effect on number of children controlling for AFLB. Moreover, these
+channels often push in opposite directions.
 
 
 ```{r plot-age-flb, fig.cap = "Effect sizes on number of children, controlling for age at first live birth (women only). Effect sizes for women without controls are shown for comparison"}
@@ -678,7 +679,7 @@ res_wt_combined <- bind_rows(
                                select(-reg.type, -dep.var, -score_name),
   Geographical             = res_wt_msoa_weights,
   `Age/Qualification`      = res_wt_age_qual_weights,
-  `Age/Qual/FLB`  = res_wt_flb_weights,
+  `Age/Qual/AFLB`  = res_wt_flb_weights,
   .id = "Weights"
 )
 
@@ -716,7 +717,7 @@ rel_sizes <- res_wt_cb_wide %>%
                 mutate(
                   Geographical = Geographical/None,
                   `Age/Qualification` = `Age/Qualification`/None,
-                  `Age/Qual/FLB` = `Age/Qual/FLB`/estimate_females
+                  `Age/Qual/AFLB` = `Age/Qual/AFLB`/estimate_females
                 ) %>% 
                 select(-consistent, -None, -p.value, -estimate_females) %>% 
                 mutate(
@@ -733,8 +734,12 @@ rel_sizes_summary <- rel_sizes %>%
 
 ```
 
-
-To compensate for ascertainment bias in the UK Biobank sample, we weight 
+These results show that there may be ascertainment bias in estimates of natural
+selection derived from UK Biobank. One way to compensate for this is by survey
+weighting. Weighting is not guaranteed to lead to unbiased estimates, because as
+well as ascertainment on characteristics which we measure and weight for, there
+may also be ascertainment on other, unmeasured characteristics. But the exercise
+will give us a rough sense of the direction and magnitude of bias. We weight
 participants using data from the 2011 Census and from the 2006 General Household
 Survey (GHS). We try three alternative weighting schemes:
 
@@ -744,18 +749,15 @@ Survey (GHS). We try three alternative weighting schemes:
   GHS data (women only).
   
 Figure \@ref(fig:plot-res-wt) plots effect sizes among the entire sample, using
-these weighting schemes. We include unweighted regressions for comparison.
-Weighted effect sizes are significantly larger in absolute value. Table
-\@ref(tab:tbl-res-wt) gives effect sizes as a proportion of unweighted effect
-sizes for the census-based weightings.
-
-
-Effect sizes are reasonably consistent across the geographical and
-age/qualification weights, but they are increased again when we weight by age at
-first live birth. This suggests that estimates might be further affected by
-weighting on other demographic variables. Given that the Biobank sample
-seems to be ascertained in ways that reduce estimates of natural selection, 
-we view our estimates as likely to be conservative.
+these weighting schemes. We include unweighted regressions for comparison. Table
+\@ref(tab:tbl-res-wt) gives effect sizes as a proportion of the unweighted
+effect size. As expected, weighting generally increases estimated effect sizes.
+Sizes are reasonably similar across the geographical and age/qualification
+weights, but they are increased further when we weight by AFLB. This suggests
+that estimates might be further affected by weighting on other demographic
+variables. Given that the Biobank sample seems to be ascertained in ways that
+reduce estimates of natural selection, we suspect that these weighted estimates
+are still conservative.
 
 
 ```{r tbl-res-wt}
@@ -783,7 +785,7 @@ rel_sizes %>%
       add_footnote(paste0(
         "Only consistent and significant (when unweighted) estimates ",
         "are shown.\n",
-        "Age/Qual/FLB as a proportion of unweighted regressions ",
+        "Age/Qual/AFLB as a proportion of unweighted regressions ",
         "for females only."),
         font_size    = 6, 
         top_padding  = 0,
@@ -871,9 +873,7 @@ standard_ggplot(res_sibs_kids, `Dep. var.`, n_regs = length(score_names))
 
 ## Mechanisms behind modern natural selection
 
-Why do selection effects have *opposite* signs across certain subgroups -- for
-example, across older and younger mothers by age at first live birth, or across those
-with more and fewer lifetime sexual partners? A possible answer is given by the
+Why do selection effects have *opposite* signs across older and younger mothers at first live birth, and opposite signs when AFLB is controlled for? A possible answer is given by the
 economic theory of fertility [@becker1960economic]. According to this,
 increases in potential earned income affect fertility via two opposing channels.
 There is an "income effect" by which children become more affordable, like any
@@ -892,13 +892,13 @@ variants which improve one's earnings may increase fertility among couples, but
 decrease fertility among single parents. They may also decrease the likelihood
 of becoming a young mother, if this is correlated with single motherhood. Lastly,
 if lifetime number of sexual partners predicts single parent versus 
-two-parent status, the theory could also explain the differently-signed
-effects across people with more and fewer sexual partners.
+two-parent status, the theory could also explain the different
+effect sizes across people with more and fewer sexual partners.
 
 This explanation predicts that the strength of polygenic scores' effects on
 fertility will correlate with the strength of their relationship with earnings.
-We measure the correlation of each PGS with household income, as well as with
-education level, a phenotype which predicts earnings. We
+To test this, we measure the correlation of each PGS with household income, 
+as well as with education level, a phenotype which predicts earnings. We
 then relate these measurements to effect sizes on number of children.
 There is a clear negative relationship between a score's effect on
 fertility, and its correlation with income or education (Figure \@ref(fig:plot-cors-income-educ)). If we control for age at first live birth,
@@ -953,31 +953,41 @@ many polygenic scores. In a loose sense, phenotypes relating to scores which are
 selected for (against) would be seen as undesirable (desirable) by many people.
 For example, most people would probably prefer to have high educational
 attainment, a low risk of major depressive disorder, and a low risk of coronary
-artery disease, but PGS underlying these traits are being selected for.
-Potentially, natural selection could increase the health burden on modern
-societies, but that depends on effect sizes. Existing work argues that these are
-small. However, as we show, estimates can be crucially affected by ascertainment
-bias in population samples. In addition, we do not know whether estimated effect
-sizes of natural selection will increase or decrease as more accurate polygenic
-scores are produced. We are also unsure about whether polygenic scores for new
-phenotypes will show a similar pattern of natural selection as existing ones. In
-short, it is probably too early to tell whether modern natural selection is
-substantively important or not.
+artery disease, but PGS underlying these traits are being selected for. In addition,
+the size of selection on PGS is negatively correlated with the score's correlation 
+with household income. Potentially, natural selection could increase the health 
+burden on modern societies, but that depends on effect sizes. Existing work 
+argues that these are small [@beauchamp2016genetic]. 
+
+However, as we show, estimates can be crucially affected by ascertainment
+bias in population samples. This problem may be less serious in other surveys,
+such as the US Health and Retirement Study, which explicitly aims to be
+representative (as the UK Biobank does not). Nevertheless, ascertainment bias 
+can still be a problem, since not all respondents consent to the collection of
+genetic data: for instance, completion rates were around 80-85% for HRS genotype
+data [@hrs2020].
+
+In addition, we do not know whether estimated effect sizes of natural selection
+will increase or decrease as more accurate polygenic scores are produced. We are
+also unsure about whether polygenic scores for new phenotypes will show a
+similar pattern of natural selection as existing ones. In short, it is probably
+too early to tell whether modern natural selection is substantively important or
+not.
 
 Previous work has documented natural selection in modern populations
 [@beauchamp2016genetic; @kong2017selection; @sanjak2018evidence] but has not
 explained its underlying causes. The economic theory of fertility provides a
 parsimonious explanation for which traits are selected, and for why the
 direction of selection is reversed among certain subgroups. An alternative
-theory is that traits selected for are linked to impulsivity and low time
-discount rates, via the channel of early sexual behaviour. The data here provide
-some support for this: scores which might plausibly be linked to
-impulsivity,like ADHD and age at smoking initiation, are selected for. However,
-the "impulsivity" theory is less good at explaining variation in selection
-across the full range of scores, including e.g. waist-hip ratio and BMI.
-Impulsivity also does not explain the reversed sign of selection among e.g.
-older parents. Overall, then, the economic theory is probably the leading
-explanation at present.
+theory is that traits selected for are linked to externalizing behaviour and low
+time discount rates, via the channel of early sexual behaviour
+[@Mills2020.05.06.081273]. The data here provide some support for this: scores
+which might plausibly be linked to externalizing behaviour, like ADHD and age at
+smoking initiation, are selected for. However, this theory is less
+good at explaining variation in selection across the full range of scores,
+including for example waist-hip ratio and BMI. Externalizing behaviour also does 
+not explain the reversed sign of selection among older parents. Overall, 
+we believe that the economic theory is the leading explanation at present.
 
 
 # Appendix
@@ -1199,6 +1209,42 @@ summary_period %>%
       group_by(Change_Respondents) %>% 
       count() %>% 
       period_table("Change in effect sizes between early and late born respondents (regressions on number of children)")
+```
+
+## Selection by number of partners, controlling for age
+
+Figure \@ref(fig:plot-n-partners-controlled) shows selection effects by
+lifetime number of sexual partners. Age, age squared, and interactions of 
+age and age squared with PGS are controlled for. 
+
+
+```{r plot-n-partners-controlled, fig.cap = "Effect sizes on number of siblings interacted with number of sexual partners (median split at 3), respondent's age and age squared."}
+drake::loadd(res_partners_controlled)
+res_partners_controlled %<>%       
+      filter(term != "(Intercept)", term != "lo_partnersTRUE") %>% 
+      mutate(`N partners` = ifelse(grepl("TRUE:", term), "<= 3", "> 3")) 
+
+
+n_regs <- as.double(nrow(res_partners_controlled))
+res_partners_controlled %>% 
+      mutate(
+        score_name = pretty_names(score_name)
+      ) %>% 
+      ggplot(aes(
+        y      = reorder_within(score_name, estimate, sex, fun = order_abs(1)), 
+        x      = estimate, 
+        fill   = `N partners`, 
+        colour = p.value < 0.05/{{n_regs}}
+      )) + 
+        my_vline +
+        pval_geom_point() +
+        facet_wrap(vars(sex), scales = "free_y") +
+        my_fill_scale(n = 2) +
+        pval_scale() +
+        my_theme(legend.position = "bottom") +
+        my_labs(x = "", y = "") + 
+        scale_y_reordered()
+
 ```
 
 

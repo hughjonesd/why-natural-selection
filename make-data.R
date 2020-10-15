@@ -7,6 +7,7 @@ suppressPackageStartupMessages({
   library(santoku)
   library(haven)
   library(sf)
+  loadNamespace("ggplot2")
   loadNamespace("car") # very annoying if it overwrites recode
   loadNamespace("matrixStats")
   loadNamespace("mlogit")
@@ -346,5 +347,3 @@ make_ghs_subset <- function(ghs_file) {
   
   ghs_subset
 }
-
-
