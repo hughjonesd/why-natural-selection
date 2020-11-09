@@ -24,6 +24,7 @@ famhist4_file      <- file.path(data_dir, "david.family_history.traits.16052020.
 famhist5_file      <- file.path(data_dir, "david.family_history.traits.18052020.out.csv")
 famhist6_file      <- file.path(data_dir, "david.family_history.traits.17062020.out.csv")
 famhist7_file      <- file.path(data_dir, "david.birthinfo.traits.14072020.out.csv")
+famhist8_file      <- file.path(data_dir, "david.traits.03112020.out.csv")
 rgs_file           <- file.path(data_dir, "EA3_rgs.10052019.rgs.csv")
 mf_pairs_file      <- file.path(data_dir, "spouse_pair_info", 
                         "UKB_out.mf_pairs_rebadged.csv")
@@ -35,6 +36,9 @@ DC1108EW_msoa_file <- file.path(data_dir, "DC1108EW-msoas.csv")
 DC5202SC_file      <- file.path(data_dir, "DC5202SC.csv")
 msoa_shapefile     <- file.path(data_dir, "infuse_msoa_lyr_2011_clipped", 
                         "infuse_msoa_lyr_2011_clipped.shp")
+ashe_income_file   <- file.path(data_dir, 
+                        "SOC-income", 
+                        "Occupation (4) Table 14.7a   Annual pay - Gross 2007.xls") 
 
 
 weighting_schemes <- rlang::syms(c("flb_weights", "age_qual_weights", 
@@ -62,6 +66,7 @@ plan <- drake_plan(
                       file_in(!! famhist5_file),
                       file_in(!! famhist6_file),
                       file_in(!! famhist7_file),
+                      file_in(!! famhist8_file),
                       file_in(!! pgs_dir)
                     ), 
                     format = "fst"
@@ -69,8 +74,10 @@ plan <- drake_plan(
   
   pcs          = read_table2(file_in(!! pcs_file)),
   
+  ashe_income = make_ashe_income(file_in(!! ashe_income_file)),
+  
   famhist      =  target(
-                   edit_famhist(famhist_raw, score_names), 
+                   edit_famhist(famhist_raw, score_names, ashe_income), 
                    format = "fst"
                   ),
   

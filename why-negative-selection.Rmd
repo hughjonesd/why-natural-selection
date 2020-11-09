@@ -7,6 +7,10 @@ output:
   bookdown::pdf_document2:
     toc: false
     latex_engine: xelatex
+header-includes:
+  - \usepackage{subfig}
+  - \usepackage{setspace}\doublespacing
+  - \usepackage{placeins}
 ---
 
 
@@ -193,6 +197,7 @@ scale_y_reordered <- function(..., sep = "___") {
 
 ```
 
+\normalem
 
 # Introduction
 
@@ -255,7 +260,7 @@ correlated. These two results are compatible with the substitution effect and th
 income effect respectively.
 
 
-```{r, eval = FALSE}
+```{r TODO, eval = FALSE}
 # Open questions/TODO
 
 * If we weight with the GHS, and plot the means of figure 1 using this w
@@ -263,15 +268,18 @@ income effect respectively.
   increases over time. Could this be because the sample includes many
   relatively educated older people? If so, then mean effects are *overestimated*
   by figure 1. 
-* Reweight other regressions (e.g. the omnibus regression in the appendix)
+* Reweight other regressions (e.g. the omnibus regression in the appendix)?
 * Look at geography, esp. in siblings regressions.
+* We say we don't see change over time. But, we do see the effect of 
+  controlling for AFLB changing over generations.
 * Beauchamp 2016 used the HRS. He reckons it's representative. Is it? How do
   his effect sizes compare?
   - he also worries about the quality/quantity tradeoff, which might mean that
     people with fewer children have more grandchildren (than you'd expect). 
     As we have the two generations, we can test this. (Actually, there's a 
     positive correlation of about 0.1)
-
+* Another point is that negative selection only among poor will increase 
+    genetic inequality.
 ```
 
 # Data
@@ -287,7 +295,7 @@ birth intervals. Several scores show consistent increases or declines over this
 30-year period, of the order of 5% of a standard deviation.
 
 
-```{r plot-means-over-time, fig.height = 5, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Points are means for 5-year intervals. Lines are 95% confidence intervals. Green lines show a significant increase over time (p < 0.05). Red lines show a significant decrease."}
+```{r plot-means-over-time, fig.height = 5, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Points are means for 5-year intervals. Lines are 95% confidence intervals. Green lines show a significant linear increase over time (p < 0.05/33). Red lines show a significant decrease."}
 
 drake::loadd(pgs_over_time)
 
@@ -801,7 +809,7 @@ n_regs <- length(score_names)
 res_wt_combined %>% 
   mutate(
     Weights  = fct_relevel(Weights, "Geographical", "Age/Qualification",
-                "Age/Qual/FLB", "None"),
+                "Age/Qual/AFLB", "None"),
     term     = pretty_names(term),
     term     = fct_reorder(term, estimate, order_abs(1))
   ) %>% 
@@ -813,13 +821,13 @@ res_wt_combined %>%
     "None"              = "grey15", 
     "Geographical"      = "dodgerblue4",
     "Age/Qualification" = "steelblue2",
-    "Age/Qual/FLB"      = "darkseagreen4"
+    "Age/Qual/AFLB"      = "darkseagreen4"
   )) +
   scale_shape_manual(values = c(
     "None" = "square filled", 
     "Geographical" = "circle filled",
     "Age/Qualification" = "circle filled", 
-    "Age/Qual/FLB" = "circle filled"
+    "Age/Qual/AFLB" = "circle filled"
   ))
 
 
@@ -897,20 +905,23 @@ effect sizes across people with more and fewer sexual partners.
 
 This explanation predicts that the strength of polygenic scores' effects on
 fertility will correlate with the strength of their relationship with earnings.
-To test this, we measure the correlation of each PGS with household income, 
-as well as with education level, a phenotype which predicts earnings. We
+To test this, we calculate the correlation of each PGS with estimated
+earnings from respondent's first job[^est-income], and with
+ education level, a phenotype which predicts earnings. We
 then relate these measurements to effect sizes on number of children.
 There is a clear negative relationship between a score's effect on
-fertility, and its correlation with income or education (Figure \@ref(fig:plot-cors-income-educ)). If we control for age at first live birth,
+fertility, and its correlation with earnings or education (Figure \@ref(fig:plot-cors-earnings-educ)). If we control for age at first live birth,
 the relationship changes sign and becomes positive.
 
+[^est-income]: Earnings are estimated from the 2007 Annual Survey of Hours and
+Earnings, using the SOC 2000 job code.
 
-```{r plot-cors-income-educ, fig.cap="Effect sizes on number of children, with and without controls for age at first live birth, by correlations with income and education"}
+```{r plot-cors-earnings-educ, fig.cap="Effect sizes on number of children, with and without controls for age at first live birth, by correlations with earnings and education. Each point represents one PGS."}
 
 drake::loadd(res_all)
 drake::loadd(res_age_flb)
 
-cors_income <- cor(famhist[score_names], famhist$income_cat, use = "pairwise")
+cors_income <- cor(famhist[score_names], famhist$first_job_pay, use = "pairwise")
 # TODO: use age_left_edu when this includes college
 cors_educ <-   cor(famhist[score_names], famhist$edu_qual, use = "pairwise")
 
@@ -923,7 +934,7 @@ effect_size_flb <-  res_age_flb %>%
                       pull(estimate)
 
 dfr <- data.frame(
-        Correlation  = rep(c("Income", "Education"), each = 33, 2),
+        Correlation  = rep(c("Earnings", "Education"), each = 33, 2),
         cor          = rep(c(cors_income[,1], cors_educ[,1]), 2),
         effect_size  = c(rep(effect_size, 2), rep(effect_size_flb, 2)),
         Controls     = rep(c("None", 
@@ -1277,8 +1288,7 @@ subsets, controlling for either parent's age at their birth. Figure
 similar, whether controlling for father's or mother's age. Unlike for the
 respondents' generation, effect sizes are positively correlated with the effect
 sizes from bivariate regressions without the age at birth control (father's age
-at birth: $\rho$ `r cor_raw_fath`; mother's age at birth: $\rho$ `r
-cor_raw_moth`).
+at birth: $\rho$ `r cor_raw_fath`; mother's age at birth: $\rho$ `r cor_raw_moth`).
 
 
 ```{r plot-age-birth-parents, fig.cap = "Effect sizes on number of siblings controlling for parents' age at birth, eldest siblings"}

@@ -37,8 +37,11 @@ calc_pgs_over_time <- function (famhist, score_names) {
         filter(term != "(Intercept)") %>% 
         select(score_name, p.value, statistic) %>% 
         mutate(
-          Change = santoku::chop(statistic, c(-1.96, 1.96), labels = c("-", "o", "+"))
-        )
+          Change = case_when(
+            p.value > 0.05/33 ~ "o", 
+            statistic > 0     ~ "+",
+            statistic <= 0    ~ "-"
+        ))
   
   pgs_over_time %<>% left_join(time_regs, by = "score_name")
   

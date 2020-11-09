@@ -11,6 +11,7 @@ suppressPackageStartupMessages({
   loadNamespace("car") # very annoying if it overwrites recode
   loadNamespace("matrixStats")
   loadNamespace("mlogit")
+  loadNamespace("readxl")
 })
 
 # utility function:
@@ -62,6 +63,7 @@ make_famhist <- function (
         famhist5_file,
         famhist6_file,
         famhist7_file,
+        famhist8_file,
         pgs_dir
       ) {
   ph <- read_csv(ph_file, col_types = cols(
@@ -77,7 +79,8 @@ make_famhist <- function (
   famhist[[4]] <- read_csv(famhist4_file, col_types = strrep("d", 33))
   famhist[[5]] <- read_csv(famhist5_file, col_types = strrep("d", 4))
   famhist[[6]] <- read_csv(famhist6_file, col_types = strrep("d", 22))
-  famhist[[7]] <- read_csv(famhist7_file, col_types = strrep("d", 3)) 
+  famhist[[7]] <- read_csv(famhist7_file, col_types = strrep("d", 3))
+  famhist[[8]] <- read_csv(famhist8_file, col_types = cols(.default = "d"))
   for (i in seq_along(famhist)) {
     names(famhist[[i]]) <- paste0("f.", names(famhist[[i]]))
     names(famhist[[i]]) <- gsub("\\-", ".", names(famhist[[i]]))  
@@ -104,7 +107,7 @@ make_famhist <- function (
 }
 
 
-edit_famhist <- function (famhist, score_names) {
+edit_famhist <- function (famhist, score_names, ashe_income) {
   # we get very few extra cases from adding f.2946.1.0 etc, and it makes calculating
   # father's year of birth more complex
   
@@ -208,6 +211,13 @@ edit_famhist <- function (famhist, score_names) {
   
   famhist[score_names] <- scale(famhist[score_names])
   
+  famhist %<>% 
+        mutate(f.22617.0.0 = as.character(f.22617.0.0)) %>% 
+        left_join(ashe_income, by = c("f.22617.0.0" = "Code")) %>% 
+        select(-Description, -mean_pay) %>% 
+        rename(first_job_pay = median_pay) %>% 
+        mutate(first_job_pay = first_job_pay/1000)
+  
   return(famhist)
 }
 
@@ -219,6 +229,20 @@ make_famhist_long_mlogit <- function (famhist, score_names) {
   mlogit::mlogit.data(fh_subset, choice = "n_ch_fac", shape = "wide", 
                         alt.levels = levels(fh_subset$n_ch_fac))
 }
+
+
+make_ashe_income <- function (ashe_income_file) {
+  ashe_income <- readxl::read_xls(ashe_income_file, range = "A5:F475")
+  
+  ashe_income %<>% 
+        dplyr::select(Description, Code, Median, Mean) %>% 
+        mutate(across(c(Median, Mean), as.numeric)) %>% 
+        rename(median_pay = Median, mean_pay = Mean)
+  
+  ashe_income %<>% filter(! is.na(Code))
+  
+  ashe_income
+} 
 
 
 make_rgs <- function (rgs_file) {
