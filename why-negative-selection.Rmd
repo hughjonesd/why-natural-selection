@@ -8,6 +8,7 @@ output:
   bookdown::pdf_document2:
     toc: false
     latex_engine: xelatex
+    number_sections: false
 header-includes:
   - \usepackage{subfig}
   - \usepackage{setspace}\doublespacing
@@ -202,7 +203,6 @@ scale_y_reordered <- function(..., sep = "___") {
 
 \normalem
 
-# Introduction
 
 Geneticists have long hypothesized that natural selection is taking
 place in modern human populations. Recent work confirms this using
@@ -223,29 +223,138 @@ natural selection in different subgroups of the population, in order to
 uncover patterns that can help illuminate the mechanisms involved.
 
 
-```{r TODO, eval = FALSE}
+```{r NOTES-TODO, eval=FALSE}
+"
 # Open questions/TODO
 
 * If we weight with the GHS, and plot the means of figure 1 using this w
   weighting, most things stay the same - but the change in EA is reversed! EA
   increases over time. Could this be because the sample includes many
   relatively educated older people? If so, then mean effects are *overestimated*
-  by figure 1. 
+  by figure 1.
 * Reweight other regressions (e.g. the omnibus regression in the appendix)?
 * Look at geography, esp. in siblings regressions.
-* We say we don't see change over time. But, we do see the effect of 
+* We say we don't see change over time. But, we do see the effect of
   controlling for AFLB changing over generations.
 * Beauchamp 2016 used the HRS. He reckons it's representative. Is it? How do
   his effect sizes compare?
   - he also worries about the quality/quantity tradeoff, which might mean that
-    people with fewer children have more grandchildren (than you'd expect). 
-    As we have the two generations, we can test this. (Actually, there's a 
+    people with fewer children have more grandchildren (than you'd expect).
+    As we have the two generations, we can test this. (Actually, there's a
     positive correlation of about 0.1)
-* Another point is that negative selection only among poor will increase 
+* Another point is that negative selection only among poor will increase
     genetic inequality.
+* When we have better definition of "partner", bring it across from the other
+  project to define with_partner
+* If you take "year of last job started" and see if it is after/before
+  the first child, you can figure out whether mothers keep working.
+  - better still, look at all jobs started and see if any are within e.g. 5 years of
+  first child's birth
+  - this could then be another way to get at income vs substitution effects. You'd
+  predict negative selection effects among mothers who worked. Of course the
+  choice to work is endogenous.
+* Put mediating effects of pay and education in there (see explore-sex-vs-pay.R)
+  - in a multivariate regression, most effects vanish once we control for these, including EA3
+
+## LITERATURE NOTES
+
+* Lundberg and Pollak JEP 2007:
+    - several models where nonmarital fertility is more likely for poorer women
+    - Burdett and Ermisch 2002, Willis 1999, Neal 2004
+    - Unmarried parents may not be able to credibly commit to each other
+  
+* Happel et al. 1994
+   - childbirth is chosen to minimize loss of earnings from interrupted work.
+   - early childbirth if your skills decay a lot  while childrearing. (No point
+     gaining them then losing them.) Late childbirth otherwise.
+   - late childbirth if you have acquired skills before marriage.
+   - Capital-market imperfections make it wise to delay childbirth (till man has
+     high income to cope while wife is at home). More so for men's wages which
+     rise faster.
+   - empirically: (among married couples) 
+     - high-skill occupation women have children later. Higher-earning men have 
+     them earlier.
+     
+- Caucutt et al. 2001
+  - high waged and high educated women (of recent cohorts) more likely to
+    delay childbirth
+    
+- Cohen et al. 2013
+  - analyse effect of Israeli subsidy
+  - along the way, find that income affects fertility negatively at low income,
+    positively at high income, supporting Becker and Tomes 76
+
+- Becker and Tomes 1976
+  - investment in children quality and quantity when quality must be equal
+    across children; and some quality comes from an innate endowment.
+  - "observed" quantity-of-children income elasticity rises as income rises
+  - while "observed" quality-of-children elasticity falls as income rises, 
+    b/c more of total quality must be paid for by parents themselves. 
+  - the need to pay more for quality results in lower quantity, since total cost is 
+    quantity X quality
+  - something fishy about argument somehow...
+  
+- Lindo 2008
+  - men who lose a job have children sooner, but fewer children in total
+  - controls for all skills effects
+  - so overall effect of income is positive, but timing changes
+  
+- Monstad et al. 2008
+  - using an education reform to vary education
+  - no evidence of a causal effect on fertility, but births start later
+  * maybe the usual correlation reflects underlying skills. Your data could
+    test this.
+    
+- Autor et al. 2017
+  - the China shock (exogenous shock to income) 
+  - they use Chinese import penetration by industry (instrumented using
+    other countries) times industry employment shares; and separate it for
+    males and females
+  - shocks to male employment decreased fertility and marriage; 
+    increased unmarried mothers
+  - shocks to female employment *increase* marriage and motherhood
+  * this roughly seems to be the consensus
+  * Whereas, you find that male and female *skills* (as 'instrumented' by PGS)
+    have the same effect on fertility - i.e. less skills = higher fertility
+ 
+ 
+# WHAT MODEL FITS YOUR DATA
+## ASSUMPTIONS
+* Genetics produce human capital h. 
+* h and education are compliments in producing earnings
+* There are income and substitution effects on fertility:
+  - income effects are stronger at high income levels (Becker and Tomes 1976)
+    and among couples
+* People seek partners when in the labour market. Women match a person, observe
+  their quality, and decide whether to have a first child.
+* Then they (may) have more children, either with the partner or not 
+  (high quality partners stay around more)
+* High quality partners increase household income
+
+## RESULTS
+* People with low h are more likely to leave education early and enter the labour market
+  - because e and h are complements
+  - this is part of the substitution effect, as they expect to spend some time
+    raising children rather than being in work
+* At low values of h, increases in h reduce fertility (substitution effect dominates)
+  at higher values, smaller reductions or increases (income effect stronger)
+  - because h predicts income
+* In 1-parent households, increases in h reduce fertility (sub. effect), in 
+  2-parent households, smaller reductions or increases (income effect stronger)
+  - because h predicts income and because stronger income effect among couples
+* People with low h start having children earlier (b/c leave educ earlier)
+  - so part of the substitution effect comes via this
+  - controlling for this the income effect dominates
+  - hence increases in h reduce fertility less once we control for AFLB
+  
+## THOUGHTS
+* Should we distinguish between men and women in couples?
+  - within couples, male h should increase fertility (via earnings)
+  - female h should decrease it (ditto?)
+  - see explore-sex-vs-pay.R
+"
 ```
 
-# Results
 
 We use data from UK Biobank. We compute 33 polygenic scores, normalized
 to mean 0, variance 1. Figure \@ref(fig:plot-means-over-time) plots mean
@@ -253,7 +362,7 @@ polygenic scores by 5-year birth intervals. Several scores show
 consistent increases or declines over this 30-year period, of the order
 of 5% of a standard deviation.
 
-```{r plot-means-over-time, fig.height = 5, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Points are means for 5-year intervals. Lines are 95% confidence intervals. Green lines show a significant linear increase over time (p < 0.05/33). Red lines show a significant decrease."}
+```{r plot-means-over-time, fig.height = 5.5, fig.cap = "Mean polygenic scores by birth year in UK Biobank. Points are means for 5-year intervals. Lines are 95% confidence intervals. Green lines show a significant linear increase over time (p < 0.05/33). Red lines show a significant decrease."}
 
 drake::loadd(pgs_over_time)
 
@@ -261,7 +370,7 @@ pgs_over_time %>%
       mutate(score_name = pretty_names(score_name)) %>% 
       ggplot(aes(YOB, group = score_name, colour = Change)) + 
       geom_pointrange(aes(ymin = score_lo, y = score, ymax = score_hi), 
-        fatten = 2) +
+        fatten = 1.25) +
       facet_wrap(~score_name, ncol = 5) +
       my_hline +
       scale_color_manual(values = c("-" = "red", "+" = "darkgreen", "o" = "black")) +
@@ -652,20 +761,19 @@ the explanation may be due to remaining ascertainment bias within our
 sample.
 
 
-Why do selection effects have *opposite* signs across older and younger
-mothers at first live birth, and opposite signs when AFLB is controlled
-for? A possible answer is given by the economic theory of fertility
-[@becker1960economic]. According to this, increases in potential earned
-income affect fertility via two opposing channels. There is an "income
-effect" by which children become more affordable, like any other good.
-Since childrearing has a cost in time, there is also a "substitution
-effect": the opportunity cost of childrearing increases if one's market wage is
-higher. The income effect would lead higher earners to have more children. The
-substitution effect would lead higher earners to have fewer children. It is
-often assumed that the substitution effect will dominate for lone parents, or
-those in unstable relationships, since they have less opportunity to share
-childcare responsibilities, while the income effect will dominate for couples
-who are able to reap the gains from specialization.
+Why do selection effects have *opposite* signs across older and younger mothers
+at first live birth, and opposite signs when AFLB is controlled for? A possible
+answer is given by the economic theory of fertility [@becker1960economic; @willis1973new].
+According to this, increases in potential earned income affect fertility via two
+opposing channels. There is an "income effect" by which children become more
+affordable, like any other good. There is also a "substitution effect": since
+childrearing has a cost in time, the opportunity cost of childrearing increases
+if one's market wage is higher. The income effect would lead higher earners to
+have more children. The substitution effect would lead higher earners to have
+fewer children. It is often assumed that the substitution effect will dominate
+for lone parents, or those in unstable relationships, since they have less
+opportunity to share childcare responsibilities, while the income effect will
+dominate for couples who are able to reap the gains from specialization.
 
 If so, then genetic characteristics which affect one's earnings
 potential in the labour market may lead to opposing effects on
@@ -731,7 +839,7 @@ dfr %>%
 
 ```
 
-# Conclusion
+# Discussion
 
 Previous work has documented natural selection in modern populations on variants
 underlying many polygenic scores [@beauchamp2016genetic; @kong2017selection;
@@ -749,9 +857,10 @@ early sexual behaviour [@Mills2020.05.06.081273]. The data here provide
 some support for this: scores which might plausibly be linked to
 externalizing behaviour, like ADHD and age at smoking initiation, are
 selected for. However, this theory is less good at explaining variation
-in selection across the full range of scores, including physical measures, e.g. waist-hip ratio and BMI. Externalizing behaviour also does not explain
-that selection effects change sign among older parents. Overall, we believe
-that the economic theory is the leading explanation at present.
+in selection across the full range of scores, including physical measures, e.g.
+waist-hip ratio and BMI. Externalizing behaviour also does not explain
+why selection effects change sign among older parents. Overall, we believe
+that the economic theory is the leading explanation.
 
 PGS which correlate with high (low) earnings and more (less) education are being
 selected against (selected for). In addition, many of the phenotypes under
@@ -760,15 +869,13 @@ have by many people. For example, most people would probably prefer to have high
 educational attainment, a low risk of major depressive disorder, and a low risk
 of coronary artery disease, but natural selection is pushing against these
 traits. Potentially, this could increase the health burden on modern societies,
-but that depends on effect sizes.
-
-Our results suggest that naïve estimates can be affected by sample ascertainment
-bias. This problem may be less serious in surveys which aim to be representative
-(as the UK Biobank does not). Nevertheless, not all respondents consent to the
-collection of genetic data: for instance, completion rates for genotype data in
-the US Health and Retirement Study  were around 80-85% [@hrs2020]. Researchers
-should be aware of the risks of ascertainment when studying contemporary 
-natural selection. 
+but that depends on effect sizes. Our results suggest that naïve estimates can
+be affected by sample ascertainment bias. This problem may be less serious in
+surveys which aim to be representative (as the UK Biobank does not).
+Nevertheless, not all respondents consent to the collection of genetic data: for
+instance, completion rates for genotype data in the US Health and Retirement
+Study were around 80-85% [@hrs2020]. Researchers should be aware of the risks
+of ascertainment when studying modern natural selection.
 
 In addition, we do not know whether estimated effect sizes of natural
 selection will increase or decrease as more accurate polygenic scores
@@ -781,7 +888,7 @@ Research on natural selection is controversial. It brings to mind eugenics,
 which has been used to justify mass murder and human rights violations, in the
 past and possibly the present [@mao1998chinese; @sleeboom2011genetic;
 @zenz2020]. Whilst we claim scientific legitimacy for our empirical results, we
-do not claim to speak with any special authority on how society should react to
+have no special authority to speak on how society should react to
 them. This can only be resolved by open debate, in which scientists take part as
 equals among many. We therefore choose not to discuss policy implications here.
 
@@ -951,6 +1058,110 @@ res_sibs_kids <-  bind_rows(
 standard_ggplot(res_sibs_kids, `Dep. var.`, n_regs = length(score_names))
 ```
 
+```{r calc-period-regs}
+
+drake::loadd(res_period_parents)
+drake::loadd(res_period_children)
+
+res_period <- bind_rows(res_period_parents, res_period_children)
+
+res_period %<>% 
+      tidyr::extract(term, c("period", "score_name"),
+        regex="year_split(.*):(.*)")
+n_tests <- nrow(res_period)/2
+
+
+summary_period <- res_period %>% 
+      select(-std.error, -statistic) %>% 
+      pivot_wider(
+        names_from  = period, 
+        values_from = c(estimate, conf.low, conf.high, p.value)
+      ) %>% 
+      group_by(score_name, children) %>% 
+      mutate(
+        significant = diff.p.value < 0.05/n_tests,
+        sign_early  = sign(estimate_early),
+        sign_late   = sign(estimate_late),
+        size_inc    = abs(estimate_early) < abs(estimate_late),
+        change_sign = sign_early != sign_late,
+        Change      = case_when(
+                        ! significant ~ "Insignificant",
+                        change_sign   ~ "Change sign",
+                        size_inc      ~ "Size increasing",
+                        ! size_inc    ~ "Size decreasing"
+                      )
+      ) %>% 
+      select(score_name, children, Change, significant, change_sign, 
+        sign_early, sign_late) %>% 
+      mutate(children = ifelse(children, "Respondents", "Parents")) %>% 
+      pivot_wider(names_from = children, 
+        values_from = c(Change, significant, change_sign, sign_early, 
+        sign_late)) %>% 
+      mutate(overall = case_when(
+              ! change_sign_Parents & ! change_sign_Respondents & 
+                sign_late_Parents == sign_early_Parents ~ 
+                "Consistent",
+              TRUE ~ "Changes direction"
+            ))
+
+
+
+```
+
+To check whether effect sizes were changing over time, we ran
+regressions interacting PGS with birth year, median split at 1950
+("early born" versus "late born"). We use both *number of children* and
+*number of siblings* as a dependent variable. We weight using
+age/qualification cells, and further adjust for selection in the
+parents' generation (see above).
+
+Tables \@ref(tab:tbl-siblings-by-period) and
+\@ref(tab:tbl-children-by-period) summarize the results. There is no
+change in natural selection within the parents' generation. In the
+respondents' generation, effect sizes were significantly larger in absolute size among the late-born for five PGS: autism, cognitive ability, EA2, EA3 and
+extraversion. These changes are inconsistent with the intergenerational change, 
+where effect sizes were if anything larger among the earlier, parents' generation.
+Three PGS showed significant changes in sign: alcohol use
+(positive to negative); conscientiousness (negative to positive); and
+type II diabetes (negative to positive). Overall, there is weak evidence for
+change over time, and the clearest result is that the direction of selection is
+broadly consistent.
+
+```{r tbl-siblings-by-period}
+
+period_table <- function (tbl, caption) {
+  tbl %>% 
+      as_hux() %>%
+      set_bold(1, everywhere) %>% 
+      set_bottom_border(1, everywhere) %>% 
+      
+      add_footnote(glue("Significance is measured at p < 0.05/{n_tests}"), 
+        border = 0.4, font_size = 8) %>% 
+      set_contents(1, everywhere, 
+        c("Change", "Number of scores")) %>% 
+      set_right_border(final(1), 1, 0) %>% 
+      set_top_padding(1) %>% 
+      set_bottom_padding(1) %>%
+      set_left_padding(everywhere, 1, 0) %>% 
+      set_right_padding(everywhere, 2, 0) %>% 
+      set_caption(caption) %>% 
+      set_caption_width(1)
+}
+
+summary_period %>% 
+      group_by(Change_Parents) %>% 
+      count() %>% 
+      period_table("Change in effect sizes between parents of early and late born respondents (regressions on number of siblings)")
+      
+```
+
+```{r tbl-children-by-period}
+summary_period %>% 
+      group_by(Change_Respondents) %>% 
+      count() %>% 
+      period_table("Change in effect sizes between early and late born respondents (regressions on number of children)")
+```
+
 \FloatBarrier
 ## Controlling for principal components
 
@@ -1056,109 +1267,6 @@ res_pcs %>%
 
 ```
 
-\FloatBarrier
-## Selection over time
-
-```{r calc-period-regs}
-
-drake::loadd(res_period_parents)
-drake::loadd(res_period_children)
-
-res_period <- bind_rows(res_period_parents, res_period_children)
-
-res_period %<>% 
-      tidyr::extract(term, c("period", "score_name"),
-        regex="year_split(.*):(.*)")
-n_tests <- nrow(res_period)/2
-
-
-summary_period <- res_period %>% 
-      select(-std.error, -statistic) %>% 
-      pivot_wider(
-        names_from  = period, 
-        values_from = c(estimate, conf.low, conf.high, p.value)
-      ) %>% 
-      group_by(score_name, children) %>% 
-      mutate(
-        significant = diff.p.value < 0.05/n_tests,
-        sign_early  = sign(estimate_early),
-        sign_late   = sign(estimate_late),
-        size_inc    = abs(estimate_early) < abs(estimate_late),
-        change_sign = sign_early != sign_late,
-        Change      = case_when(
-                        ! significant ~ "Insignificant",
-                        change_sign   ~ "Change sign",
-                        size_inc      ~ "Size increasing",
-                        ! size_inc    ~ "Size decreasing"
-                      )
-      ) %>% 
-      select(score_name, children, Change, significant, change_sign, 
-        sign_early, sign_late) %>% 
-      mutate(children = ifelse(children, "Respondents", "Parents")) %>% 
-      pivot_wider(names_from = children, 
-        values_from = c(Change, significant, change_sign, sign_early, 
-        sign_late)) %>% 
-      mutate(overall = case_when(
-              ! change_sign_Parents & ! change_sign_Respondents & 
-                sign_late_Parents == sign_early_Parents ~ 
-                "Consistent",
-              TRUE ~ "Changes direction"
-            ))
-
-
-
-```
-
-To check whether effect sizes were changing over time, we ran
-regressions interacting PGS with birth year, median split at 1950
-("early born" versus "late born"). We use both *number of children* and
-*number of siblings* as a dependent variable. We weight using
-age/qualification cells, and further adjust for selection in the
-parents' generation (see above).
-
-Tables \@ref(tab:tbl-siblings-by-period) and
-\@ref(tab:tbl-children-by-period) summarize the results. There is no
-change in natural selection in the parents' generation. In the
-respondents' generation, effect sizes were larger in absolute size among
-the late born for five PGS: autism, cognitive ability, EA2, EA3 and
-extraversion. Three PGS showed significant changes in sign: alcohol use
-(positive to negative); conscientiousness (negative to positive); and
-type II diabetes (negative to positive).
-
-```{r tbl-siblings-by-period}
-
-period_table <- function (tbl, caption) {
-  tbl %>% 
-      as_hux() %>%
-      set_bold(1, everywhere) %>% 
-      set_bottom_border(1, everywhere) %>% 
-      
-      add_footnote(glue("Significance is measured at p < 0.05/{n_tests}"), 
-        border = 0.4, font_size = 8) %>% 
-      set_contents(1, everywhere, 
-        c("Change", "Number of scores")) %>% 
-      set_right_border(final(1), 1, 0) %>% 
-      set_top_padding(1) %>% 
-      set_bottom_padding(1) %>%
-      set_left_padding(everywhere, 1, 0) %>% 
-      set_right_padding(everywhere, 2, 0) %>% 
-      set_caption(caption) %>% 
-      set_caption_width(1)
-}
-
-summary_period %>% 
-      group_by(Change_Parents) %>% 
-      count() %>% 
-      period_table("Change in effect sizes between parents of early and late born respondents (regressions on number of siblings)")
-      
-```
-
-```{r tbl-children-by-period}
-summary_period %>% 
-      group_by(Change_Respondents) %>% 
-      count() %>% 
-      period_table("Change in effect sizes between early and late born respondents (regressions on number of children)")
-```
 
 ## Selection by number of partners, controlling for age
 
@@ -1326,7 +1434,7 @@ res_age_birth_parents_dv %>%
 ## Genetic correlations with EA3
 
 Another way to examine the "earnings" theory of natural selection is to
-compare effect sizes of PGS with their genetic correlation with
+compare selection effects of PGS with their genetic correlation with
 educational attainment (EA3). Since EA3 strongly predicts earnings, if
 earnings drives differences in fertility, we'd expect a correlation
 between the two sets of results. Figure
