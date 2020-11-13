@@ -2,7 +2,7 @@
 title: "Natural Selection in the 20th Century"
 author: "David Hugh-Jones, Abdel Abdellaoui"
 date: "`r Sys.Date()`"
-abstract: "Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection on 33 polygenic scores over two generations, using data from UK Biobank. Selection effects appear consistent over time. The strength of natural selection on a polygenic score can be predicted by its correlation with earnings and education. Effects are larger among low-income and less educated individuals, younger parents, and people not living with a partner. Effect sizes are larger when we correct for ascertainment bias. The direction of natural selection is reversed among older parents, or  controlling for age at first live birth. These patterns can be explained by economic theories of fertility, in which higher earnings can either increase or decrease fertility."
+abstract: "Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection on 33 polygenic scores over two generations, using data from UK Biobank. Selection effects appear consistent over time. The strength of natural selection on a polygenic score can be predicted by its correlation with earnings and education. Effects are larger among low-income and less educated individuals, younger parents, and people not living with a partner. Effect sizes are larger when we correct for ascertainment bias. The direction of natural selection is reversed among older parents, or  controlling for age at first live birth. These patterns can be explained by economic theories of fertility, in which higher earnings may either increase or decrease fertility."
 bibliography: "negative-selection.bib"
 output: 
   bookdown::pdf_document2:
@@ -221,140 +221,6 @@ natural selection over multiple generations could lead to substantive
 effects in the long run. Most importantly, we examine the strength of
 natural selection in different subgroups of the population, in order to
 uncover patterns that can help illuminate the mechanisms involved.
-
-
-```{r NOTES-TODO, eval=FALSE}
-"
-# Open questions/TODO
-
-* If we weight with the GHS, and plot the means of figure 1 using this w
-  weighting, most things stay the same - but the change in EA is reversed! EA
-  increases over time. Could this be because the sample includes many
-  relatively educated older people? If so, then mean effects are *overestimated*
-  by figure 1.
-* Reweight other regressions (e.g. the omnibus regression in the appendix)?
-* Look at geography, esp. in siblings regressions.
-* We say we don't see change over time. But, we do see the effect of
-  controlling for AFLB changing over generations.
-* Beauchamp 2016 used the HRS. He reckons it's representative. Is it? How do
-  his effect sizes compare?
-  - he also worries about the quality/quantity tradeoff, which might mean that
-    people with fewer children have more grandchildren (than you'd expect).
-    As we have the two generations, we can test this. (Actually, there's a
-    positive correlation of about 0.1)
-* Another point is that negative selection only among poor will increase
-    genetic inequality.
-* When we have better definition of "partner", bring it across from the other
-  project to define with_partner
-* If you take "year of last job started" and see if it is after/before
-  the first child, you can figure out whether mothers keep working.
-  - better still, look at all jobs started and see if any are within e.g. 5 years of
-  first child's birth
-  - this could then be another way to get at income vs substitution effects. You'd
-  predict negative selection effects among mothers who worked. Of course the
-  choice to work is endogenous.
-* Put mediating effects of pay and education in there (see explore-sex-vs-pay.R)
-  - in a multivariate regression, most effects vanish once we control for these, including EA3
-
-## LITERATURE NOTES
-
-* Lundberg and Pollak JEP 2007:
-    - several models where nonmarital fertility is more likely for poorer women
-    - Burdett and Ermisch 2002, Willis 1999, Neal 2004
-    - Unmarried parents may not be able to credibly commit to each other
-  
-* Happel et al. 1994
-   - childbirth is chosen to minimize loss of earnings from interrupted work.
-   - early childbirth if your skills decay a lot  while childrearing. (No point
-     gaining them then losing them.) Late childbirth otherwise.
-   - late childbirth if you have acquired skills before marriage.
-   - Capital-market imperfections make it wise to delay childbirth (till man has
-     high income to cope while wife is at home). More so for men's wages which
-     rise faster.
-   - empirically: (among married couples) 
-     - high-skill occupation women have children later. Higher-earning men have 
-     them earlier.
-     
-- Caucutt et al. 2001
-  - high waged and high educated women (of recent cohorts) more likely to
-    delay childbirth
-    
-- Cohen et al. 2013
-  - analyse effect of Israeli subsidy
-  - along the way, find that income affects fertility negatively at low income,
-    positively at high income, supporting Becker and Tomes 76
-
-- Becker and Tomes 1976
-  - investment in children quality and quantity when quality must be equal
-    across children; and some quality comes from an innate endowment.
-  - "observed" quantity-of-children income elasticity rises as income rises
-  - while "observed" quality-of-children elasticity falls as income rises, 
-    b/c more of total quality must be paid for by parents themselves. 
-  - the need to pay more for quality results in lower quantity, since total cost is 
-    quantity X quality
-  - something fishy about argument somehow...
-  
-- Lindo 2008
-  - men who lose a job have children sooner, but fewer children in total
-  - controls for all skills effects
-  - so overall effect of income is positive, but timing changes
-  
-- Monstad et al. 2008
-  - using an education reform to vary education
-  - no evidence of a causal effect on fertility, but births start later
-  * maybe the usual correlation reflects underlying skills. Your data could
-    test this.
-    
-- Autor et al. 2017
-  - the China shock (exogenous shock to income) 
-  - they use Chinese import penetration by industry (instrumented using
-    other countries) times industry employment shares; and separate it for
-    males and females
-  - shocks to male employment decreased fertility and marriage; 
-    increased unmarried mothers
-  - shocks to female employment *increase* marriage and motherhood
-  * this roughly seems to be the consensus
-  * Whereas, you find that male and female *skills* (as 'instrumented' by PGS)
-    have the same effect on fertility - i.e. less skills = higher fertility
- 
- 
-# WHAT MODEL FITS YOUR DATA
-## ASSUMPTIONS
-* Genetics produce human capital h. 
-* h and education are compliments in producing earnings
-* There are income and substitution effects on fertility:
-  - income effects are stronger at high income levels (Becker and Tomes 1976)
-    and among couples
-* People seek partners when in the labour market. Women match a person, observe
-  their quality, and decide whether to have a first child.
-* Then they (may) have more children, either with the partner or not 
-  (high quality partners stay around more)
-* High quality partners increase household income
-
-## RESULTS
-* People with low h are more likely to leave education early and enter the labour market
-  - because e and h are complements
-  - this is part of the substitution effect, as they expect to spend some time
-    raising children rather than being in work
-* At low values of h, increases in h reduce fertility (substitution effect dominates)
-  at higher values, smaller reductions or increases (income effect stronger)
-  - because h predicts income
-* In 1-parent households, increases in h reduce fertility (sub. effect), in 
-  2-parent households, smaller reductions or increases (income effect stronger)
-  - because h predicts income and because stronger income effect among couples
-* People with low h start having children earlier (b/c leave educ earlier)
-  - so part of the substitution effect comes via this
-  - controlling for this the income effect dominates
-  - hence increases in h reduce fertility less once we control for AFLB
-  
-## THOUGHTS
-* Should we distinguish between men and women in couples?
-  - within couples, male h should increase fertility (via earnings)
-  - female h should decrease it (ditto?)
-  - see explore-sex-vs-pay.R
-"
-```
-
 
 We use data from UK Biobank. We compute 33 polygenic scores, normalized
 to mean 0, variance 1. Figure \@ref(fig:plot-means-over-time) plots mean
@@ -761,52 +627,187 @@ the explanation may be due to remaining ascertainment bias within our
 sample.
 
 
+```{r NOTES-TODO, eval=FALSE}
+"
+# Open questions/TODO
+
+* If we weight with the GHS, and plot the means of figure 1 using this w
+  weighting, most things stay the same - but the change in EA is reversed! EA
+  increases over time. Could this be because the sample includes many
+  relatively educated older people? If so, then mean effects are *overestimated*
+  by figure 1.
+* Reweight other regressions (e.g. the omnibus regression in the appendix)?
+* Look at geography, esp. in siblings regressions.
+* We say we don't see change over time. But, we do see the effect of
+  controlling for AFLB changing over generations.
+* Beauchamp 2016 used the HRS. He reckons it's representative. Is it? How do
+  his effect sizes compare?
+  - he also worries about the quality/quantity tradeoff, which might mean that
+    people with fewer children have more grandchildren (than you'd expect).
+    As we have the two generations, we can test this. (Actually, there's a
+    positive correlation of about 0.1)
+* Another point is that negative selection only among poor will increase
+    genetic inequality.
+* When we have better definition of "partner", bring it across from the other
+  project to define with_partner
+* If you take "year of last job started" and see if it is after/before
+  the first child, you can figure out whether mothers keep working.
+  - better still, look at all jobs started and see if any are within e.g. 5 years of
+  first child's birth
+  - this could then be another way to get at income vs substitution effects. You'd
+  predict negative selection effects among mothers who worked. Of course the
+  choice to work is endogenous.
+* Put mediating effects of pay and education in there (see explore-sex-vs-pay.R)
+  - in a multivariate regression, most effects vanish once we control for these, including EA3
+
+## LITERATURE NOTES
+
+* Lundberg and Pollak JEP 2007:
+    - several models where nonmarital fertility is more likely for poorer women
+    - Burdett and Ermisch 2002, Willis 1999, Neal 2004
+    - Unmarried parents may not be able to credibly commit to each other
+  
+* Happel et al. 1984
+   - childbirth is chosen to minimize loss of earnings from interrupted work.
+   - early childbirth if your skills decay a lot  while childrearing. (No point
+     gaining them then losing them.) Late childbirth otherwise.
+   - late childbirth if you have acquired skills before marriage.
+   - Capital-market imperfections make it wise to delay childbirth (till man has
+     high income to cope while wife is at home). More so for men's wages which
+     rise faster.
+   - empirically: (among married couples) 
+     - high-skill occupation women have children later. Higher-earning men have 
+     them earlier.
+     
+- Caucutt et al. 2001
+  - high waged and high educated women (of recent cohorts) more likely to
+    delay childbirth
+    
+- Cohen et al. 2013
+  - analyse effect of Israeli subsidy
+  - along the way, find that income affects fertility negatively at low income,
+    positively at high income, supporting Becker and Tomes 76
+
+- Becker and Tomes 1976
+  - investment in children quality and quantity when quality must be equal
+    across children; and some quality comes from an innate endowment.
+  - "observed" quantity-of-children income elasticity rises as income rises
+  - while "observed" quality-of-children elasticity falls as income rises, 
+    b/c more of total quality must be paid for by parents themselves. 
+  - the need to pay more for quality results in lower quantity, since total cost is 
+    quantity X quality
+  - something fishy about argument somehow...
+  
+- Lindo 2008
+  - men who lose a job have children sooner, but fewer children in total
+  - controls for all skills effects
+  - so overall effect of income is positive, but timing changes
+  
+- Monstad et al. 2008
+  - using an education reform to vary education
+  - no evidence of a causal effect on fertility, but births start later
+  * maybe the usual correlation reflects underlying skills. Your data could
+    test this.
+    
+- Autor et al. 2017
+  - the China shock (exogenous shock to income) 
+  - they use Chinese import penetration by industry (instrumented using
+    other countries) times industry employment shares; and separate it for
+    males and females
+  - shocks to male employment decreased fertility and marriage; 
+    increased unmarried mothers
+  - shocks to female employment *increase* marriage and motherhood
+  * this roughly seems to be the consensus
+  * Whereas, you find that male and female *skills* (as 'instrumented' by PGS)
+    have the same effect on fertility - i.e. less skills = higher fertility
+ 
+- Baudin et al. 2015
+  * look at childlessness vs. fertility (extensive/intensive margin)
+  * some people are too poor to afford children
+  * 'a husband alleviates the time cost of having children'. But for some groups (see appendix)
+    there is a +ve income/fertility gradient
+  * fertility decreases with female educn due to subst effect
+  * baby boom and bust in US: a decline in childlessness caused by poverty, then an increase
+    caused by substn effect ('opportunity cost')
+  * fertility decreases with educn both for single mothers and married women
+    - slightly (25%) higher decrease per year of educn (Table 2) for single mothers
+  
+# WHAT MODEL FITS YOUR DATA
+## ASSUMPTIONS
+* Genetics produce human capital h. 
+* h and education are compliments in producing earnings
+* There are income and substitution effects on fertility:
+  - income effects are stronger at high income levels (Becker and Tomes 1976)
+    and among couples
+* People seek partners when in the labour market. Women match a person, observe
+  their quality, and decide whether to have a first child.
+* Then they (may) have more children, either with the partner or not 
+  (high quality partners stay around more)
+* High quality partners increase household income
+
+## RESULTS
+* People with low h are more likely to leave education early and enter the labour market
+  - because e and h are complements
+  - this is part of the substitution effect, as they expect to spend some time
+    raising children rather than being in work
+* At low values of h, increases in h reduce fertility (substitution effect dominates)
+  at higher values, smaller reductions or increases (income effect stronger)
+  - because h predicts income
+* In 1-parent households, increases in h reduce fertility (sub. effect), in 
+  2-parent households, smaller reductions or increases (income effect stronger)
+  - because h predicts income and because stronger income effect among couples
+* People with low h start having children earlier (b/c leave educ earlier)
+  - so part of the substitution effect comes via this
+  - controlling for this the income effect dominates
+  - hence increases in h reduce fertility less once we control for AFLB
+  
+## THOUGHTS
+* Should we distinguish between men and women in couples?
+  - within couples, male h should increase fertility (via earnings)
+  - female h should decrease it (ditto?)
+  - see explore-sex-vs-pay.R
+"
+```
+
 Why do selection effects have *opposite* signs across older and younger mothers
 at first live birth, and opposite signs when AFLB is controlled for? A possible
-answer is given by the economic theory of fertility [@becker1960economic; @willis1973new].
+answer is given by the economic theory of fertility 
+[@becker1960economic; @willis1973new; @becker1976child].
 According to this, increases in potential earned income affect fertility via two
 opposing channels. There is an "income effect" by which children become more
 affordable, like any other good. There is also a "substitution effect": since
 childrearing has a cost in time, the opportunity cost of childrearing increases
 if one's market wage is higher. The income effect would lead higher earners to
 have more children. The substitution effect would lead higher earners to have
-fewer children. It is often assumed that the substitution effect will dominate
-for lone parents, or those in unstable relationships, since they have less
-opportunity to share childcare responsibilities, while the income effect will
-dominate for couples who are able to reap the gains from specialization.
+fewer children. If so, then genetic variants which affect earnings
+potential in the labour market may cause opposing effects on
+fertility. The income effect will cause natural selection in favour of 
+earnings-increasing variants. The substitution effect will do the reverse. 
 
-If so, then genetic characteristics which affect one's earnings
-potential in the labour market may lead to opposing effects on
-fertility. Genetic variants which improve one's earnings may increase
-fertility among couples, but decrease fertility among single parents.
-They may also decrease the likelihood of becoming a young mother, if
-this is correlated with single motherhood. Lastly, if lifetime number of
-sexual partners predicts single parent versus two-parent status, the
-theory could also explain the different effect sizes across people with
-more and fewer sexual partners.
-
-This explanation predicts that the strength of polygenic scores' effects
-on fertility will correlate with the strength of their relationship with
-earnings. To test this, we calculate the correlation of each PGS with
-estimated earnings from respondent's first job[^earnings-est], and with education
-level, a phenotype which predicts earnings. We then relate these
-measurements to effect sizes on number of children. There is a clear
-negative relationship between a score's effect on fertility, and its
-correlation with earnings or education. If we control for age at first live
-birth, the relationship changes sign and becomes positive  (Figure
-\@ref(fig:plot-cors-earnings-educ)).
+This theory predicts that genetic variants will be selected for (or against) in
+proportion to their effect on earnings. Figure
+\@ref(fig:plot-cors-earnings-educ) plots selection effects on each PGS against
+that PGS's correlation with earnings in a respondent's first job[^earnings-est],
+and against its correlation with educational attainment, a predictor of lifetime
+earnings. The raw relationships (left column) are strongly negative. If we plot
+selection effects controlling for age at first live birth (right column), the
+effect reverses and becomes positive. This is evidence that the labour market
+plays an important role in natural selection, with substitution effects
+dominating overall.
 
 [^earnings-est]: Earnings are estimated from the 2007 Annual Survey of Hours and
-    Earnings, using the SOC 2000 job code.
+Earnings, using the SOC 2000 job code.
 
-```{r plot-cors-earnings-educ, fig.cap="Effect sizes on number of children, with and without controls for age at first live birth, by correlations with earnings and education. Each point represents one PGS."}
+
+```{r plot-cors-earnings-educ, fig.cap="Selection effects, with and without controls for age at first live birth, by correlations with earnings and educational attainment. Each point represents one PGS."}
 
 drake::loadd(res_all)
 drake::loadd(res_age_flb)
 
 cors_income <- cor(famhist[score_names], famhist$first_job_pay, use = "pairwise")
 # TODO: use age_left_edu when this includes college
-cors_educ <-   cor(famhist[score_names], famhist$edu_qual, use = "pairwise")
+# TODO:
+cors_educ <-   cor(famhist[score_names], famhist$age_fulltime_edu, use = "pairwise")
 
 effect_size <-  res_all %>% 
                   filter(dep.var == "N children", reg.type == "raw") %>% 
@@ -833,11 +834,65 @@ dfr %>%
         facet_grid(Correlation ~ Controls, labeller = label_both) + 
         my_vline + 
         my_hline +
-        labs(x = "Effect on number of children", y = "Correlation") +
+        labs(x = "Selection effect", y = "Correlation") +
         scale_colour_brewer(type = "qual", palette = 2) +
         theme(legend.position = "none")
 
 ```
+
+
+Suppose that people are aware of their endowments of human capital, and 
+that education and innate human capital are complements. They choose how long
+to stay in education. After leaving education they enter the labour market and
+form families. If so, then people with less human capital will leave education 
+earlier and have their first child earlier. Whilst in the labour market, higher
+earners will have more children (i.e. income effects dominate). These 
+assumptions will lead to the pattern we observe where earnings-increasing
+variants lead to later first births (and fewer children overall), but more
+children for any given AFLB.
+
+The theory can also explain why natural selection is weaker among higher-income
+parents. @becker1976child show that if parents care about child quality as well
+as quantity, under certain assumptions the income effect will be stronger at
+higher income levels; this can lead to a U-shaped relationship between income
+and fertility.
+
+Lastly, it is often assumed that the substitution effect will dominate
+for lone parents, or those in unstable relationships, since they have less
+opportunity to share childcare responsibilities, while the income effect will
+dominate for couples who are able to reap the gains from specialization. If so,
+then earnings-increasing genetic variants may decrease fertility more among single 
+parents than among couples, as in our data. The same idea could explain our
+results for lifetime number of sexual partners, if this is associated with
+relationship stability.
+
+Empirical work shows similar relationships between *earnings* or *education* and
+fertility, to the relationships shown here between *genetics* and fertility.
+Higher income is associated with lower fertility [@becker1960economic;
+@jones2006economic].
+@cohen2013financial find that income decreases fertility at low income levels
+but increases it at higher income levels. In a US sample, fertility decreases
+with education faster among single mothers than married mothers 
+[@baudin2015fertility].
+
+
+```{r calc-res-earn-educ}
+
+drake::loadd(res_ee_control)
+drake::loadd(res_all)
+
+res_ee_control %<>% filter(term == score_name)
+n_05 <- sum(res_ee_control$p.value < 0.05)
+n_05_33 <- sum(res_ee_control$p.value < 0.05/33)
+
+```
+
+
+The economic theory predicts that natural selection on polygenic scores is mediatet
+by labour market earnings. As a final test of this,
+we re-estimate equation (\@ref(eq:regression)) for each PGS, 
+controlling for earnings in first job and education levels. Effect sizes are generally reduced (appendix Figure \@ref(fig:plot-res-earn-educ)), and only `r n_05_33` 
+out of 33 PGS are significant at $p = 0.05/33$.
 
 # Discussion
 
@@ -889,7 +944,7 @@ which has been used to justify mass murder and human rights violations, in the
 past and possibly the present [@mao1998chinese; @sleeboom2011genetic;
 @zenz2020]. Whilst we claim scientific legitimacy for our empirical results, we
 have no special authority to speak on how society should react to
-them. This can only be resolved by open debate, in which scientists take part as
+them. This is a matter for open debate, in which scientists take part as
 equals among many. We therefore choose not to discuss policy implications here.
 
 
@@ -1431,6 +1486,40 @@ res_age_birth_parents_dv %>%
 
 ```
 
+\FloatBarrier
+## Controlling for earnings and education
+
+```{r plot-res-earn-educ, fig.cap = "Selection effects controlling for earnings in first job (estimated by median earnings from ASHE 2007 for the SOC2000 job code) and education (left education before 16, 16-18, or after 18). Raw effects are shown for comparison. Lines are 95% confidence intervals uncorrected for multiple testing."}
+
+drake::loadd(res_ee_control)
+drake::loadd(res_all)
+
+res_ee_control %<>% filter(term == score_name)
+
+
+res_all %<>% 
+  filter(term == score_name, reg.type == "raw", dep.var == "N children") %>% 
+  select(-dep.var, -reg.type)
+
+res_compare <- bind_rows(
+                 Raw = res_all, 
+                 Controlled = res_ee_control, 
+                 .id = "Regression"
+               )
+
+standard_ggplot(res_compare, fill_col = Regression, n_regs = 33) +
+  geom_linerange(
+    aes(
+      xmin = estimate - 2 * std.error, 
+      xmax = estimate + 2 * std.error
+    ), 
+    alpha = .5
+  )
+  
+```
+
+
+\FloatBarrier
 ## Genetic correlations with EA3
 
 Another way to examine the "earnings" theory of natural selection is to
@@ -1474,6 +1563,7 @@ cor(combined_results[-1], use = "complete")
 
 ```
 
+\FloatBarrier
 ## Number of children
 
 Figure \@ref(fig:plot-n-children-bar) shows the full distribution of

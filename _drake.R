@@ -352,6 +352,41 @@ plan <- drake_plan(
     res
   },
   
+  res_with_partner_narrow = {
+    mf_pairs_tmp <- mf_pairs %>% select(ID.m, ID.f, n_children.m, n_children.f)
+    famhist_tmp <- famhist %>% 
+                      filter(sex == 1) %>% 
+                      select(f.eid, with_partner, n_children) %>% 
+                      left_join(mf_pairs_tmp, by = c("f.eid" = "ID.m"))
+    famhist_tmp2 <- famhist %>% 
+                      filter(sex == 0) %>% 
+                      select(f.eid, with_partner, n_children) %>% 
+                      left_join(mf_pairs_tmp, by = c("f.eid" = "ID.f"))
+    famhist_tmp  %<>% bind_rows(famhist_tmp2)
+    
+    famhist_tmp %<>% 
+          filter(n_children.f == n_children.m, with_partner) %>% 
+          group_by(f.eid) %>% 
+          filter(n() == 1)
+    
+    famhist_tmp$with_partner_narrow <- TRUE
+    famhist_tmp %<>% select(f.eid, with_partner_narrow)
+    
+    famhist %<>% left_join(famhist_tmp)
+    famhist %<>% mutate(with_partner_narrow = ! is.na(with_partner_narrow))
+    
+    res <- map_dfr(score_names,
+            ~run_regs_fml(
+              "n_children ~ with_partner_narrow + {score_name}:with_partner_narrow",
+              score_name = .x,
+              famhist    = famhist
+            ),
+            .id = "score_name"
+          )
+    res %<>% filter(term != "(Intercept)")
+    res
+  },
+  
   res_edu = {
     subsets <- rlang::exprs(
             age_fte_cat == "< 16",
@@ -447,6 +482,15 @@ plan <- drake_plan(
           mutate(sex = ifelse(subset == "sex == 1", "Male", "Female")) %>%
           select(-row_number, -subset) %>% 
           filter(! grepl("YOB", term))
+  },
+  
+  res_ee_control = {
+    res_ee_control <- map_dfr(score_names, 
+                              ~ run_regs_fml(
+                                fml = "n_children ~ {score_name} + age_fte_cat + first_job_pay",
+                                score_name = .x,
+                                famhist    = famhist
+                              ), .id = "score_name")
   },
   
   res_together = {
