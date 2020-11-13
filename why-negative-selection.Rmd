@@ -77,8 +77,9 @@ standard_ggplot <- function (
           !! score_col := pretty_names(!! score_col),
           !! score_col := fct_reorder(!! score_col, estimate, order_abs(order_idx))
         ) %>% 
+        rename(p = p.value) %>% 
         ggplot(aes(estimate, {{score_col}}, fill = {{fill_col}}, ...,
-          colour = p.value < 0.05/{{n_regs}})) +
+          colour = p < 0.05/{{n_regs}})) +
           pval_geom_point() +
           my_vline + 
           pval_scale() +
@@ -448,7 +449,8 @@ res_edu %>%
         "Age left FTE" = fct_relevel(age_fte_cat, "< 16", "16-18", "> 18"),
         "Age left FTE" = add_n(`Age left FTE`, "age_fte_cat")
       ) %>% 
-      ggplot(aes(y = term, x = estimate, colour = p.value < 0.05/{{n_regs}}, 
+      rename(p = p.value) %>% 
+      ggplot(aes(y = term, x = estimate, colour = p < 0.05/{{n_regs}}, 
         fill = `Age left FTE`)) +
         my_vline +
         pval_geom_point() + 
@@ -469,8 +471,9 @@ res_income %>%
         ),
         Income = add_n(Income, "income_cat")
       ) %>% 
+      rename(p = p.value) %>% 
       ggplot(aes(y = term, x = estimate, fill = Income, 
-        colour = p.value < 0.05/{{n_regs}})) +
+        colour = p < 0.05/{{n_regs}})) +
         my_vline +
         pval_geom_point(alpha = 0.8) + 
         my_fill_scale(n = 5, direction = -1) +
@@ -554,7 +557,7 @@ shifting respondents between categories.
 drake::loadd(res_partners)
 res_partners %<>%       
       filter(grepl(":", term)) %>% 
-      mutate(`N partners` = ifelse(grepl("TRUE:", term), "<= 3", "> 3")) 
+      mutate(`N partners` = ifelse(grepl("TRUE:", term), "3 or less", "4 or more")) 
 
 
 n_regs <- as.double(nrow(res_partners))
@@ -562,11 +565,12 @@ res_partners %>%
       mutate(
         score_name = pretty_names(score_name)
       ) %>% 
+      rename(p = p.value) %>% 
       ggplot(aes(
         y      = reorder_within(score_name, estimate, sex, fun = order_abs(1)), 
         x      = estimate, 
         fill   = `N partners`, 
-        colour = p.value < 0.05/{{n_regs}}
+        colour = p < 0.05/{{n_regs}}
       )) + 
         my_vline +
         pval_geom_point() +
@@ -606,8 +610,9 @@ res_age_flb_cross %>%
         term       = gsub("age_flb_cat(.*):.*", "\\1", term),
         term       = add_n(term, "age_flb_cat")
       ) %>% 
+      rename(p = p.value) %>% 
       ggplot(aes(estimate, score_name, fill = term, 
-        colour = p.value < 0.05/{{n_regs}})) +
+        colour = p < 0.05/{{n_regs}})) +
         my_vline +
         pval_geom_point() +
         pval_scale() +
@@ -990,8 +995,9 @@ res_sex %>%
       mutate(
         term = pretty_names(term),
       ) %>% 
+      rename(p = p.value) %>% 
       ggplot(aes(y = term, x = estimate, fill = sex, 
-            colour = p.value < 0.05/{{n_regs}})) +
+            colour = p < 0.05/{{n_regs}})) +
         my_vline +
         geom_linerange(data = res_sex_wide, 
           aes(
@@ -1024,8 +1030,9 @@ res_combined %>%
         score_name = fct_reorder(score_name, estimate, order_abs(2)),
         Regression = ifelse(reg.type == "raw", "Bivariate", "Controlled for AFLB")
       ) %>% 
+      rename(p = p.value) %>% 
       ggplot(aes(y = score_name, x = estimate, fill = Regression, 
-        color = p.value < 0.05/{{n_regs}})) + 
+        color = p < 0.05/{{n_regs}})) + 
         geom_vline(xintercept = 0, linetype = "dashed", color = "grey20") +
         pval_geom_point() +
         pval_scale() +
@@ -1087,7 +1094,14 @@ res_wt_combined %>%
     term     = pretty_names(term),
     term     = fct_reorder(term, estimate, order_abs(1))
   ) %>% 
-  ggplot(aes(x = estimate, y = term, shape = Weights, fill = Weights, colour = p.value < 0.05/{{n_regs}})) +
+  rename(p = p.value) %>% 
+  ggplot(aes(
+    x = estimate, 
+    y = term, 
+    shape = Weights, 
+    fill = Weights, 
+    colour = p < 0.05/{{n_regs}}
+  )) +
   geom_point(size = 1.5, stroke = 0.5) +
   my_vline +
   pval_scale() +
@@ -1294,8 +1308,9 @@ res_all %>%
         term    = reorder_within(term, estimate, dep.var, order_abs(1)),
         dep.var = fct_inorder(dep.var) 
       ) %>% 
+      rename(p = p.value) %>% 
       ggplot(aes(y = term, x = estimate, fill = reg.type, 
-        colour = p.value < 0.05/{{n_regs}})) +
+        colour = p < 0.05/{{n_regs}})) +
         my_vline + 
         facet_wrap(vars(dep.var), scales = "free_y") +
         pval_geom_point(position = position_dodge(0.4)) +
@@ -1330,7 +1345,8 @@ res_pcs %>%
         estimate = abs(estimate),
         dep.var  = fct_relevel(dep.var, "N children")
       ) %>% 
-      ggplot(aes(estimate, dep.var, colour = p.value < 0.05/{{n_regs}})) + 
+      rename(p = p.value) %>% 
+      ggplot(aes(estimate, dep.var, colour = p < 0.05/{{n_regs}})) + 
         geom_jitter(height = 0.15, width = 0, alpha = 0.9) + 
         scale_x_log10(labels = scales::label_number(accuracy = 0.0001)) +
         labs(x = "Effect size (log scale)", y = "") + 
@@ -1358,11 +1374,12 @@ res_partners_controlled %>%
       mutate(
         score_name = pretty_names(score_name)
       ) %>% 
+      rename(p = p.value) %>% 
       ggplot(aes(
         y      = reorder_within(score_name, estimate, sex, fun = order_abs(1)), 
         x      = estimate, 
         fill   = `N partners`, 
-        colour = p.value < 0.05/{{n_regs}}
+        colour = p < 0.05/{{n_regs}}
       )) + 
         my_vline +
         pval_geom_point() +
@@ -1422,8 +1439,9 @@ res_age_birth_parents %>%
                   "Mother's age at birth"
                 )
     ) %>% 
+    rename(p = p.value) %>% 
     ggplot(aes(y = term, x = estimate, fill = Control, 
-      colour = p.value < 0.05/{{n_regs}})) + 
+      colour = p < 0.05/{{n_regs}})) + 
       pval_geom_point(alpha = 0.8) +  
       my_vline +
       my_fill_scale(2) +
@@ -1471,7 +1489,8 @@ res_age_flb_dv %>%
         term = pretty_names(term),
         term = fct_reorder(term, estimate, order_abs(1))
       ) %>% 
-      ggplot(aes(estimate, term, colour = p.value < 0.05 / {{n_regs}})) + 
+      rename(p = p.value) %>% 
+      ggplot(aes(estimate, term, colour = p < 0.05 / {{n_regs}})) + 
       my_vline +
       pval_geom_point(fill = "steelblue4") +
       pval_scale() + 
@@ -1493,8 +1512,9 @@ res_age_birth_parents_dv %>%
           "moth_age_birth" = "Mother's age"
         )
       ) %>% 
+      rename(p = p.value) %>% 
       ggplot(aes(estimate, term, fill = `Dependent variable`, 
-        colour = p.value < 0.05 / {{n_regs}})) + 
+        colour = p < 0.05 / {{n_regs}})) + 
         my_vline +
         pval_geom_point() +
         pval_scale() +
@@ -1652,8 +1672,9 @@ res_together %>%
           "n_children" = "N Children", "n_sibs" = "N Siblings"),
         dep.var = fct_relevel(dep.var, "N Siblings")
       ) %>% 
+      rename(p = p.value) %>% 
       ggplot(aes(y = reorder_within(term, estimate, dep.var, order_abs(1)), 
-        x = estimate, color = p.value < 0.05/{{n_regs}}, fill  = PCs)) + 
+        x = estimate, color = p < 0.05/{{n_regs}}, fill  = PCs)) + 
         pval_geom_point(alpha = 0.8) +
         my_vline +
         facet_wrap(vars(dep.var), scales = "free_y") +
