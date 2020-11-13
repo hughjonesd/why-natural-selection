@@ -1,8 +1,8 @@
 ---
-title: "Natural Selection in the 20th Century"
+title: "Economic Theory of Fertility Explains Modern Natural Selection"
 author: "David Hugh-Jones, Abdel Abdellaoui"
 date: "`r Sys.Date()`"
-abstract: "Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection on 33 polygenic scores over two generations, using data from UK Biobank. Selection effects appear consistent over time. The strength of natural selection on a polygenic score can be predicted by its correlation with earnings and education. Effects are larger among low-income and less educated individuals, younger parents, and people not living with a partner. Effect sizes are larger when we correct for ascertainment bias. The direction of natural selection is reversed among older parents, or  controlling for age at first live birth. These patterns can be explained by economic theories of fertility, in which higher earnings may either increase or decrease fertility."
+abstract: "Natural selection has been documented in contemporary humans, but little is known about the mechanisms behind it. We test for natural selection on 33 polygenic scores over two generations, using data from UK Biobank. Selection effects appear consistent over time. Polygenic scores which predict lower earnings and education are selected for. Effects are larger among low-income and less educated people, younger parents, and people not living with a partner. Overall effect sizes are substantially bigger when we correct for ascertainment bias. The direction of natural selection is reversed among older parents, or controlling for age at first live birth. These patterns can be explained by economic theories of fertility, in which higher earnings may either increase or decrease fertility."
 bibliography: "negative-selection.bib"
 output: 
   bookdown::pdf_document2:
@@ -740,52 +740,51 @@ the 2011 Census and from the 2006 General Household Survey (GHS). We try three
 alternative weighting schemes: geographical weighting by census MSOA, age and
 presence/absence of a partner; weighting by age and highest educational
 qualification; and age, highest qualification, and age at first live birth, for
-women only. Mean effect sizes across all polygenic scores are increased by 
-`r mean_rel$Geographical` (geographical weighting), 
+women only. Mean effect sizes across all polygenic scores are increased by a
+factor of `r mean_rel$Geographical` (geographical weighting), 
 `r mean_rel[["Age/Qualification"]]` (age/qualification) or 
 `r mean_rel[["Age/Qual/AFLB"]]` (age/qualification/AFLB). Estimates might be
 further affected by weighting on other demographic variables. Since the Biobank
-sample seems to be ascertained in ways that reduce estimates of selection
-effects, we suspect that our weighted estimates remain conservative.
+sample seems to be ascertained in ways that shrink estimates of selection
+effects, we suspect that our weighted estimates are still conservative.
 
 The UK Biobank data contains information on respondents' number of
 siblings. Since respondents' polygenic scores are equal in expectation
 to the mean scores of their parents, we can use this to look at selection 
 effects in the parents' generation. We estimate equation (\ref{eq:regression})
 using *number of siblings* (including the respondent) as the dependent variable.
-
 The parents' generation has a further source of ascertainment bias: sampling
 parents of respondents overweights parents who have many children. For instance,
 parents of three children will have, on average, three times more children
 represented in UK Biobank than parents of one child. Parents of no children will
 by definition not be represented. To compensate, we reweight our preferred
-weightings (Age/Qualification) by the inverse of *number of siblings*. We then
-regress this on our polygenic scores. Selection effects are highly correlated
-across the two generations, and most share the same sign (appendix Figure
-\@ref(fig:plot-res-sibs)). Effect sizes appear larger in the parents'
-generation. We treat this result cautiously, because when we split respondents
-up by year of birth, we find few differences in effect sizes between early- and
-late-born respondents, for either generation. In other words, since estimated
-effect sizes change when we change the dependent variable, but do not change
-over time within either dependent variable, the explanation may be due to
-remaining ascertainment bias within our sample.
+weightings (Age/Qualification) by the inverse of *number of siblings*. 
+
+Selection effects are highly correlated across the two generations, and most
+share the same sign (appendix Figure \@ref(fig:plot-res-sibs)). Effect size
+estimates are larger for the parents' generation. We treat this result cautiously,
+because when we split respondents up by year of birth, we find few differences
+in effect sizes between early- and late-born respondents, for either generation.
+In other words, since estimated effect sizes change when we change the dependent
+variable, but do not change over time within either dependent variable, this
+may be due to remaining ascertainment bias within the sample.
 
 Although the direction of selection effects does not change between the generations,
-there are some differences. In particular, after we residualize polygenic scores
-on the first 100 principal components of the array data, selection effects on 
-*number of siblings* are reduced by about ten percent on average, whereas effects on
-*number of children* barely change (appendix Figure 
-\@ref(fig:plot-regs-controlled-pcs)). One possible explanation for this is that
-earlier fertility is driven more by poverty, which is geographically clustered
-and therefore correlates with the broad-scale genetic variation captured by
-principal components. (TODO: insurance motive.) Another difference is that
-in the parents' generation, raw selection effects and effects controlling for
-AFLB are positively correlated, whereas they are negatively correlated in
-the respondents' generation.[^educ-exception] These differences suggest that
-the mechanisms of natural selection may have changed over time, even though
-the outcomes are broadly the same.
+there are other differences. After we residualize polygenic scores on the first
+100 principal components of the array data, selection effects on *number of
+siblings* are reduced by about ten percent on average, whereas effects on
+*number of children* barely change (appendix Figure
+\@ref(fig:plot-regs-controlled-pcs)). This could be because
+earlier fertility is driven more by geographically clustered deprivation [e.g.
+via an insurance motive, @rendall1998old], which may correlate with the
+broad-scale genetic variation captured by principal components. Another
+difference is that in the parents' generation, raw selection effects and effects
+controlling for AFLB are positively correlated, whereas they are negatively
+correlated in the respondents' generation.[^educ-exception] These differences
+suggest that the mechanisms of natural selection may have changed over time,
+even though the outcomes are broadly the same.
 
-[^educ-exception] Educational attainment is an exception. It is selected 
+[^educ-exception]: Educational attainment is an exception. It is selected 
 against in the parents' generation, but selected for if we control for AFLB,
 which is the same pattern as for respondents.
 
@@ -822,16 +821,19 @@ that PGS's correlation with earnings in a respondent's first job[^earnings-est],
 and against its correlation with educational attainment, a predictor of lifetime
 earnings. The raw relationships (left column) are strongly negative. If we plot
 selection effects controlling for age at first live birth (right column), the
-effect reverses and becomes positive. This is evidence that the labour market
-plays an important role in natural selection, with substitution effects
-dominating overall. We also re-estimate equation \@ref(eq:regression) for each
+effect reverses and becomes positive. Thus, the labour market appears to
+play an important role in natural selection. Substitution effects
+dominate income effects overall, in accordance with the widespread association 
+between income and lower fertility [@becker1960economic;@jones2006economic].
+
+[^earnings-est]: Earnings are estimated from the 2007 Annual Survey of Hours and
+Earnings, using the SOC 2000 job code.
+
+We also re-estimate equation \@ref(eq:regression) for each
 PGS, controlling for earnings in first job and education levels. Effect sizes
 are generally reduced (appendix Figure \@ref(fig:plot-res-earn-educ)), and only
 `r n_05_33` out of 33 PGS are significant at $p = 0.05/33$, suggesting that
 earnings and education indeed mediate the effect of PGS on fertility.
-
-[^earnings-est]: Earnings are estimated from the 2007 Annual Survey of Hours and
-Earnings, using the SOC 2000 job code.
 
 
 ```{r plot-cors-earnings-educ, fig.cap="Selection effects, with and without controls for age at first live birth, by correlations with earnings and educational attainment. Each point represents one PGS."}
@@ -841,7 +843,7 @@ drake::loadd(res_age_flb)
 
 cors_income <- cor(famhist[score_names], famhist$first_job_pay, use = "pairwise")
 # TODO: use age_left_edu when this includes college
-# TODO:
+
 cors_educ <-   cor(famhist[score_names], famhist$age_fulltime_edu, use = "pairwise")
 
 effect_size <-  res_all %>% 
@@ -875,44 +877,38 @@ dfr %>%
 
 ```
 
-This theory can explain why selection effects have opposite signs when AFLB
-is controlled for. Suppose that people are aware of their endowments of human
+This theory can explain why selection effects have opposite signs when AFLB is
+controlled for. Suppose that people are aware of their endowments of human
 capital, and that education and innate human capital are complements. They
 choose how long to stay in education. After leaving education they enter the
 labour market and form families. If so, then people with less human capital will
-leave education earlier and have their first child earlier. This is a pure
-substitution effect: the income effect plays no role in the decision to leave
-education, since people are not yet earning wages. Whilst in the labour
-market, higher earners will have more children (i.e. income effects dominate).
-These assumptions will lead to the pattern we observe: earnings-increasing
-variants lead to later first births (and fewer children overall), but more
-children for any given AFLB.
+leave education earlier and have their first child earlier [cf.
+@caucutt2002women; @monstad2008education]. This is a pure substitution effect: the income effect plays
+no role in the decision to leave education, since people are not yet earning
+wages.[^no-borrow] Whilst in the labour market, higher earners will have more
+children (i.e. income effects dominate). These assumptions will lead to the
+pattern we observe: earnings-increasing variants lead to later first births (and
+fewer children overall), but more children for any given AFLB.
+
+[^no-borrow]: This argument assumes that capital market imperfections hinder
+people from borrowing against future income.
 
 The theory can also explain why natural selection is weaker among higher-income
 parents. @becker1976child show that if parents care about child quality as well
 as quantity, under certain assumptions the income effect will be stronger at
 higher income levels; this can lead to a U-shaped relationship between income
-and fertility.
+and fertility. Empirically, @cohen2013financial find that income decreases 
+fertility at low income levels but increases it at higher income levels.
 
-* TODO: more.
-
-Lastly, it is often assumed that the substitution effect will dominate
-for lone parents, or those in unstable relationships, since they have less
-opportunity to share childcare responsibilities, while the income effect will
-dominate for couples who are able to reap the gains from specialization. If so,
-then earnings-increasing genetic variants may decrease fertility more among single 
-parents than among couples, as in our data. The same idea could explain our
-results for lifetime number of sexual partners, if this is associated with
-relationship stability.
-
-Previous work shows similar relationships between *earnings* or *education* and
-fertility, to the relationships shown here between *genetics* and fertility.
-Higher income is associated with lower fertility [@becker1960economic;
-@jones2006economic].
-@cohen2013financial find that income decreases fertility at low income levels
-but increases it at higher income levels. In a US sample, fertility decreases
-with education faster among single mothers than married mothers 
-[@baudin2015fertility].
+Lastly, it is often assumed that the substitution effect will dominate for lone
+parents, or those in unstable relationships, since they have less opportunity to
+share childcare responsibilities, while the income effect will dominate for
+couples who are able to reap the gains from specialization. Indeed, US fertility
+decreases faster with education among single mothers than married mothers
+[@baudin2015fertility].If so, then earnings-increasing genetic variants may
+decrease fertility more among single parents than among couples, as in our data.
+The same idea could explain our results for lifetime number of sexual partners,
+if this is associated with relationship stability.
 
 
 # Discussion
