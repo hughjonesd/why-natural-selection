@@ -72,7 +72,11 @@ plan <- drake_plan(
                     format = "fst"
                   ),
   
-  pcs          = read_table2(file_in(!! pcs_file)),
+  pcs          = {
+                   pcs <- read_table2(file_in(!! pcs_file))
+                   pcs[-(1:2)] <- scale(pcs[-(1:2)])
+                   pcs
+                 },
   
   ashe_income = make_ashe_income(file_in(!! ashe_income_file)),
   
