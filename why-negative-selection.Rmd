@@ -1,8 +1,8 @@
 ---
 title: "Economic Theory of Fertility Explains Modern Natural Selection"
-author: "David Hugh-Jones, Abdel Abdellaoui"
-date: "`r Sys.Date()`"
-abstract: "Natural selection has been documented in contemporary humans, but little is known about the mechanisms behind it. We test for natural selection on 33 polygenic scores over two generations, using data from UK Biobank. Selection effects appear consistent over time. Polygenic scores which predict lower earnings and education are selected for. Effects are larger among low-income and less educated people, younger parents, and people not living with a partner. Overall effect sizes are substantially bigger when we correct for ascertainment bias. The direction of natural selection is reversed among older parents, or controlling for age at first live birth. These patterns can be explained by economic theories of fertility, in which higher earnings may either increase or decrease fertility."
+author: "David Hugh-Jones (D.Hugh-Jones@uea.ac.uk), Abdel Abdellaoui (a.abdellaoui@gmail.com)"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+abstract: "Natural selection has been documented in contemporary humans, but little is known about the mechanisms behind it. We test for natural selection on 33 polygenic scores over two generations, using data from UK Biobank. Selection effects appear consistent over time. Polygenic scores which predict lower earnings and education are selected for. Effects are larger among low-income and less educated people, younger parents, and people not living with a partner. Overall effect sizes are substantially bigger when we correct for ascertainment bias. The direction of natural selection is reversed among older parents, or after controlling for age at first live birth. These patterns can be explained by economic theories of fertility, in which higher earnings may either increase or decrease fertility."
 bibliography: "negative-selection.bib"
 output: 
   bookdown::pdf_document2:
@@ -141,7 +141,7 @@ pretty_names <- function (names) {
     cpd_substance_use       = "Cigarettes per day",
     diagram_T2D             = "Type 2 Diabetes",
     dpw_substance_use       = "Drinks per week",
-    EA2_noUKB               = "Educ. attainment 2 (no UK)",
+    EA2_noUKB               = "Educ. attainment 2 (no UKBB)",
     EA3_excl_23andMe_UK     = "Educ. attainment 3 (no UK)",
     eating_disorder         = "Eating disorder",
     extraversion            = "Extraversion",
@@ -349,23 +349,24 @@ scale_y_reordered <- function(..., sep = "___") {
 ```
 
 
-Geneticists have long hypothesized that natural selection is taking
-place in modern human populations. Recent work confirms this using
-genome-wide analysis [@Barban_2016; @beauchamp2016genetic;
-@kong2017selection; @sanjak2018evidence]. In particular, genetic
-variants associated with higher educational attainment are being
-selected against, although effect sizes appear small.
+Living organisms evolve through natural selection, in which allele frequencies
+change in the population through differential reproduction rates. Geneticists
+have long hypothesized that natural selection is taking place in modern human
+populations. Recent work confirms this using genome-wide analysis [@Barban_2016;
+@beauchamp2016genetic;
+@kong2017selection; @sanjak2018evidence]. In particular, genetic variants
+associated with higher educational attainment are being selected against,
+although effect sizes appear small.
 
 As yet we know little about the *mechanisms* behind natural selection in
-contemporary populations. This paper uses data from UK Biobank to learn
-more. We test for natural selection on 33 different polygenic scores. We
-extend the analysis over two generations, using data on respondents'
-number of siblings as well as their number of children to reconstruct
-two generations of family size. This is interesting because consistent
-natural selection over multiple generations could lead to substantive
-effects in the long run. Most importantly, we examine the strength of
-natural selection in different subgroups of the population, in order to
-uncover patterns that can help illuminate the mechanisms involved.
+contemporary human populations. This study uses data from UK Biobank to learn
+more. We test for natural selection on 33 different polygenic scores. We extend
+the analysis over two generations, using data on respondents' number of siblings
+as well as their number of children. This is interesting because consistent
+natural selection over multiple generations could lead to substantive effects in
+the long run. Most importantly, we examine reproductive rates in different
+subgroups of the population, in order to uncover patterns that can help
+illuminate the mechanisms behind modern natural selection.
 
 We use data from UK Biobank. We compute 33 polygenic scores, normalized
 to mean 0, variance 1. Figure \@ref(fig:plot-means-over-time) plots mean
@@ -546,8 +547,8 @@ is not significantly selected among the youngest third. Similarly,
 several PGS of body measurements are selected against only among older
 mothers. The correlation between effect sizes for the youngest and
 oldest terciles is `r cor_age_flb`. As before, recall that PGS may have
-two effects: changing the number of children within categories, and
-shifting respondents between categories.
+two effects: changing the number of children within each category, and changing
+the number of children by shifting respondents between categories.
 
 [^1]: This information is unavailable for men.
 
@@ -884,7 +885,8 @@ dfr %>%
 
 This theory can explain why selection effects have opposite signs when AFLB is
 controlled for. Suppose that people are aware of their endowments of human
-capital, and that education and innate human capital are complements. They
+capital, i.e. skills and characteristics that are valuable in the labour market.
+Suppose also that education and innate human capital are complements. They
 choose how long to stay in education. After leaving education they enter the
 labour market and form families. If so, then people with less human capital will
 leave education earlier and have their first child earlier [cf.
@@ -892,8 +894,9 @@ leave education earlier and have their first child earlier [cf.
 no role in the decision to leave education, since people are not yet earning
 wages.[^no-borrow] Whilst in the labour market, higher earners will have more
 children (i.e. income effects dominate). These assumptions will lead to the
-pattern we observe: earnings-increasing variants lead to later first births (and
-fewer children overall), but more children for any given AFLB.
+pattern we observe: earnings-increasing variants will predict later first births (and
+fewer children overall), but they will also predict more children within any given
+age at first live birth.
 
 [^no-borrow]: This argument assumes that capital market imperfections hinder
 people from borrowing against future income.
@@ -1020,7 +1023,7 @@ res_sex %>%
 \FloatBarrier
 ## Controlling for AFLB
 
-```{r plot-age-flb, fig.cap = "Selection effects controlling for age at first live birth (women only). Effect sizes for women without controls are shown for comparison"}
+```{r plot-age-flb, fig.cap = "Selection effects controlling for age at first live birth (women only). Effect sizes for women only without controls are shown for comparison."}
 
 n_regs <- as.double(nrow(res_age_flb))
 
@@ -1084,7 +1087,7 @@ rel_sizes %>%
       
 ```
 
-```{r plot-res-wt, fig.cap = "Effects of polygenic scores on fertility. Weighted regressions."}
+```{r plot-res-wt, fig.cap = "Selection effects: weighted regressions."}
 
 n_regs <- length(score_names)
 res_wt_combined %>% 
@@ -1131,7 +1134,7 @@ generation (*number of children*), excluding respondents with no
 children.
 
 
-```{r plot-res-sibs, fig.cap = "Selection effects, respondents' parents vs. respondents"}
+```{r plot-res-sibs, fig.cap = "Selection effects, respondents' parents vs. respondents."}
 drake::loadd(res_sibs_parent_weights)
 drake::loadd(res_children_comparison)
 
@@ -1237,7 +1240,7 @@ period_table <- function (tbl, caption) {
 summary_period %>% 
       group_by(Change_Parents) %>% 
       count() %>% 
-      period_table("Change in effect sizes between parents of early and late born respondents (regressions on number of siblings)")
+      period_table("Change in selection effects between parents of early and late born respondents (regressions on number of siblings)")
       
 ```
 
@@ -1245,7 +1248,7 @@ summary_period %>%
 summary_period %>% 
       group_by(Change_Respondents) %>% 
       count() %>% 
-      period_table("Change in effect sizes between early and late born respondents (regressions on number of children)")
+      period_table("Change in selection effects between early and late born respondents (regressions on number of children)")
 ```
 
 \FloatBarrier
@@ -1297,7 +1300,7 @@ Overall, `r prop_consistent_controlled * 100` per cent of effect sizes
 are consistently signed across all four regressions (on children and
 siblings, and with and without residualization).
 
-```{r plot-regs-controlled-pcs, fig.cap = "Effects of residualized polygenic scores on number of siblings/children."}
+```{r plot-regs-controlled-pcs, fig.cap = "Selection effects using residualized polygenic scores on number of siblings/children."}
 
 drake::loadd(res_all)
 
@@ -1338,7 +1341,7 @@ shows, effects are larger and more significant in siblings regressions.
 predicted number of siblings, while only `r prop_sig[["N children"]]`
 significantly predicted number of children.
 
-```{r plot-pc-regs, fig.cap = "Effect of principal components of genetic data on number of siblings/children. Absolute effect sizes are plotted. Each dot represents one bivariate regression. Points are jittered on the Y axis.", fig.height = 2}
+```{r plot-pc-regs, fig.cap = "Selection effects of principal components of genetic data. Absolute effect sizes are plotted. Each dot represents one bivariate regression. Points are jittered on the Y axis.", fig.height = 2}
 
 res_pcs %>% 
       mutate(
@@ -1362,7 +1365,7 @@ Figure \@ref(fig:plot-n-partners-controlled) shows selection effects by
 lifetime number of sexual partners. Age, age squared, and interactions
 of age and age squared with PGS are controlled for.
 
-```{r plot-n-partners-controlled, fig.cap = "Effect sizes on number of siblings interacted with number of sexual partners (median split at 3), respondent's age and age squared."}
+```{r plot-n-partners-controlled, fig.cap = "Selection effects by number of sexual partners (median split at 3), controlling for respondent's age and age squared."}
 drake::loadd(res_partners_controlled)
 res_partners_controlled %<>%       
       filter(term != "(Intercept)", term != "lo_partnersTRUE") %>% 
@@ -1424,7 +1427,7 @@ regressions without the age at birth control (father's age at birth:
 $\rho$ `r cor_raw_fath`; mother's age at birth: $\rho$
 `r cor_raw_moth`).
 
-```{r plot-age-birth-parents, fig.cap = "Selection effects controlling for parents' age at birth, eldest siblings"}
+```{r plot-age-birth-parents, fig.cap = "Selection effects (parents' generation) among eldest siblings, controlling for parents' age at birth."}
 
 
 n_regs <- as.double(nrow(res_age_birth_parents)/2)
@@ -1480,7 +1483,7 @@ correlated across generations. Effect sizes of PGS on father's age at
 own birth, and on own age at first live birth, have a correlation of
 `r cor_flb_fath`; for mother's age and own age it is `r cor_flb_moth`
 
-```{r plot-age-flb-dv, fig.cap = "Effects of polygenic scores on age at first live birth"}
+```{r plot-age-flb-dv, fig.cap = "Effects of polygenic scores on age at first live birth."}
 
 n_regs <- as.double(nrow(res_age_flb_dv))
 
@@ -1499,7 +1502,7 @@ res_age_flb_dv %>%
 
 ```
 
-```{r plot-age-birth-parents-dv, fig.cap = "Effects of polygenic scores on parents' age at own birth, eldest siblings"}
+```{r plot-age-birth-parents-dv, fig.cap = "Effects of polygenic scores on parents' age at respondent's birth, eldest siblings."}
 
 n_regs <- as.double(nrow(res_age_birth_parents_dv))
 
@@ -1508,8 +1511,8 @@ res_age_birth_parents_dv %>%
         term = pretty_names(term),
         term = fct_reorder(term, estimate, order_abs(1)),
         "Dependent variable" = dplyr::recode(dep.var, 
-          "fath_age_birth" = "Father's age", 
-          "moth_age_birth" = "Mother's age"
+          "fath_age_birth" = "Father's AFLB", 
+          "moth_age_birth" = "Mother's AFLB"
         )
       ) %>% 
       rename(p = p.value) %>% 
@@ -1568,7 +1571,7 @@ between the two sets of results. Figure
 
 TODO: ref source of data.
 
-```{r plot-rgs-by-effect-size, fig.cap = "Effect size on n siblings by genetic correlation with EA3"}
+```{r plot-rgs-by-effect-size, fig.cap = "Selection effects plotted against genetic correlation with EA3."}
 
 drake::loadd(rgs)
 drake::loadd(res_all)
@@ -1600,32 +1603,6 @@ cor(combined_results[-1], use = "complete")
 
 ```
 
-\FloatBarrier
-## Number of children
-
-Figure \@ref(fig:plot-n-children-bar) shows the full distribution of
-number of children born for different ventiles of the EA3 polygenic
-score. The strongest relationship seems to be for having 0 children
-versus 1 or more.
-
-```{r plot-n-children-bar, fig.cap = "Number of children by ventiles of EA3 PGS"}
-famhist %>% 
-      select(n_children, EA3_excl_23andMe_UK, sex) %>% 
-      mutate(
-        "EA3 Ventile" = chop_equally(EA3_excl_23andMe_UK, 20, labels = 1:20),
-        "N Children"  = santoku::chop(n_children, 0:4, labels = c(0:3, "4+")),
-        Sex           = factor(sex, levels = 0:1, labels = c("Female", "Male"))
-        ) %>% 
-      filter(! is.na(`EA3 Ventile`), ! is.na(`N Children`)) %>% 
-      ggplot(aes(`EA3 Ventile`, fill = `N Children`, group = `N Children`)) + 
-        geom_bar(position = position_fill(reverse = TRUE), alpha = 0.7) + 
-        facet_wrap(vars(Sex)) +
-        scale_fill_viridis_d(option = "A") +
-        scale_y_continuous(n.breaks = 10, labels = scales::percent) +
-        theme(legend.position = "bottom")
-
-
-```
 
 ## Causality
 
@@ -1661,7 +1638,7 @@ as_hux(cor_tbl, add_colnames = TRUE) %>%
 
 ```
 
-```{r plot-together, fig.cap = "Partial correlations with number of children"}
+```{r plot-together, fig.cap = "Partial correlations of PGS with fertility, from a single regression."}
 
 loadd(res_together)
 n_regs <- as.double(nrow(res_together))
