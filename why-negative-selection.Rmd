@@ -2,7 +2,7 @@
 title: "Economic Theory of Fertility Explains Modern Natural Selection"
 author: "David Hugh-Jones (D.Hugh-Jones@uea.ac.uk), Abdel Abdellaoui (a.abdellaoui@gmail.com)"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
-abstract: "Natural selection has been documented in contemporary humans, but little is known about the mechanisms behind it. We test for natural selection on 33 polygenic scores over two generations, using data from UK Biobank. Selection effects appear consistent over time. Polygenic scores which predict lower earnings and education are selected for. Effects are larger among low-income and less educated people, younger parents, and people not living with a partner. Overall effect sizes are substantially bigger when we correct for ascertainment bias. The direction of natural selection is reversed among older parents, or after controlling for age at first live birth. These patterns can be explained by economic theories of fertility, in which higher earnings may either increase or decrease fertility."
+abstract: "Natural selection has been documented in contemporary humans, but little is known about the mechanisms behind it. We test for natural selection on 33 polygenic scores over two generations, using data from UK Biobank. Selection effects appear consistent over time. Polygenic scores which predict lower earnings and education are selected for. Effects are concentrated among low-income and less educated people, younger parents, people with more lifetime sexual partners, and people not living with a partner. Overall effect sizes are substantially larger after correcting for ascertainment bias. The direction of natural selection is reversed among older parents, or after controlling for age at first live birth. These patterns can be explained by economic theories of fertility, in which higher earnings may either increase or decrease fertility."
 bibliography: "negative-selection.bib"
 output: 
   bookdown::pdf_document2:
@@ -162,11 +162,14 @@ pretty_names <- function (names) {
 
 
 n_in_regs <- function (var, dv = "n_children") {
+  fh_subset <- famhist
+  if (dv == "n_children") fh_subset %<>% filter(age_at_recruitment >= 45)
   # all PGS have the same NA pattern, so we just use one
-  tbl <- table(famhist[
-                  ! is.na(famhist[dv]) & ! is.na(famhist$whr_combined), 
+  tbl <- table(fh_subset[
+                  ! is.na(fh_subset[dv]) & ! is.na(fh_subset$whr_combined), 
                   var
                 ])
+  
   c(tbl)
 }
 
@@ -210,25 +213,21 @@ scale_y_reordered <- function(..., sep = "___") {
 "
 # Open questions/TODO
 
+* Check each result with a manually done regression!
 * If we weight with the GHS, and plot the means of figure 1 using this w
   weighting, most things stay the same - but the change in EA is reversed! EA
   increases over time. Could this be because the sample includes many
   relatively educated older people? If so, then mean effects are *overestimated*
   by figure 1.
 * Reweight other regressions (e.g. the omnibus regression in the appendix)?
-* Look at geography, esp. in siblings regressions.
-* We say we don't see change over time. But, we do see the effect of
-  controlling for AFLB changing over generations.
-* Beauchamp 2016 used the HRS. He reckons it's representative. Is it? How do
-  his effect sizes compare?
-  - he also worries about the quality/quantity tradeoff, which might mean that
-    people with fewer children have more grandchildren (than you'd expect).
-    As we have the two generations, we can test this. (Actually, there's a
-    positive correlation of about 0.1)
+* Look at geography, esp. in siblings regressions 
+  - maybe Townshend f.189? Not sure essential
 * Another point is that negative selection only among poor will increase
     genetic inequality.
 * When we have better definition of "partner", bring it across from the other
   project to define with_partner
+  - `with_partner` is fine, but if you want to have pairs who had the same children
+  you need to do more
 * If you take "year of last job started" and see if it is after/before
   the first child, you can figure out whether mothers keep working.
   - better still, look at all jobs started and see if any are within e.g. 5 years of
@@ -236,8 +235,7 @@ scale_y_reordered <- function(..., sep = "___") {
   - this could then be another way to get at income vs substitution effects. You'd
   predict negative selection effects among mothers who worked. Of course the
   choice to work is endogenous.
-* Put mediating effects of pay and education in there (see explore-sex-vs-pay.R)
-  - in a multivariate regression, most effects vanish once we control for these, including EA3
+* double check which scores are reverse coded!
 
 ## LITERATURE NOTES
 
@@ -345,6 +343,15 @@ scale_y_reordered <- function(..., sep = "___") {
   - within couples, male h should increase fertility (via earnings)
   - female h should decrease it (ditto?)
   - see explore-sex-vs-pay.R
+  
+## RIVAL MECHANISMS
+* Lynn 2011 mentions two:
+  - social class gradient on ability to delay gratification
+  - modern society protects the weak (Darwin 1871, Spencer 1874)
+    NB this latter doesn't predict more fertility among "dysgenic" ppl, just
+    equal fertility and then genetic drift does its work
+    - examples include modern sanitation, post-1800
+    - and monogamy!
 "
 ```
 
@@ -364,11 +371,31 @@ more. We test for natural selection on 33 different polygenic scores. We extend
 the analysis over two generations, using data on respondents' number of siblings
 as well as their number of children. This is interesting because consistent
 natural selection over multiple generations could lead to substantive effects in
-the long run. Most importantly, we examine reproductive rates in different
-subgroups of the population, in order to uncover patterns that can help
-illuminate the mechanisms behind modern natural selection.
+the long run. 
 
-We use data from UK Biobank. We compute 33 polygenic scores, normalized
+Most importantly, we examine reproductive rates in different
+subgroups of the population, in order to uncover patterns that can help
+illuminate the mechanisms behind modern natural selection. We find that 
+across the board, polygenic scores have stronger relationships with fertility 
+in specific subgroups of the population. Furthermore, in some subgroups, 
+the direction of relationships is actually reversed. 
+
+These patterns can be explained by economic theories of fertility
+[@becker1960economic]. In these, higher potential earnings have two opposite
+effects on fertility: a fertility-increasing *income effect* (higher income
+makes children more affordable), and a fertility-lowering *substitution effect*
+(time spent on childrearing has a higher cost in foregone earnings). Our
+results suggest that the substitution effect dominates for single parents,
+while the income effect is stronger for couples.
+
+
+# Data and methods
+
+We use data from UK Biobank. Our sample consists of white British (as defined
+by genetic estimated ancestry). For regressions on number of children we 
+limit the sample to people over 45, since most fertility is completed by this age.
+
+We compute 33 polygenic scores, normalized
 to mean 0, variance 1. Figure \@ref(fig:plot-means-over-time) plots mean
 polygenic scores by 5-year birth intervals. Several scores show
 consistent increases or declines over this 30-year period, of the order
@@ -511,7 +538,8 @@ women, including major depressive disorder (MDD), schizophrenia and
 neuroticism, while extraversion is more selected for among men. Waist
 circumference and waist-hip ratio are less selected for among women, and
 educational attainment is more selected against, though the difference
-is only significant for EA3.
+is only significant for EA3. One possible reason for these sex differences is
+that polygenic scores may affect fertility via mate search. 
 
 
 ```{r calc-age-flb-cross}
@@ -552,8 +580,22 @@ the number of children by shifting respondents between categories.
 
 [^1]: This information is unavailable for men.
 
-```{r plot-n-partners, fig.cap = "Selection effects by number of sexual partners, household type, and age at first live birth", fig.subcap = c("Number of partners", "Household type", "Age at first live birth"), fig.ncol = 1, out.height = c("35%", "27%", "27%"), fig.align = "center"}
+```{r plot-n-partners, fig.cap = "Selection effects by number of sexual partners, household type, and age at first live birth", fig.subcap = c("Lifetime number of sexual partners", "Household type", "Age at first live birth, females"), fig.ncol = 1, out.height = c("32%", "32%", "25%"), fig.align = "center"}
 
+sexes_theme <-  my_theme(
+                  plot.margin          = unit(c(1, 1, 0, 1), "lines"),
+                  legend.position      = "bottom", 
+                  legend.box.spacing   = unit(0, "lines"),
+                  legend.box.margin    = margin(),
+                  legend.box.just      = "left",
+                  legend.justification = "left",
+                  legend.text          = element_text(size = 7),
+                  legend.title         = element_text(size = 8)
+                )
+sexes_guides <- guides(
+                  # fill  = guide_legend(title.position = "top"),
+                  # color = guide_legend(title.position = "top")
+                )
 
 drake::loadd(res_partners)
 res_partners %<>%       
@@ -578,26 +620,38 @@ res_partners %>%
         facet_wrap(vars(sex), scales = "free_y") +
         my_fill_scale(n = 2) +
         pval_scale() +
-        my_theme(legend.position = "bottom") +
+        sexes_theme +
         my_labs(x = "", y = "") + 
-        scale_y_reordered()
+        scale_y_reordered() +
+        sexes_guides
 
-drake::loadd(res_with_partner)
-res_with_partner %<>% filter(grepl(":", term)) 
+drake::loadd(res_with_partner_sex)
+res_with_partner_sex %<>% filter(grepl(":", term)) 
 
-n_regs <- nrow(res_with_partner)
-hhtype_n <- n_in_regs("with_partner")
+n_regs <- as.double(nrow(res_with_partner_sex))
 
-res_with_partner %>% 
+res_with_partner_sex %>% 
       mutate(
+        score_name = pretty_names(score_name),
         Household = ifelse(grepl("TRUE", term), "With partner", 
-                      "Without partner"),
-        with_p    = as.character(grepl("TRUE", term)),
-        Household = sprintf("%s (N = %s)", Household, 
-                      prettyNum(hhtype_n[with_p], big.mark = ","))
+                      "Without partner")
       ) %>% 
-      standard_ggplot(fill = Household, n_regs = n_regs, score_col = score_name)
-
+      rename(p = p.value) %>% 
+      ggplot(aes(
+        y      = reorder_within(score_name, estimate, sex, fun = order_abs(1)), 
+        x      = estimate, 
+        fill   = Household, 
+        colour = p < 0.05/{{n_regs}}
+      )) + 
+        my_vline +
+        pval_geom_point() +
+        facet_wrap(vars(sex), scales = "free_y") +
+        my_fill_scale(n = 2) +
+        pval_scale() +
+        sexes_theme +
+        my_labs(x = "", y = "") + 
+        scale_y_reordered() +
+        sexes_guides
 
 drake::loadd(res_age_flb_cross)
 
@@ -792,7 +846,16 @@ even though the outcomes are broadly the same.
 
 [^educ-exception]: Educational attainment is an exception. It is selected 
 against in the parents' generation, but selected for if we control for AFLB,
-which is the same pattern as for respondents.
+which is the same pattern we observe among the respondents' generation.
+
+```{r calc-siblings-children}
+sib_chn_cor <- cor(famhist$n_sibs, famhist$n_children, use = "complete")
+```
+
+Lastly, the siblings data lets us check for a "quantity-quality tradeoff" between
+number of children and number of grandchildren (for the parents' generation). We
+do not find any: in fact, the correlation between *number of siblings* and 
+*number of children* is `r sib_chn_cor`.
 
 Our empirical results can be explained by the economic
 theory of fertility [@becker1960economic; @willis1973new; @becker1976child].
@@ -829,7 +892,7 @@ earnings. The raw relationships (left column) are strongly negative. If we plot
 selection effects controlling for age at first live birth (right column), the
 effect reverses and becomes positive. Thus, the labour market appears to
 play an important role in natural selection. Substitution effects
-dominate income effects overall, in accordance with the widespread association 
+dominate income effects overall, which fits the empirical association 
 between income and lower fertility [@becker1960economic;@jones2006economic].
 
 [^earnings-est]: Earnings are estimated from the 2007 Annual Survey of Hours and
@@ -838,7 +901,7 @@ Earnings, using the SOC 2000 job code.
 We also re-estimate equation \@ref(eq:regression) for each
 PGS, controlling for earnings in first job and education levels. Effect sizes
 are generally reduced (appendix Figure \@ref(fig:plot-res-earn-educ)), and only
-`r n_05_33` out of 33 PGS are significant at $p = 0.05/33$, suggesting that
+`r n_05_33` out of 33 PGS are significant at $p = 0.05/33$. This suggests that
 earnings and education indeed mediate the effect of PGS on fertility.
 
 
@@ -913,10 +976,10 @@ parents, or those in unstable relationships, since they have less opportunity to
 share childcare responsibilities, while the income effect will dominate for
 couples who are able to reap the gains from specialization. Indeed, US fertility
 decreases faster with education among single mothers than married mothers
-[@baudin2015fertility].If so, then earnings-increasing genetic variants may
-decrease fertility more among single parents than among couples, as in our data.
-The same idea could explain our results for lifetime number of sexual partners,
-if this is associated with relationship stability.
+[@baudin2015fertility]. This can explain why earnings-increasing genetic variants 
+decrease fertility more among single parents than among couples. The same logic 
+could explain our results for lifetime number of sexual partners, if this is 
+associated with relationship stability.
 
 
 # Discussion
@@ -927,9 +990,9 @@ underlying many polygenic scores [@beauchamp2016genetic; @kong2017selection;
 concentrated among specific subgroups of the population, including poorer
 people, less educated people, younger parents and those with more lifetime
 sexual partners. Indeed, among older parents selection effects are actually
-reversed. Furthermore, the size of selection effects correlates with the
-association between a PGS and labour market earnings. The economic theory of
-fertility provides a parsimonious explanation for this.
+reversed. Furthermore, the size of selection effects on a polygenic score
+correlates with that score's association with labour market earnings. The 
+economic theory of fertility provides a parsimonious explanation for this.
 
 An alternative theory is that traits selected for are linked to
 externalizing behaviour and low time discount rates, via the channel of
@@ -938,24 +1001,25 @@ some support for this: scores which might plausibly be linked to
 externalizing behaviour, like ADHD and age at smoking initiation, are
 selected for. However, this theory is less good at explaining variation
 in selection across the full range of scores, including physical measures, e.g.
-waist-hip ratio and BMI. Externalizing behaviour also does not explain
+waist-hip ratio and BMI (see also appendix Figure \@ref(fig:plot-together)). 
+Externalizing behaviour also does not explain
 why selection effects change sign among older parents. Overall, we believe
 that the economic theory is the leading explanation.
 
 PGS which correlate with high (low) earnings and more (less) education are being
 selected against (selected for). In addition, many of the phenotypes under
-positive selection are linked to poor health, or would be seen as undesirable to
-have by many people. For example, most people would probably prefer to have high
-educational attainment, a low risk of major depressive disorder, and a low risk
-of coronary artery disease, but natural selection is pushing against these
-traits. Potentially, this could increase the health burden on modern societies,
-but that depends on effect sizes. Our results suggest that naïve estimates can
-be affected by sample ascertainment bias. This problem may be less serious in
-surveys which aim to be representative (as the UK Biobank does not).
-Nevertheless, not all respondents consent to the collection of genetic data: for
-instance, completion rates for genotype data in the US Health and Retirement
-Study were around 80-85% [@hrs2020]. Researchers should be aware of the risks
-of ascertainment when studying modern natural selection.
+positive selection are linked to poor health, or are what many people would see
+as undesirable to have. For example, most people would probably prefer to have
+high educational attainment, a low risk of major depressive disorder, and a low
+risk of coronary artery disease, but natural selection is pushing against
+genetics linked to these traits. Potentially, this could increase the health
+burden on modern populations, but that depends on effect sizes. Our results
+suggest that naïve estimates can be affected by sample ascertainment bias. This
+problem may be less serious in surveys which aim to be representative (as the UK
+Biobank does not). Nevertheless, not all respondents consent to the collection
+of genetic data: for instance, completion rates for genotype data in the US
+Health and Retirement Study were around 80-85% [@hrs2020]. Researchers should be
+aware of the risks of ascertainment when studying modern natural selection.
 
 In addition, we do not know whether estimated effect sizes of natural
 selection will increase or decrease as more accurate polygenic scores
@@ -964,13 +1028,16 @@ phenotypes will show a similar pattern of natural selection as these ones.
 In short, it is probably too early to tell whether modern natural
 selection is substantively important or not.
 
-Research on natural selection is controversial. It brings to mind eugenics,
-which has been used to justify mass murder and human rights violations, in the
-past and possibly the present [@mao1998chinese; @sleeboom2011genetic;
-@zenz2020]. Whilst we claim scientific legitimacy for our empirical results, we
-have no special authority to speak on how society should react to
-them. This is a matter for open debate, in which scientists take part as
-equals among many. We therefore choose not to discuss policy implications here.
+Any model of fertility is implicitly a model of natural selection. But so far,
+the economic and human genetics literatures have developed in parallel.
+Integrating the two could deepen our understanding of modern natural selection.
+Economics possesses a range of theoretical models on the effects of skills,
+education and income [see @hotz1997economics, @lundberg2007american]. One
+perennial problem is how to test these theories in a world where education,
+labour and marriage markets all interact. Genetic data, such as polygenic
+scores, could help to pin down causality. Conversely, theory and empirical
+results from economics can shine a light on the mechanisms behind natural
+selection.
 
 
 \FloatBarrier

@@ -49,11 +49,11 @@ calc_pgs_over_time <- function (famhist, score_names) {
 }
 
 
-run_regs_basic <- function (dep_var, score_names, famhist) {
+run_regs_basic <- function (dep_var, score_names, famhist, subset = NULL) {
   
   run_reg <- function (score_name) {
     fml <- as.formula(glue("{dep_var} ~ {score_name}"))
-    reg_bv <- tidy(lm(fml, famhist), conf.int = TRUE) 
+    reg_bv <- tidy(lm(fml, famhist, subset = eval(subset)), conf.int = TRUE) 
     reg_bv
   }
   basic_res <- map_dfr(score_names, run_reg, .id = "score_name")
@@ -61,7 +61,7 @@ run_regs_basic <- function (dep_var, score_names, famhist) {
   run_resid_reg <- function (score_name) {
     score_resid <- paste0(score_name, "_resid")
     fml_resid <- as.formula(glue("{dep_var} ~ {score_resid}"))
-    reg_resid <- tidy(lm(fml_resid, famhist), conf.int = TRUE) 
+    reg_resid <- tidy(lm(fml_resid, famhist, subset = eval(subset)), conf.int = TRUE) 
     reg_resid <- mutate(reg_resid, term = gsub("_resid", "", term))
     reg_resid
   }
@@ -74,14 +74,14 @@ run_regs_basic <- function (dep_var, score_names, famhist) {
 }
 
 
-run_regs_pcs <- function (dep_var, famhist, pcs) {
+run_regs_pcs <- function (dep_var, famhist, pcs, subset = NULL) {
   pc_names <- grep("PC", names(pcs), value = TRUE)
   
-  fh_short <- join_famhist_pcs(famhist[c("f.eid", dep_var)], pcs)
+  fh_short <- join_famhist_pcs(famhist[c("f.eid", dep_var, "age_at_recruitment")], pcs)
   
   run_reg_pc <- function(pc_name) {
     fml <- as.formula(glue("{dep_var} ~ {pc_name}"))
-    reg <- tidy(lm(fml, fh_short), conf.int = TRUE) 
+    reg <- tidy(lm(fml, fh_short, subset = eval(subset)), conf.int = TRUE) 
     reg %<>% filter(term != "(Intercept)")
   }
   
@@ -89,11 +89,12 @@ run_regs_pcs <- function (dep_var, famhist, pcs) {
 }
 
 
-run_regs_weighted <- function (score_name, famhist, weight_data, dep.var) {
+run_regs_weighted <- function (score_name, famhist, weight_data, dep.var, subset = NULL) {
   famhist <- inner_join(famhist, weight_data, by = "f.eid")
 
   fml <- as.formula(glue("{dep.var} ~ {score_name}"))
-  mod <- lm(fml, data = famhist, weights = weights, na.action = na.exclude)
+  mod <- lm(fml, data = famhist, weights = weights, na.action = na.exclude, 
+            subset = eval(subset))
   res <- tidy(mod, conf.int = TRUE)
   res %<>% filter(term != "(Intercept)")
   attr(res, "call") <- mod$call
@@ -107,12 +108,13 @@ run_regs_period <- function (children, score_name, famhist, weight_data) {
   famhist <- inner_join(famhist, weight_data, by = "f.eid")
   
   dep_var  <- if (children) "n_children" else "n_sibs"
+  subset   <- if (children) quote(age_at_recruitment >= 45) else NULL
   famhist$year_split <- famhist$YOB >= 1950
   # evaluates to 1950:
   # median(famhist$YOB, na.rm = TRUE)
   famhist$year_split <- factor(famhist$year_split, labels = c("early", "late"))
   fml <- as.formula(glue("{dep_var} ~ year_split + {score_name}:year_split"))
-  mod <- lm(fml, famhist, weights = weights)
+  mod <- lm(fml, famhist, weights = weights, subset = eval(subset))
   res <- tidy(mod, conf.int = TRUE)
   res <- filter(res, grepl(score_name, term))
   

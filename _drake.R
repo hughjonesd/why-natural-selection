@@ -147,7 +147,8 @@ plan <- drake_plan(
     res_chn <- run_regs_basic(
             dep_var     = "n_children", 
             score_names = score_names, 
-            famhist     = famhist
+            famhist     = famhist,
+            subset      = quote(age_at_recruitment >= 45)
           )
     dplyr::bind_rows(
             "N siblings" = res_sibs, 
@@ -166,7 +167,8 @@ plan <- drake_plan(
     res_chn_pcs <- run_regs_pcs(
       dep_var     = "n_children", 
       famhist     = famhist,
-      pcs         = pcs
+      pcs         = pcs,
+      subset      = quote(age_at_recruitment >= 45)
     )
     dplyr::bind_rows(
       "N siblings" = res_sibs_pcs, 
@@ -178,9 +180,10 @@ plan <- drake_plan(
   res_wt =  target(
               map_dfr(score_names, 
                 run_regs_weighted,
-                famhist = famhist,
+                famhist     = famhist,
                 weight_data = weighting_scheme,
-                dep.var = "n_children"
+                dep.var     = "n_children",
+                subset      = quote(age_at_recruitment >= 45)
               ),
               transform = map(
                 weighting_scheme = !! weighting_schemes
@@ -198,7 +201,8 @@ plan <- drake_plan(
                               run_regs_weighted,
                               famhist     = famhist %>% filter(n_children > 0),
                               weight_data = age_qual_weights,
-                              dep.var     = "n_children"
+                              dep.var     = "n_children",
+                              subset      = quote(age_at_recruitment >= 45)
                             ),
   
   res_period =  target(
@@ -224,13 +228,17 @@ plan <- drake_plan(
             score_name = score_names, 
             subset     = sexes
           ) %>% 
-            pmap_dfr(run_regs_subset, famhist = famhist)
+            pmap_dfr(
+              run_regs_subset, 
+              famhist = famhist %>% filter(age_at_recruitment >= 45)
+            )
     res_sex$sex <- ifelse(res_sex$subset == "sex == 0", "Female", "Male") 
     
     int_pval <- map_dfr(score_names, ~ run_regs_fml(
                     fml        = "n_children ~ {score_name}*I(sex==0)",
                     score_name = .x,
-                    famhist    = famhist
+                    famhist    = famhist,
+                    subset     = quote(age_at_recruitment >= 45)
                   ),
                   .id = "score_name"
                 ) %>% 
@@ -246,7 +254,8 @@ plan <- drake_plan(
             ~run_regs_fml(
               fml        = "n_children ~ {score_name} + age_flb",
               score_name = .x, 
-              famhist    = famhist
+              famhist    = famhist,
+              subset     = quote(age_at_recruitment >= 45) 
             ), 
             .id = "score_name"
           )
@@ -260,7 +269,8 @@ plan <- drake_plan(
             ~run_regs_fml(
               fml        = "n_children ~ age_flb_cat + {score_name}:age_flb_cat",
               score_name = .x,
-              famhist    = famhist
+              famhist    = famhist,
+              subset     = quote(age_at_recruitment >= 45)
             ),
             .id = "score_name"
           )
@@ -273,7 +283,8 @@ plan <- drake_plan(
             ~run_regs_fml(
               fml        = "age_flb ~ {score_name}",
               score_name = .x, 
-              famhist    = famhist
+              famhist    = famhist,
+              subset     = quote(age_at_recruitment >= 45)
             )
           )
     res %<>% filter(term != "(Intercept)")
@@ -331,7 +342,7 @@ plan <- drake_plan(
               fml        =
                 "n_children ~ lo_partners + {score_name}:lo_partners",
               score_name = .y,
-              famhist    = famhist,
+              famhist    = famhist %>% filter(age_at_recruitment >= 45),
               subset     = .x
             ),
               .id = "row_number"
@@ -348,12 +359,33 @@ plan <- drake_plan(
             ~run_regs_fml(
               "n_children ~ with_partner + {score_name}:with_partner",
               score_name = .x,
-              famhist    = famhist
+              famhist    = famhist,
+              subset     = quote(age_at_recruitment >= 45)
             ),
             .id = "score_name"
           )
     res %<>% filter(term != "(Intercept)")
     res
+  },
+  
+  res_with_partner_sex = {
+    sexes <- rlang::exprs(sex == 0, sex == 1)
+    pars <- expand_grid(subset = sexes, score_name = score_names)
+    res <- pmap_dfr(pars,
+            ~ run_regs_fml(
+              fml        =
+                "n_children ~ with_partner + {score_name}:with_partner",
+              score_name = .y,
+              famhist    = famhist %>% filter(age_at_recruitment >= 45),
+              subset     = .x
+            ),
+              .id = "row_number"
+          )
+    pars$row_number <- as.character(seq_len(nrow(pars)))
+    
+    left_join(res, pars, by = "row_number") %>%
+          mutate(sex = ifelse(subset == "sex == 1", "Male", "Female")) %>%
+          select(-row_number, -subset)
   },
   
   res_with_partner_narrow = {
@@ -383,7 +415,8 @@ plan <- drake_plan(
             ~run_regs_fml(
               "n_children ~ with_partner_narrow + {score_name}:with_partner_narrow",
               score_name = .x,
-              famhist    = famhist
+              famhist    = famhist,
+              subset     = quote(age_at_recruitment >= 45)
             ),
             .id = "score_name"
           )
@@ -404,7 +437,7 @@ plan <- drake_plan(
               "n_children ~ {score_name}", 
               score_name = .y, 
               subset     = .x,
-              famhist    = famhist
+              famhist    = famhist %>% filter(age_at_recruitment >= 45)
             ),
             .id = "row_number"
           ) 
@@ -432,7 +465,7 @@ plan <- drake_plan(
               "n_children ~ {score_name}", 
               score_name = .y, 
               subset     = .x,
-              famhist    = famhist
+              famhist    = famhist %>% filter(age_at_recruitment >= 45)
             ),
             .id = "row_number"
           ) 
@@ -449,7 +482,9 @@ plan <- drake_plan(
     res <- map_dfr(score_names, 
             ~run_regs_fml(
               "n_children ~ {score_name}*(income_cat + YOB +I(YOB^2))", 
-              score_name = .x, famhist = famhist
+              score_name = .x, 
+              famhist    = famhist,
+              subset     = quote(age_at_recruitment >= 45)
             ),
             .id = "score_name"
           )
@@ -460,7 +495,9 @@ plan <- drake_plan(
     res <- map_dfr(score_names, 
       ~run_regs_fml(
         "n_children ~ {score_name}*(as.numeric(age_fte_cat) + YOB + I(YOB^2))", 
-        score_name = .x, famhist = famhist
+        score_name = .x, 
+        famhist    = famhist,
+        subset     = quote(age_at_recruitment >= 45)
       ),
       .id = "score_name"
     )
@@ -475,7 +512,7 @@ plan <- drake_plan(
               fml        =
                 "n_children ~ lo_partners + lo_partners:({score_name} + YOB + I(YOB^2))",
               score_name = .y,
-              famhist    = famhist,
+              famhist    = famhist %>% filter(age_at_recruitment >= 45),
               subset     = .x
             ),
               .id = "row_number"
@@ -493,7 +530,8 @@ plan <- drake_plan(
                               ~ run_regs_fml(
                                 fml = "n_children ~ {score_name} + age_fte_cat + first_job_pay",
                                 score_name = .x,
-                                famhist    = famhist
+                                famhist    = famhist,
+                                subset     = quote(age_at_recruitment >= 45)
                               ), .id = "score_name")
   },
   
@@ -506,7 +544,15 @@ plan <- drake_plan(
     
     fml <- glue("{{dep_var}} ~ {all_pgs}") # double to quote and use below
     res_all_pgs <- map_dfr(dep_vars,
-            ~run_regs_fml(fml, dep_var = .x, famhist = famhist),
+            ~run_regs_fml(fml, 
+                            dep_var = .x, 
+                            famhist = famhist, 
+                            subset  = if (.x == "n_children") {
+                                        quote(age_at_recruitment >= 45)
+                                      } else {
+                                        NULL
+                                      }
+                          ),
             .id = "dep.var"
           )
     famhist <- join_famhist_pcs(famhist, pcs)
@@ -514,7 +560,16 @@ plan <- drake_plan(
     all_pcs <- paste(all_pcs, collapse = " + ")
     fml_pcs <- glue("{{dep_var}} ~ {all_pgs} + {all_pcs}")
     res_all_pgs_pcs <- map_dfr(dep_vars,
-            ~run_regs_fml(fml_pcs, dep_var = .x, famhist = famhist),
+            ~run_regs_fml(
+              fml_pcs, 
+              dep_var = .x, 
+              famhist = famhist,
+              subset  = if (.x == "n_children") {
+                          quote(age_at_recruitment >= 45)
+                        } else {
+                          NULL
+                        }
+              ),
             .id = "dep.var"
           )
     
