@@ -1276,7 +1276,7 @@ parents' generation (see above).
 Tables \@ref(tab:tbl-siblings-by-period) and
 \@ref(tab:tbl-children-by-period) summarize the results. There is no
 change in natural selection within the parents' generation. In the
-respondents' generation, effect sizes were significantly larger in absolute size among the late-born for five PGS: autism, cognitive ability, EA2, EA3 and
+respondents' generation, effect sizes were significantly larger in absolute size among the late-born for four PGS: cognitive ability, EA2, EA3 and
 extraversion. These changes are inconsistent with the intergenerational change, 
 where effect sizes were if anything larger among the earlier, parents' generation.
 Three PGS showed significant changes in sign: alcohol use
