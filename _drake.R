@@ -497,28 +497,6 @@ plan <- drake_plan(
     res %>% filter(grepl(":factor\\(age_fte_cat\\)", term))
   },
   
-  res_partners_controlled = {
-    sexes <- rlang::exprs(sex == 0, sex == 1)
-    pars <- expand_grid(subset = sexes, score_name = score_names)
-    res <- pmap_dfr(pars,
-            ~ run_regs_fml(
-              fml = "n_children ~ age_at_recruitment + I(age_at_recruitment^2) + lo_partners +
-                {score_name}:lo_partners + 
-                {score_name}:(age_at_recruitment + I(age_at_recruitment^2))",
-              score_name = .y,
-              famhist    = famhist %>% filter(kids_ss),
-              subset     = .x
-            ),
-              .id = "row_number"
-          )
-    pars$row_number <- as.character(seq_len(nrow(pars)))
-    
-    left_join(res, pars, by = "row_number") %>%
-          mutate(sex = ifelse(subset == "sex == 1", "Male", "Female")) %>%
-          select(-row_number, -subset) %>% 
-          filter(grepl("lo_partners.*:", term))
-  },
-  
   res_ee_control = {
     map_dfr(score_names, 
               ~ run_regs_fml(

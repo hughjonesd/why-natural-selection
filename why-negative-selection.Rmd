@@ -561,9 +561,7 @@ We next focus on variables related to mate search and household
 formation. We split males and females by lifetime number of sexual
 partners, at the median value of 3 (Figure \@ref(fig:plot-n-partners)a).
 For both sexes, selection effects are larger and more significant among
-those with more than 3 partners. Results are unchanged if we control for
-respondents' age (appendix Figure
-\@ref(fig:plot-n-partners-controlled)). Splitting respondents by whether
+those with more than 3 partners. Splitting respondents by whether
 they were living with a spouse or partner at the time of interview,
 effects are larger among those not living with a spouse or partner
 (Figure \@ref(fig:plot-n-partners)b). Lastly, we split female
@@ -1429,41 +1427,6 @@ res_pcs %>%
 
 ```
 
-
-## Selection by number of partners, controlling for age
-
-Figure \@ref(fig:plot-n-partners-controlled) shows selection effects by
-lifetime number of sexual partners. Age, age squared, and interactions
-of age and age squared with PGS are controlled for.
-
-```{r plot-n-partners-controlled, fig.cap = "Selection effects by number of sexual partners (median split at 3), controlling for respondent's age and age squared."}
-drake::loadd(res_partners_controlled)
-res_partners_controlled %<>%       
-      mutate(`N partners` = ifelse(grepl("TRUE", term), "<= 3", "> 3")) 
-
-
-n_regs <- as.double(nrow(res_partners_controlled))
-res_partners_controlled %>% 
-      mutate(
-        score_name = pretty_names(score_name)
-      ) %>% 
-      rename(p = p.value) %>% 
-      ggplot(aes(
-        y      = reorder_within(score_name, estimate, sex, fun = order_abs(1)), 
-        x      = estimate, 
-        fill   = `N partners`, 
-        colour = p < 0.05/{{n_regs}}
-      )) + 
-        my_vline +
-        pval_geom_point() +
-        facet_wrap(vars(sex), scales = "free_y") +
-        my_fill_scale(n = 2) +
-        pval_scale() +
-        my_theme(legend.position = "bottom") +
-        my_labs(x = "", y = "") + 
-        scale_y_reordered()
-
-```
 
 ## Selection controlling for age at first live birth: respondents' parents
 
