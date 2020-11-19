@@ -218,6 +218,8 @@ edit_famhist <- function (famhist, score_names, ashe_income) {
         rename(first_job_pay = median_pay) %>% 
         mutate(first_job_pay = first_job_pay/1000)
   
+  famhist$kids_ss <- famhist$age_at_recruitment >= 45
+  
   return(famhist)
 }
 

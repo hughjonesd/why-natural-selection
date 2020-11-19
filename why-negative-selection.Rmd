@@ -163,7 +163,7 @@ pretty_names <- function (names) {
 
 n_in_regs <- function (var, dv = "n_children") {
   fh_subset <- famhist
-  if (dv == "n_children") fh_subset %<>% filter(age_at_recruitment >= 45)
+  if (dv == "n_children") fh_subset %<>% filter(kids_ss)
   # all PGS have the same NA pattern, so we just use one
   tbl <- table(fh_subset[
                   ! is.na(fh_subset[dv]) & ! is.na(fh_subset$whr_combined), 
@@ -213,7 +213,12 @@ scale_y_reordered <- function(..., sep = "___") {
 "
 # Open questions/TODO
 
+* Limit max no. of children in regressions (use an "in_children" bool)
+  - not necessary. Very few have abnormally many.
 * Check each result with a manually done regression!
+* Consider doing separate regressions for "any children" vs. "n children | 1 or more"
+  - heckit too slow and gives crazy answers, just use plm/ols
+  - some variables do look different
 * If we weight with the GHS, and plot the means of figure 1 using this w
   weighting, most things stay the same - but the change in EA is reversed! EA
   increases over time. Could this be because the sample includes many
@@ -527,8 +532,7 @@ interaction with income remains significant at 0.05/`r n_regs_ic` for
 `r n_sig_ic` out of `r n_regs_ic` regressions. Similarly if we interact
 the PGS with age of leaving full time education and a quadratic in age,
 the interaction with age leaving FTE remains significant at
-0.05/`r n_regs_educ` for `r n_sig_educ` out of `r n_regs_educ`
-regressions.
+0.05/`r n_regs_educ` for `r n_sig_educ` out of `r n_regs_educ` regressions.
 
 Selection effects are also different between men and women (Appendix
 Figure \@ref(fig:plot-sexes)). Differences are particularly large for
@@ -1435,8 +1439,7 @@ of age and age squared with PGS are controlled for.
 ```{r plot-n-partners-controlled, fig.cap = "Selection effects by number of sexual partners (median split at 3), controlling for respondent's age and age squared."}
 drake::loadd(res_partners_controlled)
 res_partners_controlled %<>%       
-      filter(term != "(Intercept)", term != "lo_partnersTRUE") %>% 
-      mutate(`N partners` = ifelse(grepl("TRUE:", term), "<= 3", "> 3")) 
+      mutate(`N partners` = ifelse(grepl("TRUE", term), "<= 3", "> 3")) 
 
 
 n_regs <- as.double(nrow(res_partners_controlled))

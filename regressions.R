@@ -7,7 +7,9 @@ suppressPackageStartupMessages({
   library(tidyr)
   library(dplyr)
   library(lmtest)
+  loadNamespace("tibble")
   loadNamespace("ggplot2")
+  loadNamespace("sampleSelection")
 })
 
 calc_pgs_over_time <- function (famhist, score_names) {
@@ -77,7 +79,7 @@ run_regs_basic <- function (dep_var, score_names, famhist, subset = NULL) {
 run_regs_pcs <- function (dep_var, famhist, pcs, subset = NULL) {
   pc_names <- grep("PC", names(pcs), value = TRUE)
   
-  fh_short <- join_famhist_pcs(famhist[c("f.eid", dep_var, "age_at_recruitment")], pcs)
+  fh_short <- join_famhist_pcs(famhist[c("f.eid", dep_var, "kids_ss")], pcs)
   
   run_reg_pc <- function(pc_name) {
     fml <- as.formula(glue("{dep_var} ~ {pc_name}"))
@@ -108,7 +110,7 @@ run_regs_period <- function (children, score_name, famhist, weight_data) {
   famhist <- inner_join(famhist, weight_data, by = "f.eid")
   
   dep_var  <- if (children) "n_children" else "n_sibs"
-  subset   <- if (children) quote(age_at_recruitment >= 45) else NULL
+  subset   <- if (children) quote(kids_ss) else NULL
   famhist$year_split <- famhist$YOB >= 1950
   # evaluates to 1950:
   # median(famhist$YOB, na.rm = TRUE)
@@ -152,7 +154,7 @@ run_regs_fml <- function(fml, ..., subset = NULL, famhist) {
 }
 
 
-run_regs_mnlogit <- function(score_names, fhl_mlogit) {
+run_regs_mnlogit <- function (score_names, fhl_mlogit) {
   loadNamespace("mnlogit")
   run_1_mnlogit <- function(score_name) {
     fml <- as.formula(glue::glue("n_ch_fac ~ 1 | {score_name}"))
@@ -164,3 +166,12 @@ run_regs_mnlogit <- function(score_names, fhl_mlogit) {
   lapply(score_names, run_1_mnlogit)
 }
 
+
+run_age_anova <- function (score_name, control, famhist) {
+  fml <- as.formula(glue::glue(
+    "n_children ~ {score_name}*({control} + 
+          age_at_recruitment + I(age_at_recruitment^2))"))
+  res <- lm(fml, data = famhist, subset = kids_ss) %>% 
+           car::Anova() %>% 
+           tidy()
+}
