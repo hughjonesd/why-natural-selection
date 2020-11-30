@@ -5,29 +5,17 @@ suppressPackageStartupMessages({
   library(purrr)
   library(tidyr)
   library(readr)
+  loadNamespace("future")
 })
 
-
-source("make-data.R")
+source("make-data.R") 
+# infrastructure available at github.com/hughjonesd-private/import-ukbb-data
+source("~/import-ukbb-data/import-ukbb-data.R")
 source("make-census-weights.R")
 source("regressions.R")
 source("weight-data.R")
 
-data_dir           <- "../negative-selection-data"
-pgs_dir            <- file.path(data_dir, "polygenic_scores/")
-ph_file            <- file.path(data_dir, "UKB.EA_pheno.coordinates.QC.csv")
-pcs_file           <- file.path(data_dir, "UKB.HM3.100PCs.40310.txt")
-famhist_file       <- file.path(data_dir, "david.family_history.traits.out.csv")
-famhist2_file      <- file.path(data_dir, "david.family_history.traits.20042020.out.csv")
-famhist3_file      <- file.path(data_dir, "david.family_history.traits.05052020.out.csv")
-famhist4_file      <- file.path(data_dir, "david.family_history.traits.16052020.out.csv")
-famhist5_file      <- file.path(data_dir, "david.family_history.traits.18052020.out.csv")
-famhist6_file      <- file.path(data_dir, "david.family_history.traits.17062020.out.csv")
-famhist7_file      <- file.path(data_dir, "david.birthinfo.traits.14072020.out.csv")
-famhist8_file      <- file.path(data_dir, "david.traits.03112020.out.csv")
-rgs_file           <- file.path(data_dir, "EA3_rgs.10052019.rgs.csv")
-mf_pairs_file      <- file.path(data_dir, "spouse_pair_info", 
-                        "UKB_out.mf_pairs_rebadged.csv")
+
 nomis_file         <- file.path(data_dir, "nomis-2011-statistics.csv")
 ghs_file           <- file.path(data_dir, "UKDA-5804-stata8", "stata8", 
                         "Ghs06client.dta")
@@ -36,85 +24,73 @@ DC1108EW_msoa_file <- file.path(data_dir, "DC1108EW-msoas.csv")
 DC5202SC_file      <- file.path(data_dir, "DC5202SC.csv")
 msoa_shapefile     <- file.path(data_dir, "infuse_msoa_lyr_2011_clipped", 
                         "infuse_msoa_lyr_2011_clipped.shp")
-ashe_income_file   <- file.path(data_dir, 
-                        "SOC-income", 
-                        "Occupation (4) Table 14.7a   Annual pay - Gross 2007.xls") 
 
 
-weighting_schemes <- rlang::syms(c("flb_weights", "age_qual_weights", 
+weighting_scheme_syms <- rlang::syms(c("flb_weights", "age_qual_weights", 
                         "msoa_weights"))
 period_weight_syms <- rlang::syms((c("age_qual_weights", "parent_weights")))
 
 plan <- drake_plan(
   
-  score_names  = {
-    score_names <- sub(
-      ".*UKB\\.AMC\\.(.*?)\\..*", 
-      "\\1", 
-      list.files(file_in(!! pgs_dir), pattern = "csv$"), 
-      perl = TRUE
-    )
-    setNames(score_names, score_names)
-  },
+  score_names  = import_score_names(pgs_dir),
+  
+  relatedness = target(
+                  make_relatedness(file_in(!! relatedness_file)),
+                  format = "fst_tbl"
+                ),
+  
+  sib_groups = target(make_sib_groups(relatedness), format = "fst_tbl"),
   
   famhist_raw  = target(
-                   make_famhist( 
-                      file_in(!! ph_file), 
-                      file_in(!! famhist_file),
-                      file_in(!! famhist2_file),
-                      file_in(!! famhist3_file),
-                      file_in(!! famhist4_file),
-                      file_in(!! famhist5_file),
-                      file_in(!! famhist6_file),
-                      file_in(!! famhist7_file),
-                      file_in(!! famhist8_file),
-                      file_in(!! pgs_dir)
-                    ), 
-                    format = "fst"
-                  ),
+                   import_famhist(famhist_files, pgs_dir),
+                   format = "fst_tbl"
+                 ),
   
-  pcs          = {
-                   pcs <- read_table2(file_in(!! pcs_file))
-                   pcs[-(1:2)] <- scale(pcs[-(1:2)])
-                   pcs
-                 },
+  pcs          = import_pcs(file_in(!! pcs_file)),
   
-  ashe_income = make_ashe_income(file_in(!! ashe_income_file)),
+  ashe_income  = import_ashe_income(file_in(!! ashe_income_file)),
   
-  famhist      =  target(
-                   edit_famhist(famhist_raw, score_names, ashe_income), 
-                   format = "fst"
+  famhist      =  target({
+                      famhist <- clean_famhist(famhist_raw, score_names, sib_groups)
+                      famhist <- add_ashe_income(famhist, ashe_income)
+                      famhist$kids_ss <- famhist$age_at_recruitment >= 45
+                      famhist
+                    },
+                    format = "fst_tbl"
                   ),
   
   famhist_msoa = target(
                    find_containing_msoas(famhist, msoa_shapefile), 
-                   format = "fst"
+                   format = "fst_tbl"
                  ),
   
   # mlogit now uses dfidx to create a "long" dataset, but mnlogit 
   # (used below) doesn't update. Skipping for now.
   # fhl_mlogit   =  make_famhist_long_mlogit(famhist, score_names),
   
-  resid_scores = target(
-                   make_resid_scores(famhist, pcs, score_names), 
-                   format = "fst"
+  resid_scores = target({
+                     resid_scores <- compute_resid_scores(famhist, pcs, score_names)
+                     resid_scores <- subset_resid_scores(resid_scores, famhist, score_names)
+                     resid_scores
+                   },
+                   format = "fst_tbl"
                  ),
 
-  ghs_subset   = target(make_ghs_subset(file_in(!! ghs_file)), format = "fst"),
+  ghs_subset   = target(
+                   make_ghs_subset(file_in(!! ghs_file)), 
+                   format = "fst_tbl"
+                 ),
   
   pgs_over_time = calc_pgs_over_time(famhist, score_names),
   
-  census_age_qual = target(
-                      make_census_age_qual(
-                        file_in(!! DC1108EW_file),
-                        file_in(!! DC5202SC_file)
-                      ), 
-                      format = "fst"
-                    ),
+  census_age_qual =  make_census_age_qual(
+                       file_in(!! DC1108EW_file),
+                       file_in(!! DC5202SC_file)
+                     ),
   
   census_msoa = target(
                   make_census_msoa(file_in(!! DC1108EW_msoa_file)), 
-                  format = "fst"
+                  format = "fst_tbl"
                 ),
   
   flb_weights = {
@@ -132,8 +108,8 @@ plan <- drake_plan(
   msoa_weights = weight_by_census_msoa(famhist, census_msoa, famhist_msoa),
   
   mf_pairs =  target(
-                make_mf_pairs(file_in(!! mf_pairs_file), famhist), 
-                format = "fst"
+                make_mf_pairs(file_in(!! mf_pairs_file), famhist, resid_scores), 
+                format = "fst_tbl"
               ), 
   
   rgs = make_rgs(file_in(!! rgs_file)),
@@ -187,7 +163,7 @@ plan <- drake_plan(
                 subset      = quote(kids_ss)
               ),
               transform = map(
-                weighting_scheme = !! weighting_schemes
+                weighting_scheme = !! weighting_scheme_syms
               )
             ),
   
@@ -301,7 +277,7 @@ plan <- drake_plan(
     res <- pmap_dfr(vars,
             run_regs_fml,
             fml = "n_sibs ~ {score_name} + {control}",
-            subset = quote(n_older_sibs == 0),
+            subset = quote(birth_order == 1),
             famhist = famhist,
             .id = "id"
           )
@@ -322,7 +298,7 @@ plan <- drake_plan(
     res <- pmap_dfr(vars,
             run_regs_fml,
             fml = "{dep.var} ~ {score_name}",
-            subset = quote(n_older_sibs == 0),
+            subset = quote(birth_order == 1),
             famhist = famhist,
             .id = "id"
           )
@@ -508,6 +484,18 @@ plan <- drake_plan(
             .id = "score_name")
   },
   
+    res_risk_control = {
+      # f.2040.0.0 is risk attitude (via questionnaire)
+      map_dfr(score_names, 
+                ~ run_regs_fml(
+                  fml = "n_children ~ {score_name} + f.2040.0.0",
+                  score_name = .x,
+                  famhist    = famhist,
+                  subset     = quote(kids_ss)
+                ), 
+              .id = "score_name")
+  },
+  
   # res_margins = {
   #    res_extensive <- map_dfr(score_names, 
   #                       ~ run_regs_fml(
@@ -587,4 +575,7 @@ plan <- drake_plan(
 )
 
 
-drake_config(plan, history = FALSE)
+future::plan(future::multisession) 
+
+drake_config(plan, history = FALSE, log_build_times = FALSE, 
+             parallelism = "future", jobs = 2)

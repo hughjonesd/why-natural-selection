@@ -4,9 +4,9 @@ suppressPackageStartupMessages({
   library(magrittr)
   library(dplyr)
   library(rlang)
-  library(santoku)
   library(haven)
   library(sf)
+  loadNamespace("santoku")
   loadNamespace("ggplot2")
   loadNamespace("car") # very annoying if it overwrites recode
   loadNamespace("matrixStats")
@@ -14,96 +14,14 @@ suppressPackageStartupMessages({
   loadNamespace("readxl")
 })
 
-# utility function:
-negative_to_na <- function (x) {
-  x[x < 0] <- NA
-  x
-}
-
-make_pcs <- function (pcs_file) {
-  pcs <- read_table(pcs_file)
-  pc_names <- grep("PC", names(pcs), value = TRUE)
-  pcs[pc_names] <- scale(pcs[pc_names])
-  pcs
-}
-
 
 join_famhist_pcs <- function (famhist, pcs) {
-  left_join(famhist, pcs, by = c("f.eid" = "IID"))
+  left_join(famhist, pcs, by = c("f.eid" = "eid"))
 }
 
 
 join_famhist_resid_scores <- function (famhist, resid_scores) {
   cbind(famhist, resid_scores)
-}
-
-
-make_resid_scores <- function (famhist, pcs, score_names) {
-  famhist <- join_famhist_pcs(famhist, pcs)
-  resid_scores <- data.frame(dummy = numeric(nrow(famhist))) 
-  
-  for (score_name in score_names) {
-    resid_fml <- paste(score_name, "~", paste0("PC", 1:40, collapse = " + "))
-    resid_score <- resid(lm(as.formula(resid_fml), famhist, 
-          na.action = na.exclude))
-    resid_scores[[paste0(score_name, "_resid")]] <- resid_score
-  }
-  
-  resid_scores$dummy <- NULL
-  resid_scores
-}
-
-
-make_famhist <- function (
-        ph_file, 
-        famhist_file,
-        famhist2_file,
-        famhist3_file,
-        famhist4_file,
-        famhist5_file,
-        famhist6_file,
-        famhist7_file,
-        famhist8_file,
-        pgs_dir
-      ) {
-  ph <- read_csv(ph_file, col_types = cols(
-    geno_measurement_plate = col_skip(),
-    geno_measurement_well = col_skip(),
-    .default = col_double()
-  ))
-  
-  famhist <- list()
-  famhist[[1]] <- read_csv(famhist_file, col_types = strrep("d", 40))
-  famhist[[2]] <- read_csv(famhist2_file, col_types = strrep("d", 17))
-  famhist[[3]] <- read_csv(famhist3_file)
-  famhist[[4]] <- read_csv(famhist4_file, col_types = strrep("d", 33))
-  famhist[[5]] <- read_csv(famhist5_file, col_types = strrep("d", 4))
-  famhist[[6]] <- read_csv(famhist6_file, col_types = strrep("d", 22))
-  famhist[[7]] <- read_csv(famhist7_file, col_types = strrep("d", 3))
-  famhist[[8]] <- read_csv(famhist8_file, col_types = cols(.default = "d"))
-  for (i in seq_along(famhist)) {
-    names(famhist[[i]]) <- paste0("f.", names(famhist[[i]]))
-    names(famhist[[i]]) <- gsub("\\-", ".", names(famhist[[i]]))  
-  }
-  
-  famhist[[1]] %<>% left_join(ph, by = c("f.eid" = "eid"))
-  for (fh in famhist[-1]) {
-    famhist[[1]] %<>% left_join(fh, by = "f.eid")  
-  }
-  famhist <- famhist[[1]]
-  
-  # only "genetic" whites
-  famhist %<>% filter(! is.na(genetic_ethnic_grouping))
-  
-  for (pgs_file in list.files(pgs_dir, pattern = "csv$", full.names = TRUE)) {
-    score_name <- sub(".*UKB\\.AMC\\.(.*?)\\..*", "\\1", pgs_file, perl = TRUE)
-    pgs <- read_delim(pgs_file, delim = " ", col_types = "dd")
-    pgs %<>% filter(FID > 0) 
-    names(pgs)[2] <- score_name # instead of "SCORE"
-    famhist %<>% left_join(pgs, by = c("f.eid" = "FID"))
-  }
-  
-  return(famhist)
 }
 
 
@@ -125,6 +43,8 @@ edit_famhist <- function (famhist, score_names, ashe_income) {
     )
   )
 
+  famhist$female <- famhist$f.31.0.0 == 0
+  
   # "Field 845 was collected from all participants except those who indicated 
   # they have a College or University degree, as defined by their answers to 
   # Field 6138". So, we impute this to be 21.
@@ -233,20 +153,6 @@ make_famhist_long_mlogit <- function (famhist, score_names) {
 }
 
 
-make_ashe_income <- function (ashe_income_file) {
-  ashe_income <- readxl::read_xls(ashe_income_file, range = "A5:F475")
-  
-  ashe_income %<>% 
-        dplyr::select(Description, Code, Median, Mean) %>% 
-        mutate(across(c(Median, Mean), as.numeric)) %>% 
-        rename(median_pay = Median, mean_pay = Mean)
-  
-  ashe_income %<>% filter(! is.na(Code))
-  
-  ashe_income
-} 
-
-
 make_rgs <- function (rgs_file) {
   rgs <- read_csv(rgs_file)
   
@@ -257,19 +163,6 @@ make_rgs <- function (rgs_file) {
   ) %>% {sub("\\.GPC\\.23andme$", "", .)}
   
   rgs
-}
-
-
-make_mf_pairs <- function (mf_pairs_file, famhist) {
-  mf_pairs <- read_csv(mf_pairs_file, col_types = "dddccccc")
-  famhist_tmp <- famhist %>% dplyr::select(! (starts_with("f.") | 
-      starts_with("PC") | starts_with("home") |
-      starts_with("assessment") | starts_with("birth_")), f.eid)
-  mf_pairs %<>% 
-    left_join(famhist_tmp, by = c("ID.m" = "f.eid")) %>% 
-    left_join(famhist_tmp, by = c("ID.f" = "f.eid"), suffix = c(".m", ".f"))
-  
-  mf_pairs
 }
 
 

@@ -14,6 +14,7 @@ suppressPackageStartupMessages({
 
 calc_pgs_over_time <- function (famhist, score_names) {
   pgs_over_time <- famhist %>% 
+        select(YOB, all_of(score_names)) %>% 
         group_by(
           YOB = santoku::chop(YOB, 
             seq(1940, 1970, 5), 
@@ -22,7 +23,9 @@ calc_pgs_over_time <- function (famhist, score_names) {
           ) 
         ) %>% 
         filter(! is.na(YOB)) %>% 
-        summarize(across(all_of(score_names), ggplot2::mean_cl_normal, na.rm = TRUE)) %>% 
+        summarize(across(all_of(score_names), 
+          ggplot2::mean_cl_normal, na.rm = TRUE
+        )) %>% 
         pivot_longer(-YOB, names_to = "score_name", values_to = "score") %>% 
         mutate(
           score_lo = score$ymin,

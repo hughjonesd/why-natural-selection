@@ -16,6 +16,7 @@ header-includes:
 editor_options: 
   markdown: 
     wrap: 72
+  chunk_output_type: console
 ---
 
 ```{r setup, include = FALSE}
@@ -951,8 +952,8 @@ dfr %>%
 This theory can explain why selection effects have opposite signs when AFLB is
 controlled for. Suppose that people are aware of their endowments of human
 capital, i.e. skills and characteristics that are valuable in the labour market.
-Suppose also that education and innate human capital are complements. They
-choose how long to stay in education. After leaving education they enter the
+Suppose also that education and innate human capital are complements. Individuals
+choose how long to stay in education; after leaving education they enter the
 labour market and form families. If so, then people with less human capital will
 leave education earlier and have their first child earlier [cf.
 @caucutt2002women; @monstad2008education]. This is a pure substitution effect: the income effect plays
@@ -983,6 +984,48 @@ decrease fertility more among single parents than among couples. The same logic
 could explain our results for lifetime number of sexual partners, if this is 
 associated with relationship stability.
 
+```{r calc-risk-attitude}
+
+drake::loadd(res_risk_control)
+drake::loadd(res_all)
+
+n_risk_sig <- res_risk_control %>% 
+            filter(term == 'f.2040.0.0') %>% 
+            {sum(.$p.value <= 0.05/33)}
+
+n_pgs_sig <- res_risk_control %>% 
+            filter(term == score_name) %>% 
+            {sum(.$p.value <= 0.05/33)}
+
+res_compare <- res_all %>% 
+  filter(dep.var=='N children', reg.type == 'raw') %>% 
+  left_join(res_risk_control %>% filter(term == score_name), by = 'score_name')
+
+ratio <- res_compare$estimate.y/res_compare$estimate.x
+n_less_sig <- sum(res_compare$p.value.y <= 0.05/33 & res_compare$p.value.x > 0.05/33)
+```
+
+An alternative theory is that traits selected for are linked to externalizing
+behaviour, risk-seeking and low time discount rates, via the channel of early
+sexual behaviour [@Mills2020.05.06.081273]. The data here provide some support
+for this: scores which might plausibly be linked to externalizing behaviour,
+like ADHD and age at smoking initiation, are selected for. However, this theory
+is less good at explaining variation in selection across the full range of
+scores, including physical measures, e.g. waist-hip ratio and BMI (see also
+appendix Figure \@ref(fig:plot-together)). Externalizing behaviour also does not
+explain why selection effects change sign among older parents. 
+
+We test the alternative theory directly by re-estimating equation
+\@ref(eq:regression) controlling for a measure of risk attitude (Biobank field
+2040). While risk attitude is always a highly significant predictor of number of
+children, it has little impact on the effect size or significance of the PGS.
+The median ratio of PGS effect sizes between regressions with and without
+controls is `r median(ratio)`; all PGS which are significant at $p \le 0.05/33$
+in uncontrolled regressions remain so when controlling for risk attitude. Thus,
+although risk attitude does predict number of children, it appears not to
+mediate selection effects. Overall, we believe that the economic theory is the
+leading explanation.
+
 
 # Discussion
 
@@ -995,18 +1038,6 @@ sexual partners. Indeed, among older parents selection effects are actually
 reversed. Furthermore, the size of selection effects on a polygenic score
 correlates with that score's association with labour market earnings. The 
 economic theory of fertility provides a parsimonious explanation for this.
-
-An alternative theory is that traits selected for are linked to
-externalizing behaviour and low time discount rates, via the channel of
-early sexual behaviour [@Mills2020.05.06.081273]. The data here provide
-some support for this: scores which might plausibly be linked to
-externalizing behaviour, like ADHD and age at smoking initiation, are
-selected for. However, this theory is less good at explaining variation
-in selection across the full range of scores, including physical measures, e.g.
-waist-hip ratio and BMI (see also appendix Figure \@ref(fig:plot-together)). 
-Externalizing behaviour also does not explain
-why selection effects change sign among older parents. Overall, we believe
-that the economic theory is the leading explanation.
 
 PGS which correlate with high (low) earnings and more (less) education are being
 selected against (selected for). In addition, many of the phenotypes under

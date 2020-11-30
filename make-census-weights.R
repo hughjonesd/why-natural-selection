@@ -123,7 +123,7 @@ find_containing_msoas <- function (famhist, msoa_shapefile) {
 make_census_msoa <- function (census_msoa_file) {
   census_msoa <-  readr::read_csv(census_msoa_file) 
   census_msoa %<>% 
-        select(
+        dplyr::select(
           -matches("Total"), 
           -matches("All categories"), 
           -matches("All persons")

@@ -219,7 +219,7 @@ test_that("res_age_flb_dv", {
 test_that("res_age_birth_parents", {
   loadd(res_age_birth_parents)
   coef <- lm_coef(n_sibs ~ hip_combined + fath_age_birth, 
-                  data = famhist %>% filter(n_older_sibs == 0))
+                  data = famhist %>% filter(birth_order == 1))
   expect_equivalent(
     coef,
     res_age_birth_parents %>% 
@@ -228,7 +228,7 @@ test_that("res_age_birth_parents", {
   )
   
   coef <- lm_coef(n_sibs ~ hip_combined + moth_age_birth, 
-                  data = famhist %>% filter(n_older_sibs == 0))
+                  data = famhist %>% filter(birth_order == 1))
   expect_equivalent(
     coef,
     res_age_birth_parents %>% 
@@ -241,7 +241,7 @@ test_that("res_age_birth_parents", {
 test_that("res_age_birth_parents_dv", {
   loadd(res_age_birth_parents_dv)
   coef <- lm_coef(fath_age_birth ~ age_at_menopauze, 
-                  data = famhist %>% filter(n_older_sibs == 0))
+                  data = famhist %>% filter(birth_order == 1))
   expect_equivalent(
     coef, 
     res_age_birth_parents_dv %>% 
