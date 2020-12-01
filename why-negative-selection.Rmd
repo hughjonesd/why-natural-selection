@@ -1622,7 +1622,7 @@ Figure \@ref(fig:plot-age-birth-parents-dv) does the same for their
 parents. Effect sizes are reasonably large. They are also very highly
 correlated across generations. Effect sizes of PGS on father's age at
 own birth, and on own age at first live birth, have a correlation of
-`r cor_flb_fath`; for mother's age and own age it is `r cor_flb_moth`
+`r cor_flb_fath`; for mother's age and own age it is `r cor_flb_moth`.
 
 ```{r plot-age-flb-dv, fig.cap = "Effects of polygenic scores on age at first live birth."}
 
