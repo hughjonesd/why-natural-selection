@@ -162,8 +162,8 @@ pretty_names <- function (names) {
 }
 
 
-n_in_regs <- function (var, dv = "n_children") {
-  fh_subset <- famhist
+n_in_regs <- function (var, dv = "n_children", data = famhist) {
+  fh_subset <- data
   if (dv == "n_children") fh_subset %<>% filter(kids_ss)
   # all PGS have the same NA pattern, so we just use one
   tbl <- table(fh_subset[
@@ -175,9 +175,9 @@ n_in_regs <- function (var, dv = "n_children") {
 }
 
 
-add_n <- function (var, famhist_var = var, dv = "n_children") {
+add_n <- function (var, famhist_var = var, dv = "n_children", data = famhist) {
   var <- as.factor(var)
-  n <- n_in_regs(famhist_var, dv)
+  n <- n_in_regs(famhist_var, dv, data)
   levels(var) <- sprintf("%s (N = %s)", levels(var), 
                          prettyNum(n[seq_len(nlevels(var))], big.mark = ","))
   # var_n <- sprintf("%s (N = %s)", var, prettyNum(n[var], big.mark = ","))
@@ -851,9 +851,35 @@ even though the outcomes are broadly the same.
 against in the parents' generation, but selected for if we control for AFLB,
 which is the same pattern we observe among the respondents' generation.
 
+
+```{r plot-siblings-townsend, fig.cap = "Selection effects in the parents' generation by Townsend deprivation score quintile", fig.align = "center"}
+
+drake::loadd(res_townsend_parents)
+drake::loadd(famhist_townsend_71)
+n_regs <- nrow(res_townsend_parents)
+
+res_townsend_parents %>% 
+  mutate(
+    `Townsend quintile` = sub("Quin71(\\d):.*", "\\1", term),
+    add_n(`Townsend quintile`, "Quin71", dv = "n_sibs", data = famhist_townsend_71)
+  ) %>% 
+  standard_ggplot(`Townsend quintile`, n_regs = n_regs, score_col = score_name, order_idx = 5)
+
+rm(famhist_townsend_71)
+```
+
+
+We also check whether selection effects differ by socio-economic status in the
+parents' generation. We have no information about parents' income, so we use
+the 1971 Townsend deprivation score of respondents' birthplace as a proxy. Results
+(Figure \@ref(fig:plot-siblings-townsend)) show the same pattern as for respondents:
+effect sizes are larger and more significant in the most deprived areas. 
+
+
 ```{r calc-siblings-children}
 sib_chn_cor <- cor(famhist$n_sibs, famhist$n_children, use = "complete")
 ```
+
 
 Lastly, the siblings data lets us check for a "quantity-quality tradeoff" between
 number of children and number of grandchildren (for the parents' generation). We
@@ -1485,11 +1511,11 @@ father's age, and who had no elder siblings. We run regressions on
 *number of siblings* on these subsets, controlling for either parent's
 age at their birth. Figure \@ref(fig:plot-age-birth-parents) shows the
 results. Effect sizes are very similar, whether controlling for father's
-or mother's age. Unlike for the respondents' generation, effect sizes
-are positively correlated with the effect sizes from bivariate
-regressions without the age at birth control (father's age at birth:
-$\rho$ `r cor_raw_fath`; mother's age at birth: $\rho$
-`r cor_raw_moth`).
+or mother's age. As in the respondents' generation, effect sizes
+are negatively correlated with the effect sizes from bivariate
+regressions without the age at birth control, though the correlation
+is smaller (father's age at birth: $\rho$ `r cor_raw_fath`; mother's age at
+birth: $\rho$ `r cor_raw_moth`).
 
 ```{r plot-age-birth-parents, fig.cap = "Selection effects (parents' generation) among eldest siblings, controlling for parents' age at birth."}
 

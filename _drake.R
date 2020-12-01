@@ -24,7 +24,7 @@ DC1108EW_msoa_file <- file.path(data_dir, "DC1108EW-msoas.csv")
 DC5202SC_file      <- file.path(data_dir, "DC5202SC.csv")
 msoa_shapefile     <- file.path(data_dir, "infuse_msoa_lyr_2011_clipped", 
                         "infuse_msoa_lyr_2011_clipped.shp")
-
+dep_data_dir       <- file.path(data_dir, "deprivation-data")
 
 weighting_scheme_syms <- rlang::syms(c("flb_weights", "age_qual_weights", 
                         "msoa_weights"))
@@ -63,6 +63,11 @@ plan <- drake_plan(
                    find_containing_msoas(famhist, msoa_shapefile), 
                    format = "fst_tbl"
                  ),
+  
+  famhist_townsend_71 = target(
+                          add_deprivation_data(famhist, dep_data_dir),
+                          format = "fst_tbl"
+                        ),
   
   # mlogit now uses dfidx to create a "long" dataset, but mnlogit 
   # (used below) doesn't update. Skipping for now.
@@ -287,6 +292,19 @@ plan <- drake_plan(
     res$id <- NULL
     res %<>% filter(term != "(Intercept)")
     
+    res
+  },
+  
+  res_townsend_parents = {
+    res <-  map_dfr(score_names,
+              ~run_regs_fml(
+                "n_sibs ~ Quin71 + {score_name}:Quin71",
+                score_name = .x,
+                famhist    = famhist_townsend_71
+              ),
+              .id = "score_name"
+            )
+    res %<>% filter(grepl(":", term))
     res
   },
   
