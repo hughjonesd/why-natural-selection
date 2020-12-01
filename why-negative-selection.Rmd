@@ -852,7 +852,7 @@ against in the parents' generation, but selected for if we control for AFLB,
 which is the same pattern we observe among the respondents' generation.
 
 
-```{r plot-siblings-townsend, fig.cap = "Selection effects in the parents' generation by Townsend deprivation score quintile", fig.align = "center"}
+```{r plot-siblings-townsend, fig.cap = "Selection effects in the parents' generation by area Townsend deprivation quintile", fig.align = "center"}
 
 drake::loadd(res_townsend_parents)
 drake::loadd(famhist_townsend_71)
@@ -861,19 +861,25 @@ n_regs <- nrow(res_townsend_parents)
 res_townsend_parents %>% 
   mutate(
     `Townsend quintile` = sub("Quin71(\\d):.*", "\\1", term),
-    add_n(`Townsend quintile`, "Quin71", dv = "n_sibs", data = famhist_townsend_71)
+    `Townsend quintile` = add_n(`Townsend quintile`, "Quin71", dv = "n_sibs", 
+                                  data = famhist_townsend_71)
   ) %>% 
-  standard_ggplot(`Townsend quintile`, n_regs = n_regs, score_col = score_name, order_idx = 5)
+  standard_ggplot(fill_col    = `Townsend quintile`,
+                    n_regs    = n_regs, 
+                    score_col = score_name, 
+                    order_idx = 5
+                  )
 
 rm(famhist_townsend_71)
 ```
 
 
 We also check whether selection effects differ by socio-economic status in the
-parents' generation. We have no information about parents' income, so we use
-the 1971 Townsend deprivation score of respondents' birthplace as a proxy. Results
-(Figure \@ref(fig:plot-siblings-townsend)) show the same pattern as for respondents:
-effect sizes are larger and more significant in the most deprived areas. 
+parents' generation. We have no information about parents' income, so we use the
+1971 Townsend deprivation score of respondents' birthplace as a proxy
+[@townsend1987deprivation]. Results (Figure \@ref(fig:plot-siblings-townsend))
+show the same pattern as for respondents: effect sizes are larger and more
+significant in the most deprived areas.
 
 
 ```{r calc-siblings-children}
@@ -938,6 +944,9 @@ earnings and education indeed mediate the effect of PGS on fertility.
 
 drake::loadd(res_all)
 drake::loadd(res_age_flb)
+drake::loadd(ashe_income)
+
+famhist <- add_ashe_income(famhist, ashe_income)
 
 cors_income <- cor(famhist[score_names], famhist$first_job_pay, use = "pairwise")
 # TODO: use age_left_edu when this includes college
@@ -1619,7 +1628,7 @@ res_age_birth_parents_dv %>%
 \FloatBarrier
 ## Controlling for earnings and education
 
-```{r plot-res-earn-educ, fig.cap = "Selection effects controlling for earnings in first job (estimated by median earnings from ASHE 2007 for the SOC2000 job code) and education (left education before 16, 16-18, or after 18). Raw effects are shown for comparison. Lines are 95% confidence intervals uncorrected for multiple testing."}
+```{r plot-res-earn-educ, fig.cap = "Selection effects controlling for earnings in first job (estimated by mean earnings from ASHE 2007 for the SOC2000 job code) and education (left education before 16, 16-18, or after 18). Raw effects are shown for comparison. Lines are 95% confidence intervals uncorrected for multiple testing."}
 
 drake::loadd(res_ee_control)
 drake::loadd(res_all)

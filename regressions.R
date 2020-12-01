@@ -10,6 +10,8 @@ suppressPackageStartupMessages({
   loadNamespace("tibble")
   loadNamespace("ggplot2")
   loadNamespace("sampleSelection")
+  loadNamespace("Formula")
+  loadNamespace("fixest")
 })
 
 calc_pgs_over_time <- function (famhist, score_names) {
@@ -177,4 +179,41 @@ run_age_anova <- function (score_name, control, famhist) {
   res <- lm(fml, data = famhist, subset = kids_ss) %>% 
            car::Anova() %>% 
            tidy()
+}
+
+
+run_reg_income_dv <- function (famhist, score_names, ashe_income, age_qual_weights) {
+  famhist %<>% add_ashe_income(ashe_income)
+  famhist %<>% left_join(age_qual_weights, by = "f.eid")
+  
+  most_score_names <- setdiff(score_names, c("EA2_noUKB", "whr_combined", 
+                                "wc_combined", "hip_combined", "body_fat"))
+  
+  fml <- paste(most_score_names, collapse = " + ")
+  fml <- glue::glue("log(cur_job_pay) ~ age_at_recruitment + ",
+                      "I(age_at_recruitment^2) + {fml} | factor(sib_group)")
+  fml <- Formula::as.Formula(fml)
+  
+  res <- fixest::feols(fml, data = famhist, weights = ~ weights)
+  
+  # predict manually, using causal coefficients from within-family regs
+  # and choosing intercept to minimize squared error
+  scores <- famhist %>% 
+              mutate(agesq = age_at_recruitment^2) %>% 
+              select(age_at_recruitment, agesq, all_of(most_score_names)) %>% 
+              as.matrix()
+  pay_hat <- c(scores %*% coef(res))
+  alpha <- mean(log(famhist$cur_job_pay) - pay_hat, na.rm = TRUE)
+  pay_hat <- pay_hat + alpha
+  
+  famhist$pay_hat <- pay_hat
+}
+
+run_income_dist <- function (famhist) {
+  # predict individual income from PGS
+  # 3 densities:
+  # - empirically from last_job_pay, weighted by e.g. age_qual
+  # - predicted from reg of last_job_pay on PGS, same weighting
+  #   - use within-family regressions, then work out the intercept separately
+  # - predicted from regression, weighting multiplied by n_children
 }

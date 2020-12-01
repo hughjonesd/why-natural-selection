@@ -52,7 +52,6 @@ plan <- drake_plan(
   
   famhist      =  target({
                       famhist <- clean_famhist(famhist_raw, score_names, sib_groups)
-                      famhist <- add_ashe_income(famhist, ashe_income)
                       famhist$kids_ss <- famhist$age_at_recruitment >= 45
                       famhist
                     },
@@ -113,7 +112,8 @@ plan <- drake_plan(
   msoa_weights = weight_by_census_msoa(famhist, census_msoa, famhist_msoa),
   
   mf_pairs =  target(
-                make_mf_pairs(file_in(!! mf_pairs_file), famhist, resid_scores), 
+                make_mf_pairs(file_in(!! mf_pairs_file), famhist, resid_scores,
+                                ashe_income), 
                 format = "fst_tbl"
               ), 
   
@@ -492,6 +492,7 @@ plan <- drake_plan(
   },
   
   res_ee_control = {
+    famhist <- add_ashe_income(famhist, ashe_income)
     map_dfr(score_names, 
               ~ run_regs_fml(
                 fml = "n_children ~ {score_name} + age_fte_cat + first_job_pay",
@@ -592,8 +593,4 @@ plan <- drake_plan(
   
 )
 
-
-future::plan(future::multisession) 
-
-drake_config(plan, history = FALSE, log_build_times = FALSE, 
-             parallelism = "future", jobs = 2)
+drake_config(plan, history = FALSE, log_build_times = FALSE)
