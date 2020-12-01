@@ -544,43 +544,43 @@ plan <- drake_plan(
   #    res
   # },
   
-  res_together = {
-    most_score_names <- setdiff(score_names, 
-          c("EA2_noUKB", "whr_combined", "wc_combined", "hip_combined"))
-    all_pgs <- paste0(most_score_names, collapse = " + ")
-    dep_vars <- c("n_children", "n_sibs")
-    names(dep_vars) <- dep_vars
-    
-    fml <- glue("{{dep_var}} ~ {all_pgs}") # double to quote and use below
-    res_all_pgs <- map_dfr(dep_vars,
-            ~run_regs_fml(fml, 
-                            dep_var = .x, 
-                            famhist = famhist, 
-                            subset  = if (.x == "n_children") {
-                                        quote(kids_ss)
-                                      } else {
-                                        NULL
-                                      }
-                          ),
-            .id = "dep.var"
-          )
-    famhist <- join_famhist_pcs(famhist, pcs)
-    all_pcs <- grep("PC", names(pcs), value = TRUE)
-    all_pcs <- paste(all_pcs, collapse = " + ")
-    fml_pcs <- glue("{{dep_var}} ~ {all_pgs} + {all_pcs}")
-    res_all_pgs_pcs <- map_dfr(dep_vars,
-            ~run_regs_fml(
-              fml_pcs, 
-              dep_var = .x, 
-              famhist = famhist,
-              subset  = if (.x == "n_children") quote(kids_ss) else NULL
-              ),
-            .id = "dep.var"
-          )
-    
-    bind_rows("No" = res_all_pgs, "Yes" = res_all_pgs_pcs, .id = "PCs") %>% 
-          filter(term != "(Intercept)", ! grepl("^PC", term))
-  },
+  # res_together = {
+  #   most_score_names <- setdiff(score_names, 
+  #         c("EA2_noUKB", "whr_combined", "wc_combined", "hip_combined"))
+  #   all_pgs <- paste0(most_score_names, collapse = " + ")
+  #   dep_vars <- c("n_children", "n_sibs")
+  #   names(dep_vars) <- dep_vars
+  #   
+  #   fml <- glue("{{dep_var}} ~ {all_pgs}") # double to quote and use below
+  #   res_all_pgs <- map_dfr(dep_vars,
+  #           ~run_regs_fml(fml, 
+  #                           dep_var = .x, 
+  #                           famhist = famhist, 
+  #                           subset  = if (.x == "n_children") {
+  #                                       quote(kids_ss)
+  #                                     } else {
+  #                                       NULL
+  #                                     }
+  #                         ),
+  #           .id = "dep.var"
+  #         )
+  #   famhist <- join_famhist_pcs(famhist, pcs)
+  #   all_pcs <- grep("PC", names(pcs), value = TRUE)
+  #   all_pcs <- paste(all_pcs, collapse = " + ")
+  #   fml_pcs <- glue("{{dep_var}} ~ {all_pgs} + {all_pcs}")
+  #   res_all_pgs_pcs <- map_dfr(dep_vars,
+  #           ~run_regs_fml(
+  #             fml_pcs, 
+  #             dep_var = .x, 
+  #             famhist = famhist,
+  #             subset  = if (.x == "n_children") quote(kids_ss) else NULL
+  #             ),
+  #           .id = "dep.var"
+  #         )
+  #   
+  #   bind_rows("No" = res_all_pgs, "Yes" = res_all_pgs_pcs, .id = "PCs") %>% 
+  #         filter(term != "(Intercept)", ! grepl("^PC", term))
+  # },
   
   # crashes out of memory if we run the loop within the plan?
   # res_mnl = run_regs_mnlogit(score_names, fhl_mlogit),
