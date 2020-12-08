@@ -111,9 +111,12 @@ plan <- drake_plan(
   
   msoa_weights = weight_by_census_msoa(famhist, census_msoa, famhist_msoa),
   
-  mf_pairs =  target(
-                make_mf_pairs(file_in(!! mf_pairs_file), famhist, resid_scores,
-                                ashe_income), 
+  mf_pairs =  target({
+                mf_pairs <- make_mf_pairs(file_in(!! mf_pairs_file), famhist, 
+                                            resid_scores, ashe_income)
+                mf_pairs <- filter_mf_pairs(mf_pairs)
+                mf_pairs
+              },
                 format = "fst_tbl"
               ), 
   
