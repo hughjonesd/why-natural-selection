@@ -26,30 +26,30 @@ test_that("res_all", {
     res_all %>% 
       filter(dep.var == "N children", reg.type == "raw") %>% 
       estimate_for("ADHD_2017"),
-    lm_coef(n_children ~ ADHD_2017)
+    lm_coef(n_children ~ ADHD_2017_raw)
   )
   
   expect_equivalent(
     res_all %>% 
       filter(dep.var == "N siblings", reg.type == "raw") %>% 
       estimate_for("alcohol_schumann"),
-    lm_coef(n_sibs ~ alcohol_schumann, data = famhist)
+    lm_coef(n_sibs ~ alcohol_schumann_raw, data = famhist)
   )
   
   
-  fh2 <- cbind(famhist, resid_scores)
+  fh2 <- cbind(famhist, resid_scores[-1])
   expect_equivalent(
     res_all %>% 
       filter(dep.var == "N children", reg.type == "controlled") %>% 
       estimate_for("height_combined"),
-    lm_coef(n_children ~ height_combined_resid, data = fh2 %>% filter(kids_ss))
+    lm_coef(n_children ~ height_combined, data = fh2 %>% filter(kids_ss))
   )
   
   expect_equivalent(
     res_all %>% 
       filter(dep.var == "N siblings", reg.type == "controlled") %>% 
       estimate_for("height_combined"),
-    lm_coef(n_sibs ~ height_combined_resid, data = fh2)
+    lm_coef(n_sibs ~ height_combined, data = fh2)
   )
 })
 
@@ -57,7 +57,7 @@ test_that("res_all", {
 test_that("res_pcs", {
   loadd(res_pcs)
   loadd(pcs)
-  fh <- left_join(famhist, pcs, by = c("f.eid" = "IID"))
+  fh <- left_join(famhist, pcs, by = c("f.eid" = "eid"))
   expect_equivalent(
     res_pcs %>% filter(dep.var == "N children", term == "PC33") %>% pull(estimate),
     lm_coef(n_children ~ PC33, data = fh %>% filter(kids_ss))
@@ -409,7 +409,12 @@ test_that("res_partners_controlled", {
 
 test_that("res_ee_control", {
   loadd(res_ee_control)
-  coef <- lm_coef(n_children ~ dpw_substance_use + age_fte_cat + first_job_pay)
+  loadd(ashe_income)
+  source("~/import-ukbb-data/import-ukbb-data.R")
+  fh <- add_ashe_income(famhist, ashe_income)
+  fh %<>% filter(kids_ss)
+  coef <- lm_coef(n_children ~ dpw_substance_use + age_fte_cat + first_job_pay, 
+                    data = fh)
          
   expect_equivalent(
     coef, 

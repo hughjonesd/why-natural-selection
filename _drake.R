@@ -50,14 +50,27 @@ plan <- drake_plan(
   
   ashe_income  = import_ashe_income(file_in(!! ashe_income_file)),
   
-  famhist      =  target({
-                      famhist <- clean_famhist(famhist_raw, score_names, sib_groups)
-                      famhist$kids_ss <- famhist$age_at_recruitment >= 45
-                      famhist
+  famhist_no_resid      =  target({
+                      fnr <- clean_famhist(famhist_raw, score_names, sib_groups)
+
+                      fnr$kids_ss <- fnr$age_at_recruitment >= 45
+                      fnr
                     },
                     format = "fst_tbl"
                   ),
   
+  famhist = target({
+                     famhist <- join_famhist_resid_scores(famhist_no_resid, 
+                                                            resid_scores)
+                     # use residualized scores as defaults:
+                     names(famhist)[names(famhist) %in% score_names] %<>%
+                       paste0("_raw")
+                     names(famhist) <- gsub("_resid$", "", names(famhist))
+                     famhist
+                   },
+                    format = "fst_tbl"
+                  ),
+
   famhist_msoa = target(
                    find_containing_msoas(famhist, msoa_shapefile), 
                    format = "fst_tbl"
@@ -73,8 +86,11 @@ plan <- drake_plan(
   # fhl_mlogit   =  make_famhist_long_mlogit(famhist, score_names),
   
   resid_scores = target({
-                     resid_scores <- compute_resid_scores(famhist, pcs, score_names)
-                     resid_scores <- subset_resid_scores(resid_scores, famhist, score_names)
+                     resid_scores <- compute_resid_scores(famhist_no_resid, 
+                                                            pcs, score_names)
+                     resid_scores <- subset_resid_scores(resid_scores, 
+                                                           famhist_no_resid, 
+                                                           score_names)
                      resid_scores
                    },
                    format = "fst_tbl"
@@ -113,7 +129,7 @@ plan <- drake_plan(
   
   mf_pairs =  target({
                 mf_pairs <- make_mf_pairs(file_in(!! mf_pairs_file), famhist, 
-                                            resid_scores, ashe_income)
+                                            resid_scores = NULL, ashe_income)
                 mf_pairs <- filter_mf_pairs(mf_pairs)
                 mf_pairs
               },
@@ -123,7 +139,6 @@ plan <- drake_plan(
   rgs = make_rgs(file_in(!! rgs_file)),
   
   res_all = {
-    famhist <- join_famhist_resid_scores(famhist, resid_scores)
     res_sibs <- run_regs_basic(
             dep_var     = "n_sibs", 
             score_names = score_names,
@@ -588,11 +603,13 @@ plan <- drake_plan(
   # crashes out of memory if we run the loop within the plan?
   # res_mnl = run_regs_mnlogit(score_names, fhl_mlogit),
   
-  report =  rmarkdown::render(
-              input       = knitr_in("why-negative-selection.Rmd"), 
-              output_file = file_out("why-negative-selection.pdf"), 
-              quiet       = TRUE
-            )
+  report =  {
+              rmarkdown::render(
+                input       = knitr_in("why-negative-selection.Rmd"), 
+                output_file = file_out("why-negative-selection.pdf"), 
+                quiet       = TRUE
+              )
+            }
   
 )
 

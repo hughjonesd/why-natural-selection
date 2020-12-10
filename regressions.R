@@ -59,17 +59,16 @@ calc_pgs_over_time <- function (famhist, score_names) {
 run_regs_basic <- function (dep_var, score_names, famhist, subset = NULL) {
   
   run_reg <- function (score_name) {
-    fml <- as.formula(glue("{dep_var} ~ {score_name}"))
+    fml <- as.formula(glue("{dep_var} ~ {score_name}_raw"))
     reg_bv <- tidy(lm(fml, famhist, subset = eval(subset)), conf.int = TRUE) 
+    reg_bv <- mutate(reg_bv, term = gsub("_raw", "", term))
     reg_bv
   }
   basic_res <- map_dfr(score_names, run_reg, .id = "score_name")
   
   run_resid_reg <- function (score_name) {
-    score_resid <- paste0(score_name, "_resid")
-    fml_resid <- as.formula(glue("{dep_var} ~ {score_resid}"))
+    fml_resid <- as.formula(glue("{dep_var} ~ {score_name}"))
     reg_resid <- tidy(lm(fml_resid, famhist, subset = eval(subset)), conf.int = TRUE) 
-    reg_resid <- mutate(reg_resid, term = gsub("_resid", "", term))
     reg_resid
   }
   resid_res <- map_dfr(score_names, run_resid_reg, .id = "score_name")

@@ -21,7 +21,7 @@ join_famhist_pcs <- function (famhist, pcs) {
 
 
 join_famhist_resid_scores <- function (famhist, resid_scores) {
-  cbind(famhist, resid_scores)
+  cbind(famhist, resid_scores %>% select(-f.eid))
 }
 
 
