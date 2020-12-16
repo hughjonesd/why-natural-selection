@@ -763,7 +763,7 @@ res_combined %>%
         my_vline +
         pval_geom_point() +
         pval_scale() +
-        my_fill_scale(n = 2, direction = -1) +
+        my_fill_scale(n = 2) +
         my_labs() +
         my_theme()
 ```
@@ -1013,7 +1013,7 @@ could explain our results for lifetime number of sexual partners, if this is
 associated with relationship stability.
 
 
-```{r plot-cors-earnings-educ, fig.cap="Selection effects, with and without controls for age at first live birth, by correlations with earnings and educational attainment. Each point represents one PGS."}
+```{r plot-cors-earnings-educ, fig.cap="Selection effects, with and without controls for age at first live birth, by correlations with earnings and educational attainment. Each point represents one PGS.", fig.height = 4}
 
 drake::loadd(res_all)
 drake::loadd(res_age_flb)
