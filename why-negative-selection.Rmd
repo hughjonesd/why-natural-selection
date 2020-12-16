@@ -1,5 +1,5 @@
 ---
-title: "Labor Market Income and Substitution Effects Explain Modern Natural Selection"
+title: "Labor Market Income and Substitution Effects Explain Contemporary Natural Selection"
 author: "David Hugh-Jones \\thanks{Corresponding author. School of Economics, University of East Anglia. Email: D.Hugh-Jones@uea.ac.uk}, Abdel Abdellaoui \\thanks{Amsterdam UMC. Email: a.abdellaoui@amsterdamumc.nl}"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 abstract: "Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection on 33 polygenic scores over two generations, using data from UK Biobank (N = 409,629 British subjects with European ancestry). Consistently over time, polygenic scores which predict lower (higher) earnings and education are selected for (against). Selection effects are concentrated among low-income and less educated people, younger parents, people with more lifetime sexual partners, and people not living with a partner. Effect sizes are substantially larger after correcting for ascertainment bias. The direction of natural selection is reversed among older parents, or after controlling for age at first live birth. These patterns can be explained by economic theories of fertility, in which higher earnings may either increase or decrease fertility via income and substitution effects in the labour market. We find evidence in modern day Great Britain for multiple natural selection pressures that vary between subgroups in the direction and strength of their effects and that are strongly related to the socio-economic system."
@@ -584,28 +584,27 @@ For both sexes, selection effects are larger and more significant among
 those with more than 3 partners. Next we split respondents by whether
 they were living with a spouse or partner at the time of interview.
 Effects are larger among those not living with a spouse or partner
-(Figure \@ref(fig:plot-n-partners)b). Lastly, we split female
-respondents by age at first live birth (AFLB).[^1] There is evidence for
-genetic effects on AFLB [@Barban_2016], and there is a close link
-between this variable and number of children born. Figure
-\@ref(fig:plot-n-partners)c shows effect sizes estimated separately for
-each tercile of AFLB. Several effects are strikingly different across
-terciles. ADHD and MDD are selected for amongst the youngest third of
+(Figure \@ref(fig:plot-n-partners)b). 
+
+Lastly, we split female respondents by age at first live birth
+(AFLB).[^aflb-no-men] There is evidence for genetic effects on AFLB
+[@Barban_2016], and there is a close link between this variable and number of
+children born. Figure \@ref(fig:plot-age-flb)a shows effect sizes estimated
+separately for each tercile of AFLB. Several effects are strikingly different
+across terciles. ADHD and MDD are selected for amongst the youngest third of
 mothers, but selected against among the oldest two-thirds. Educational
-attainment is selected for among the oldest two-thirds of mothers, but
-is not significantly selected among the youngest third. Similarly,
-several PGS of body measurements are selected against only among older
-mothers. The correlation between effect sizes for the youngest and
-oldest terciles is `r cor_age_flb`. As before, recall that polygenic scores may 
-have two effects: changing the number of children within each category, and 
-changing the number of children by shifting respondents between categories.
+attainment is selected for among the oldest two-thirds of mothers, but is not
+significantly selected among the youngest third. Similarly, several PGS of body
+measurements are selected against only among older mothers. The correlation
+between effect sizes for the youngest and oldest terciles is `r cor_age_flb`. As
+before, recall that polygenic scores may have two effects: changing the number
+of children within each category, and changing the number of children by
+shifting respondents between categories.
 
-[^1]: This information is unavailable for men.
+[^aflb-no-men]: This information is unavailable for men.
 
 
-\newgeometry{left=1cm,right=1cm,top=1cm,bottom=1cm}
-
-```{r plot-n-partners, fig.cap = "Selection effects by number of sexual partners, household type, and age at first live birth", fig.subcap = c("Lifetime number of sexual partners", "Household type", "Age at first live birth, females"), fig.ncol = 1, out.height = c("32%", "32%", "25%"), fig.align = "center"}
+```{r plot-n-partners, fig.cap = "Selection effects by number of sexual partners, household type, and age at first live birth", fig.subcap = c("Lifetime number of sexual partners", "Household type", "Age at first live birth, females"), fig.ncol = 1, fig.align = "center"}
 
 sexes_theme <-  my_theme(
                   plot.margin          = unit(c(1, 1, 0, 1), "lines"),
@@ -614,9 +613,7 @@ sexes_theme <-  my_theme(
                   legend.box.margin    = margin(-5, 0, 0, -5),
                   legend.margin        = margin(0, 0, 0, 0),
                   legend.box.just      = "left",
-                  legend.justification = "left",
-                  legend.text          = element_text(size = 7),
-                  legend.title         = element_text(size = 8)
+                  legend.justification = "left"
                 )
 sexes_guides <- guides(
                   # fill  = guide_legend(title.position = "top"),
@@ -679,31 +676,8 @@ res_with_partner_sex %>%
         scale_y_reordered() +
         sexes_guides
 
-drake::loadd(res_age_flb_cross)
-
-# this counts each cross term as a separate test:
-n_regs <- as.double(nrow(res_age_flb_cross)) 
-
-res_age_flb_cross %>% 
-      mutate(
-        score_name = pretty_names(score_name),
-        score_name = fct_reorder(score_name, estimate, order_abs(1)),
-        term       = gsub("age_flb_cat(.*):.*", "\\1", term),
-        term       = add_n(term, "age_flb_cat")
-      ) %>% 
-      rename(p = p.value) %>% 
-      ggplot(aes(estimate, score_name, fill = term, 
-        colour = p < 0.05/{{n_regs}})) +
-        my_vline +
-        pval_geom_point() +
-        pval_scale() +
-        my_fill_scale(n = 3, direction = -1, 
-          guide = guide_legend(title = "Age at first live birth")) +
-        my_labs() +
-        my_theme()
 ```
 
-\restoregeometry
 
 ```{r calc-corr-age-flb}
 
@@ -740,7 +714,7 @@ opp_signed <- sum(
 
 
 To investigate this further, we regress number of children on PGS
-*controlling* for AFLB (Figure \@ref(fig:plot-age-flb)). In
+*controlling* for AFLB (Figure \@ref(fig:plot-age-flb)b). In
 `r opp_signed` out of `r length(score_names)` cases, effects
 change sign when controls are added. The correlation between effect
 sizes controlling for AFLB, and raw effect sizes, is `r cor_raw_flb`.
@@ -749,7 +723,30 @@ effect on AFLB, and an opposite-signed effect on number of children
 controlling for AFLB.
 
 
-```{r plot-age-flb, fig.cap = "Selection effects controlling for age at first live birth (women only). Effect sizes without controls (for women only) are shown for comparison."}
+```{r plot-age-flb, fig.cap = "Selection effects by age at first live birth, and controlling for age at first live birth (women only).", fig.ncol = 1,  fig.subcap = c("Effect sizes by age at first live birth terciles", "Effect sizes controlling for age at first live birth. Effect sizes without controls (for women only) shown for comparison."), fig.align = "center"}
+
+drake::loadd(res_age_flb_cross)
+
+# this counts each cross term as a separate test:
+n_regs <- as.double(nrow(res_age_flb_cross)) 
+
+res_age_flb_cross %>% 
+      mutate(
+        score_name = pretty_names(score_name),
+        score_name = fct_reorder(score_name, estimate, order_abs(1)),
+        term       = gsub("age_flb_cat(.*):.*", "\\1", term),
+        term       = add_n(term, "age_flb_cat")
+      ) %>% 
+      rename(p = p.value) %>% 
+      ggplot(aes(estimate, score_name, fill = term, 
+        colour = p < 0.05/{{n_regs}})) +
+        my_vline +
+        pval_geom_point() +
+        pval_scale() +
+        my_fill_scale(n = 3, direction = -1, 
+          guide = guide_legend(title = "Age at first live birth")) +
+        my_labs() +
+        my_theme()
 
 n_regs <- as.double(nrow(res_age_flb))
 
@@ -762,15 +759,16 @@ res_combined %>%
       rename(p = p.value) %>% 
       ggplot(aes(y = score_name, x = estimate, fill = Regression, 
         color = p < 0.05/{{n_regs}})) + 
-        geom_vline(xintercept = 0, linetype = "dashed", color = "grey20") +
+        my_vline +
         pval_geom_point() +
         pval_scale() +
-        scale_fill_brewer(type = "qual", palette = 3) +
+        my_fill_scale(n = 2, direction = -1) +
         my_labs() +
         my_theme()
 ```
 
 
+\FloatBarrier
 ## Correcting for sampling bias
 
 
