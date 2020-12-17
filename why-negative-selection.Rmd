@@ -367,23 +367,26 @@ scale_y_reordered <- function(..., sep = "___") {
 
 
 Living organisms evolve through natural selection, in which allele frequencies
-change in the population through differential reproduction rates. Geneticists
+change in the population through differential reproduction rates. Studying the
+mechanisms behind natural selection can help us better understand how
+individual differences in complex traits and disease risk arise. Geneticists
 have long hypothesized that natural selection is taking place in modern human
-populations. Recent work confirms this using genome-wide analysis [@Barban_2016;
-@beauchamp2016genetic;
-@kong2017selection; @sanjak2018evidence]. In particular, genetic variants
-associated with higher educational attainment are being selected against,
-although effect sizes appear small.
+populations [@galton1869hereditary;@darwin1871the]; recent work confirms this 
+using genome-wide analysis
+[@Barban_2016;@beauchamp2016genetic;@kong2017selection;@sanjak2018evidence]. In
+particular, genetic variants associated with higher educational attainment are
+being selected against, although effect sizes appear small.
 
-As yet we know little about the social mechanisms behind these effects. This study uses
-data from UK Biobank [@bycroft2018uk] to learn more. We test for natural selection on 33
-different polygenic scores by estimating their correlation with fertility. We
-extend the analysis over two generations, using data on respondents' number of
-siblings as well as their number of children. This is interesting because
-consistent natural selection over multiple generations could lead to substantive
-effects in the long run. Most importantly, we examine reproductive rates in
-different subgroups of the population, in order to uncover patterns that can
-help illuminate the mechanisms behind modern natural selection.
+As yet we know little about the social mechanisms behind these effects. This
+study uses data from UK Biobank [@bycroft2018uk] to learn more. We test for
+natural selection on 33 different polygenic scores by estimating their
+correlation with fertility. We extend the analysis over two generations, using
+data on respondents' number of siblings as well as their number of children.
+This is interesting because consistent natural selection over multiple
+generations could lead to substantive effects in the long run. Most importantly,
+we examine reproductive rates in different subgroups of the population, in order
+to uncover patterns that can help illuminate the mechanisms behind modern
+natural selection.
 
 We find selection effects on many polygenic scores. Effects are largely consistent
 across generations. The strength of natural selection on a polygenic score is
@@ -1196,7 +1199,10 @@ blue bars show the actual means, i.e. parents' mean polygenic score weighted by
 number of children. The grey bars show the hypothetical means if all households
 had equal numbers of children. Natural selection against genes associated with 
 educational attainment, which lowers the mean, is stronger at the bottom of the 
-income distribution, and this increases the differences between groups.
+income distribution, and this increases the differences between groups.  Overall,
+natural selection increases inequality for 29 out of 33 polygenic scores 
+(Appendix Table \@ref(tab:tbl-inequality-effects)).
+
 
 ```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean PGS for educational attainment (EA3) of children by household income group. Blue is actual. Grey is hypothetical in the absence of selection effects.", fig.width = 4}
 income_EA3 <- famhist %>% 
@@ -1229,17 +1235,28 @@ income_EA3 %>%
 ```
 
 
+Existing evidence on human natural selection has led some to "biocosmic
+pessimism", including speculation that the Fermi paradox may be resolved by
+dysgenic selection among alien species [@sarraf2019modernity]. Others are more
+sanguine, and argue that natural selection's effects are outweighed by
+environmental improvements, such as those underlying (e.g.) the Flynn effect
+[@flynn1987massive]. The evidence here may add some nuance to this debate.
+Patterns of natural selection have been relatively consistent across the past two
+generations, but they are not the outcome of a universal, society-wide phenomenon.
+Instead they result from a sum of opposing forces, operating in different
+parts of society and pulling in different directions.
+
 Any model of fertility is implicitly a model of natural selection, but so far,
 the economic and human genetics literatures have developed in parallel.
-Integrating the two could deepen our understanding of natural selection in 
-modern societies.
-Economics possesses a range of theoretical models on the effects of skills,
-education and income [see @hotz1997economics; @lundberg2007american]. One
-perennial problem is how to test these theories in a world where education,
-labour and marriage markets all interact. Genetic data, such as polygenic
-scores, could help to pin down directions of causality. Conversely, theory 
-and empirical results from economics can shine a light on the mechanisms 
-behind natural selection.
+Integrating the two could deepen our understanding of natural selection in
+modern societies. Economics possesses a range of theoretical models on the
+effects of skills, education and income [see @hotz1997economics;
+@lundberg2007american]. One perennial problem is how to test these theories in a
+world where education, labour and marriage markets all interact. Genetic data,
+such as polygenic scores, could help to pin down the direction of causality.
+Conversely, theory and empirical results from economics can shine a light on the
+mechanisms behind natural selection, and thereby on the nature of individual
+differences in complex traits and disease risk.
 
 
 # Materials and methods
@@ -1852,8 +1869,8 @@ rgs %>%
 
 Table \@ref(tab:tbl-inequality-effects) estimates differences in children's mean
 polygenic scores between the highest and lowest income groups. Column "Actual"
-shows respondents' scores weighted by Age/Qualification times number of
-children. Column "Without selection" shows scores weighted by Age/Qualification
+uses respondents' scores weighted by Age/Qualification times number of
+children. Column "Without selection" uses scores weighted by Age/Qualification
 only, i.e. if all couples had the same number of children.
 
 
