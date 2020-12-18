@@ -1538,7 +1538,10 @@ summary_period <- res_period %>%
             ))
 
 
-
+stopifnot(sum(summary_period$Change_Parents == "Insignificant") == 33)
+stopifnot(sum(summary_period$Change_Respondents == "Size increasing") == 4)
+stopifnot(sum(summary_period$Change_Respondents == "Change sign") == 1)
+stopifnot(sum(summary_period$Change_Respondents == "Insignificant") == 28)
 ```
 
 As an alternative approach, , we run
@@ -1555,9 +1558,8 @@ respondents' generation, effect sizes were significantly larger in absolute size
 among the later-born for four polygenic scores: cognitive ability, EA2, EA3 and
 extraversion. These changes are inconsistent with the intergenerational change, 
 where estimated effect sizes were larger among the earlier, parents' generation.
-Three scores showed significant changes in sign: alcohol use
-(positive to negative); conscientiousness (negative to positive); and
-type II diabetes (negative to positive). 
+One score, conscientiousness, showed a significant change in sign, from 
+negative to positive effects on fertility.
 
 Overall, there is weak evidence for change over time. The clearest results are
 that (a) the direction of selection, and (b) the pattern of relative effect sizes
