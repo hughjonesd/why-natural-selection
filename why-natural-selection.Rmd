@@ -1446,17 +1446,6 @@ drake::loadd(res_children_comparison)
 
 cmp <- left_join(res_wt_age_qual_weights, res_children_comparison, by = "term")
 
-cmp %>%
-      mutate(
-        term = fct_reorder(term, estimate.x, order_abs(1)),
-        term = pretty_names(term)
-      ) %>%
-      ggplot(aes(y = term)) +
-        geom_pointrange(aes(x = estimate.x, xmin = conf.low.x,
-                            xmax = conf.high.x), color = "red", alpha = .8) +
-        geom_pointrange(aes(x = estimate.y, xmin = conf.low.y,
-                            xmax = conf.high.y), color = "blue", alpha = .8)
-
 cor_inc_vs_excl_childless <- cor(cmp$estimate.x, cmp$estimate.y)
 n_smaller <- sum(abs(cmp$estimate.y) < abs(cmp$estimate.x))
 
