@@ -533,6 +533,24 @@ plan <- drake_plan(
               .id = "score_name")
   },
   
+  res_ineq = {
+    famhist %>% 
+          left_join(age_qual_weights, by = "f.eid") %>% 
+          filter(! is.na(n_children), ! is.na(income_cat), ! is.na(weights)) %>% 
+          group_by(income_cat) %>% 
+          summarize(across(all_of(score_names), 
+                    list(
+                      unw = ~ weighted.mean(.x, weights, na.rm = TRUE),
+                      wtd = ~ weighted.mean(.x, weights * n_children, 
+                                              na.rm = TRUE)
+                    )
+          )) %>% 
+          tidyr::pivot_longer(-income_cat, 
+                                names_to = c("score", ".value"), 
+                                names_pattern = "(.*)_(.+?)$"
+                              ) 
+  },
+  
   # res_margins = {
   #    res_extensive <- map_dfr(score_names, 
   #                       ~ run_regs_fml(
