@@ -865,7 +865,7 @@ further affected by weighting on other demographic variables. Since the Biobank
 sample seems to be ascertained in ways that shrink estimates of selection
 effects, we suspect that our weighted estimates are still conservative.[^purifying]
 
-[^purifying]: We also check for purifying selection by estimating (\@ref(eq:regression)) with a quadratic term in $PGS_i$. See Appendix figure \@ref(fig:plot-purifying).
+[^purifying]: We also check for purifying selection by estimating \@ref(eq:regression) with a quadratic term. See Appendix Figure \@ref(fig:plot-purifying).
 
 
 ```{r plot-res-wt, fig.cap = "Selection effects: weighted regressions. Unweighted estimates are shown for comparison."}
@@ -1392,7 +1392,7 @@ rel_sizes %>%
 ## Purifying and diversifying selection
 
 
-We rerun equation (\@ref(eq:regression)), adding a quadratic term in $PGS_i$,
+We rerun equation \@ref(eq:regression), adding a quadratic term in $PGS_i$,
 and using our age/qualification weights. Scores for hip circumference and drinks
 per week show significant purifying selection ($p < 0.05/33$, negative
 coefficient). Scores for educational attainment (EA2 and EA3) show significant
@@ -1400,7 +1400,7 @@ diversifying selection ($p < 0.05/33$, positive coefficient), which reduces the
 strength of selection against educational attainment at very high levels of the 
 PGS. Figure
 \@ref(fig:plot-purifying) plots predicted number of children against polygenic
-score from these regressions.
+score from these regressions. 
 
 ```{r plot-purifying, fig.align = "center", fig.cap = "Purifying/diversifying selection: predicted number of children by polygenic score", fig.height = 5}
 
