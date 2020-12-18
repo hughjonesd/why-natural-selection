@@ -923,13 +923,16 @@ by definition not be represented. To compensate, we reweight our preferred
 weightings (Age/Qualification) by the inverse of *number of siblings*. 
 
 Selection effects are highly correlated across the two generations, and most
-share the same sign (Appendix Figure \@ref(fig:plot-res-sibs)). Effect size
-estimates are larger for the parents' generation. We treat this result cautiously,
-because when we split respondents up by year of birth, we find few differences
-in effect sizes between early- and late-born respondents, for either generation.
-In other words, since estimated effect sizes change when we change the dependent
-variable, but do not change over time within either dependent variable, this
-may be due to remaining ascertainment bias within the sample.
+share the same sign (Appendix Figure \@ref(fig:plot-res-sibs)). Absolute effect
+size estimates are larger for the parents' generation. We treat this result
+cautiously, because when we split respondents up by year of birth, we find few
+differences in effect sizes between early- and late-born respondents, for either
+generation. In other words, since estimated effect sizes change across
+"generations", but do not change over time within either generation, the change
+may be due to remaining ascertainment bias within the sample or other effects.
+In particular, effect sizes in both generations may depend on polygenic scores'
+correlation with childlessness, and we cannot estimate this for the parents'
+generation.
 
 Although the direction of selection effects does not change between the
 generations, there are other differences. Compared to residualized polygenic
@@ -1437,11 +1440,51 @@ par(op)
 ## Parents' generation
 
 
-Figure \@ref(fig:plot-res-sibs) shows regressions of *number of siblings* on
-polygenic scores. By definition, people who had no children cannot be included in
-this data. For a cleaner comparison, we rerun regressions on the respondents'
-generation (*number of children*) after excluding respondents with no
-children.
+```{r calc-res-sibs}
+drake::loadd(res_wt_age_qual_weights)
+drake::loadd(res_children_comparison)
+
+cmp <- left_join(res_wt_age_qual_weights, res_children_comparison, by = "term")
+
+cmp %>%
+      mutate(
+        term = fct_reorder(term, estimate.x, order_abs(1)),
+        term = pretty_names(term)
+      ) %>%
+      ggplot(aes(y = term)) +
+        geom_pointrange(aes(x = estimate.x, xmin = conf.low.x,
+                            xmax = conf.high.x), color = "red", alpha = .8) +
+        geom_pointrange(aes(x = estimate.y, xmin = conf.low.y,
+                            xmax = conf.high.y), color = "blue", alpha = .8)
+
+cor_inc_vs_excl_childless <- cor(cmp$estimate.x, cmp$estimate.y)
+n_smaller <- sum(abs(cmp$estimate.y) < abs(cmp$estimate.x))
+
+pct_diff <- abs(cmp$estimate.y)/abs(cmp$estimate.x) - 1
+median_pct_diff <- median(pct_diff)
+
+```
+
+
+Figure \@ref(fig:plot-res-sibs) shows regressions of *number of siblings*, i.e.
+parents' number of children, on polygenic scores. By definition, members of the
+parents' generation who had no children cannot be included in this data. For a
+clean comparison with the respondents' generation, we rerun regressions on
+*number of children* excluding those with no children, and show
+results in the figure.
+
+Excluding childless people in the parents' generation could bias our estimates.
+To learn about this, we compare effect sizes excluding and including childless
+people in the *current* generation. The correlation
+between the two sets of effect sizes is `r cor_inc_vs_excl_childless`. So, patterns across
+different scores are broadly similar whether the childless are counted or not. 
+Unfortunately, however, absolute effect sizes are smaller when the
+childless are excluded, for `r n_smaller` out of 33 scores; the median
+percentage change is `r percent(median_pct_diff)`. The fact that childless
+people have such a strong effect on estimates makes it hard to compare absolute
+effect sizes across generations. In particular, since the parents' generation has
+a different distribution of numbers of children, childless people may have had 
+more or less effect in that generation.
 
 
 ```{r plot-res-sibs, fig.cap = "Selection effects, respondents' parents vs. respondents."}
@@ -1456,6 +1499,8 @@ res_sibs_kids <-  bind_rows(
 
 standard_ggplot(res_sibs_kids, `Dep. var.`, n_regs = length(score_names))
 ```
+
+
 
 ```{r calc-period-regs}
 
@@ -1507,7 +1552,7 @@ summary_period <- res_period %>%
 
 ```
 
-To check whether effect sizes were changing over time, we ran
+As an alternative approach, , we run
 regressions interacting polygenic scores with birth year, median split at 1950
 ("early born" versus "late born"). We use both *number of children* and
 *number of siblings* as a dependent variable. We weight using
@@ -1516,16 +1561,19 @@ parents' generation (see above).
 
 Tables \@ref(tab:tbl-siblings-by-period) and
 \@ref(tab:tbl-children-by-period) summarize the results. There is no
-evidence for change in natural selection within the parents' generation. In the
+evidence for changes in selection effects within the parents' generation. In the
 respondents' generation, effect sizes were significantly larger in absolute size 
-among the late-born for four polygenic scores: cognitive ability, EA2, EA3 and
+among the later-born for four polygenic scores: cognitive ability, EA2, EA3 and
 extraversion. These changes are inconsistent with the intergenerational change, 
-where effect sizes were if anything larger among the earlier, parents' generation.
+where estimated effect sizes were larger among the earlier, parents' generation.
 Three scores showed significant changes in sign: alcohol use
 (positive to negative); conscientiousness (negative to positive); and
-type II diabetes (negative to positive). Overall, there is weak evidence for
-change over time, and the clearest result is that the direction of selection is
-broadly consistent.
+type II diabetes (negative to positive). 
+
+Overall, there is weak evidence for change over time. The clearest results are
+that (a) the direction of selection, and (b) the pattern of relative effect sizes
+across scores, are broadly consistent over time.
+
 
 ```{r tbl-siblings-by-period}
 
