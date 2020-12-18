@@ -148,10 +148,10 @@ run_regs_subset <- function(score_name, subset, famhist) {
 }
 
 
-run_regs_fml <- function(fml, ..., subset = NULL, famhist) {
+run_regs_fml <- function(fml, ..., subset = NULL, famhist, weights = NULL) {
   glue_args <- list(...)
   fml <- as.formula(glue::glue_data(fml, .x = glue_args))
-  mod <- lm(fml, famhist, subset = eval(subset))
+  mod <- lm(fml, famhist, subset = eval(subset), weights = eval(weights))
   res <- tidy(mod, conf.int = TRUE)
   attr(res, "call") <- mod$call
   res

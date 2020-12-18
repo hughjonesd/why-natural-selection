@@ -157,6 +157,19 @@ plan <- drake_plan(
           )
   },
   
+  res_quadratic = {
+    famhist %<>% inner_join(age_qual_weights, by = "f.eid")
+    map_dfr(score_names, 
+              ~run_regs_fml(
+                             "n_children ~ {score_name} + I({score_name}^2)", 
+                             score_name = .x,
+                             famhist    = famhist,
+                             weights    = quote(weights)
+                           ),
+              .id = "score_name"
+            )
+  },
+  
   res_pcs = {
     pc_names <- grep("PC", names(pcs), value = TRUE)
     res_sibs_pcs <- run_regs_pcs( 
@@ -623,8 +636,8 @@ plan <- drake_plan(
   
   report =  {
               rmarkdown::render(
-                input       = knitr_in("why-negative-selection.Rmd"), 
-                output_file = file_out("why-negative-selection.pdf"), 
+                input       = knitr_in("why-natural-selection.Rmd"), 
+                output_file = file_out("why-natural-selection.pdf"), 
                 quiet       = TRUE
               )
             }
