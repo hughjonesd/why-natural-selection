@@ -476,7 +476,7 @@ the number of children, which is the average polygenic score in the next
 generation.
 
 
-```{r plot-income-educ-level, fig.cap = "Selection effects by education and income. Each point represents a single bivariate regression of number of children on a PGS", fig.subcap = c("Age left full-time education", "Household income"), fig.ncol = 1}
+```{r plot-income-educ-level, fig.cap = "Selection effects by education and income. Each point represents a single bivariate regression of number of children on a polygenic score", fig.subcap = c("Age left full-time education", "Household income"), fig.ncol = 1}
 
 drake::loadd(res_edu)
 n_regs <- as.double(nrow(res_edu))
@@ -523,16 +523,15 @@ res_income %>%
 ```
 
 
-Figure \@ref(fig:plot-income-educ-level) plots selection effects for
-each polygenic score, grouping respondents by age of completing
-full-time education, and by household income. Effects are larger and
-more significant for the lowest income category, and for the lowest
-education category. Note that the overall effect is not a simple average
-of the effect among the different subgroups, because polygenic scores
-may also shift respondents between the subgroups. For example, a high
-PGS for educational attainment may predict having fewer children among
-early school leavers, but it may also increase the age at which a
-respondent leaves school.
+Figure \@ref(fig:plot-income-educ-level) plots selection effects for each
+polygenic score, grouping respondents by age of completing full-time education,
+and by household income. Effects are larger and more significant for the lowest
+income category, and for the lowest education category. Note that the overall
+effect is not a simple average of the effect among the different subgroups,
+because polygenic scores may also shift respondents between the subgroups. For
+example, a high polygenic score for educational attainment may predict having
+fewer children among early school leavers, but it may also increase the age at
+which a respondent leaves school.
 
 
 ```{r calc-income-edu-controlled}
@@ -556,18 +555,18 @@ the PGS with age of leaving full time education and a quadratic in age,
 the interaction with age leaving FTE remains significant at
 0.05/`r n_regs_educ` for `r n_sig_educ` out of `r n_regs_educ` regressions.
 
-Selection effects are also different between men and women (Appendix
-Figure \@ref(fig:plot-sexes)). Differences are particularly large for
-educational attainment, height and MDD. Several PGS for mental illness
-and personality traits are more selected for (or less against) among
-women, including major depressive disorder (MDD), schizophrenia and
-neuroticism, while extraversion is more selected for among men. PGS for waist
-circumference and waist-hip ratio are less selected for among women, and PGS for
-educational attainment are more selected against, though the difference
-is only significant for the educational attainment PGS of @lee2018gene
-("EA3"). One possible reason for these sex differences is
-that polygenic scores may affect fertility via success in marriage markets, and
-men and women may value different characteristics in these.
+Selection effects are also different between men and women (Appendix Figure
+\@ref(fig:plot-sexes)). Differences are particularly large for educational
+attainment, height and MDD. Several polygenic scores for mental illness and
+personality traits are more selected for (or less against) among women,
+including major depressive disorder (MDD), schizophrenia and neuroticism, while
+extraversion is more selected for among men. Scores for waist circumference and
+waist-hip ratio are less selected for among women, and scores for educational
+attainment are more selected against, though the difference is only significant
+for the "EA3" educational attainment PGS of @lee2018gene . One possible reason
+for these sex differences is that polygenic scores may affect fertility via
+success in marriage markets, and men and women may value different
+characteristics in these.
 
 
 ```{r calc-age-flb-cross}
@@ -598,12 +597,12 @@ separately for each tercile of AFLB. Several effects are strikingly different
 across terciles. ADHD and MDD are selected for amongst the youngest third of
 mothers, but selected against among the oldest two-thirds. Educational
 attainment is selected for among the oldest two-thirds of mothers, but is not
-significantly selected among the youngest third. Similarly, several PGS of body
-measurements are selected against only among older mothers. The correlation
-between effect sizes for the youngest and oldest terciles is `r cor_age_flb`. As
-before, recall that polygenic scores may have two effects: changing the number
-of children within each category, and changing the number of children by
-shifting respondents between categories.
+significantly selected among the youngest third. Similarly, several polygenic
+scores for body measurements are selected against only among older mothers. The
+correlation between effect sizes for the youngest and oldest terciles is `r
+cor_age_flb`. As before, recall that polygenic scores may have two effects:
+changing the number of children within each category, and changing the number of
+children by shifting respondents between categories.
 
 [^aflb-no-men]: This information is unavailable for men.
 
@@ -717,13 +716,12 @@ opp_signed <- sum(
 ```
 
 
-To investigate this further, we regress number of children on PGS
-*controlling* for AFLB (Figure \@ref(fig:plot-age-flb)b). In
-`r opp_signed` out of `r length(score_names)` cases, effects
-change sign when controls are added. The correlation between effect
-sizes controlling for AFLB, and raw effect sizes, is `r cor_raw_flb`.
-Thus, selection effects seem to come through two opposing channels: an
-effect on AFLB, and an opposite-signed effect on number of children 
+To investigate this further, we regress *number of children* on polygenic scores
+*controlling* for AFLB (Figure \@ref(fig:plot-age-flb)b). In `r opp_signed` out
+of `r length(score_names)` cases, effects change sign when controls are added.
+The correlation between effect sizes controlling for AFLB, and raw effect sizes,
+is `r cor_raw_flb`. Thus, selection effects seem to come through two opposing
+channels: an effect on AFLB, and an opposite-signed effect on number of children
 controlling for AFLB.
 
 
@@ -1016,7 +1014,7 @@ could explain our results for lifetime number of sexual partners, if this is
 associated with relationship stability.
 
 
-```{r plot-cors-earnings-educ, fig.cap="Selection effects, with and without controls for age at first live birth, by correlations with earnings and educational attainment. Each point represents one PGS.", fig.height = 4}
+```{r plot-cors-earnings-educ, fig.cap="Selection effects, with and without controls for age at first live birth, by correlations with earnings and educational attainment. Each point represents one polygenic score.", fig.height = 4}
 
 drake::loadd(res_all)
 drake::loadd(res_age_flb)
@@ -1076,7 +1074,7 @@ dfr %>%
 We test this explanation in two ways. First, the economic theory predicts that
 genetic variants will be selected for (or against) in proportion to their effect
 on earnings. Figure \@ref(fig:plot-cors-earnings-educ) plots selection effects
-on each PGS against that PGS's correlation with earnings in a respondent's first
+on each polygenic score against that score's correlation with earnings in a respondent's first
 job, and against its correlation with educational attainment, a
 predictor of lifetime earnings. The raw relationships (left column) are strongly
 negative. If we plot selection effects controlling for age at first live birth
@@ -1098,11 +1096,12 @@ n_05_33 <- sum(res_ee_control$p.value < 0.05/33)
 ```
 
 
-Second, we re-estimate equation \@ref(eq:regression) for each
-polygenic score, controlling for earnings in first job and education levels. Effect sizes
-are generally reduced (Appendix Figure \@ref(fig:plot-res-earn-educ)), and only
-`r n_05_33` out of 33 PGS are significant at $p = 0.05/33$. This suggests that
-earnings and education indeed mediate the effect of polygenic scores on fertility.
+Second, we re-estimate equation \@ref(eq:regression) for each polygenic score,
+controlling for earnings in first job and education levels. Effect sizes are
+generally reduced (Appendix Figure \@ref(fig:plot-res-earn-educ)), and only 
+`r n_05_33` out of 33 scores are significant at $p = 0.05/33$. This suggests that
+earnings and education indeed mediate the effect of polygenic scores on
+fertility.
 
 
 ```{r calc-risk-attitude}
@@ -1141,8 +1140,8 @@ this via income effects, as described above. We test the alternative theory
 directly by re-estimating equation \@ref(eq:regression) controlling for a
 measure of risk attitude (UK Biobank field 2040). While risk attitude is always a
 highly significant predictor of number of children, it has little impact on the
-effect size or significance of the PGS. The median ratio of PGS effect sizes
-between regressions with and without controls is `r median(ratio)`; all PGS
+effect size or significance of the polygenic scores. The median ratio of effect sizes
+between regressions with and without controls is `r median(ratio)`; all scores
 which are significant at $p \le 0.05/33$ in uncontrolled regressions remain so
 when controlling for risk attitude. Thus, although risk attitude does predict
 number of children, it appears not to mediate selection effects. Overall, we
