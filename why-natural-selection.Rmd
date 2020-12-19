@@ -1,8 +1,8 @@
 ---
 title: "Labor Market Income and Substitution Effects Explain Contemporary Natural Selection"
-author: "David Hugh-Jones \\thanks{Corresponding author. School of Economics, University of East Anglia. Email: D.Hugh-Jones@uea.ac.uk}, Abdel Abdellaoui \\thanks{Amsterdam UMC. Email: a.abdellaoui@amsterdamumc.nl}"
+author: "David Hugh-Jones \\thanks{Corresponding author. School of Economics, University of East Anglia, Norwich, UK. Email: D.Hugh-Jones@uea.ac.uk}, Abdel Abdellaoui \\thanks{Department of Psychiatry, Amsterdam UMC, University of Amsterdam, Amsterdam, The Netherlands. Email: a.abdellaoui@amsterdamumc.nl}"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
-abstract: "Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection on 33 polygenic scores over two generations, using data from UK Biobank (N = 409,629 British subjects with European ancestry). Consistently over time, polygenic scores which predict lower (higher) earnings and education are selected for (against). Selection effects are concentrated among low-income and less educated people, younger parents, people with more lifetime sexual partners, and people not living with a partner. Effect sizes are substantially larger after correcting for ascertainment bias. The direction of natural selection is reversed among older parents, or after controlling for age at first live birth. These patterns can be explained by economic theories of fertility, in which higher earnings may either increase or decrease fertility via income and substitution effects in the labour market. We find evidence in modern day Great Britain for multiple natural selection pressures that vary between subgroups in the direction and strength of their effects and that are strongly related to the socio-economic system."
+abstract: "Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection through the association between 33 polygenic scores and fertility, across two generations, using data from UK Biobank (N = 409,629 British subjects with European ancestry). Consistently over time, polygenic scores which predict lower (higher) earnings and education are selected for (against). Selection effects are concentrated among lower-income and less educated people, younger parents, people with more lifetime sexual partners, and people not living with a partner. Effect sizes are substantially larger after correcting for ascertainment bias. The direction of natural selection is reversed among older parents, or after controlling for age at first live birth. These patterns are in line with economic theories of fertility, in which higher earnings may either increase or decrease fertility via income and substitution effects in the labour market. We find evidence in modern day Great Britain for multiple natural selection pressures that vary between subgroups in the direction and strength of their effects and that are strongly related to the socio-economic system."
 bibliography: "negative-selection.bib"
 output: 
   bookdown::pdf_document2:
@@ -15,14 +15,15 @@ header-includes:
   - \usepackage{placeins}
   - \usepackage[format=plain, labelfont={bf,it}, textfont=it]{caption}
   - \usepackage{titlesec}
-  - \titleformat*{\section}{\bfseries\sffamily\LARGE}
-  - \titleformat*{\subsection}{\bfseries\sffamily\itshape\Large}
+  - \titleformat*{\section}{\sffamily\LARGE}
+  - \titleformat*{\subsection}{\sffamily\itshape\Large}
   - \hypersetup{colorlinks = true, linkcolor = {blue}, linkbordercolor = {white}}
 editor_options: 
   markdown: 
     wrap: 72
   chunk_output_type: console
-mainfont: Times
+mainfont: Baskerville
+sansfont: "Gill Sans"
 ---
 
 ```{r setup, include = FALSE}
@@ -368,11 +369,10 @@ scale_y_reordered <- function(..., sep = "___") {
 
 Living organisms evolve through natural selection, in which allele frequencies
 change in the population through differential reproduction rates. Studying the
-mechanisms behind natural selection can help us better understand how
-individual differences in complex traits and disease risk arise. Geneticists
-have long hypothesized that natural selection is taking place in modern human
-populations [@galton1869hereditary;@darwin1871the]; recent work confirms this 
-using genome-wide analysis
+mechanisms behind natural selection can help us better understand how individual
+differences in complex traits and disease risk arise. Recent work confirms that
+natural selection is taking place in modern human populations, using genome-wide
+analysis
 [@Barban_2016;@beauchamp2016genetic;@kong2017selection;@sanjak2018evidence]. In
 particular, genetic variants associated with higher educational attainment are
 being selected against, although effect sizes appear small.
@@ -395,7 +395,7 @@ that predict lower education and earnings are being selected for. Also, across
 the board, polygenic scores have stronger relationships with fertility among
 specific subgroups. Selection effects are stronger in groups with lower
 income and less education, among younger parents, people not living with a partner,
-and people with many lifetime sexual partners. Outside these groups, effects are
+and people with more lifetime sexual partners. Outside these groups, effects are
 weaker and often statistically insignificant. In some subgroups, the
 direction of selection is even reversed: polygenic scores predicting
 higher education and earnings are associated with *higher* fertility.
@@ -411,15 +411,17 @@ while the income effect is stronger for couples.
 
 # Results
 
-Figure \@ref(fig:plot-means-over-time) plots mean polygenic scores in the
-sample by 5-year birth intervals. Several scores show consistent increases or
-declines over this 30-year period, of the order of 5% of a standard
+We created polygenic scores for 33 traits in `r nrow(famhist)` individuals,
+corrected for ancestry using 100 genetic principal components (see Materials and
+Methods). Figure \@ref(fig:plot-means-over-time) plots mean polygenic scores in
+the sample by 5-year birth intervals. Several scores show consistent increases
+or declines over this 30-year period, of the order of 5% of a standard
 deviation. These changes could reflect natural selection within the UK
-population, but also emigration, or ascertainment bias within the sample. 
-Respondents have higher income and are better educated than the UK population, 
-and they may also differ on other unobserved characteristics [@10.1093/aje/kwx246].
-Since richer and educated people also live longer, this bias could also
-increase with age.
+population, but also emigration, or ascertainment bias within the sample.
+Respondents have higher income and are better educated than the UK population,
+and they may also differ on other unobserved characteristics
+[@10.1093/aje/kwx246]. Since richer and educated people also live longer, this
+bias could also increase with age.
 
 ```{r plot-means-over-time, fig.height = 6, fig.cap = "Mean polygenic scores (PGS) by birth year in UK Biobank. Points are means for 5-year intervals. Lines are 95% confidence intervals. Green triangles show a significant linear increase over time (p < 0.05/33). Red squares show a significant decrease."}
 
@@ -444,8 +446,8 @@ pgs_over_time %>%
 ```
 
 
-To test directly for natural selection, we regress respondents' polygenic scores
-(PGS) on their number of children ($y_i$):
+To test directly for natural selection, we regress respondents' number of
+children ($y_i$) on their polygenic scores (PGS):
 
 
 ```{=tex}
@@ -545,14 +547,14 @@ n_sig_educ <- sum(res_edu_controlled$p.value < 0.05/n_regs_educ)
 ```
 
 
-These results could be driven by age, if older respondents have lower income
-and are less educated, and also more subject to selection on polygenic
+These results could be explained by age, if older respondents have lower income
+and are less educated, and also show more natural selection on polygenic
 scores. However, if we rerun the regressions, interacting the polygenic
 score with income category and also with a quadratic in age, the
 interaction with income remains significant at 0.05/`r n_regs_ic` for
 `r n_sig_ic` out of `r n_regs_ic` regressions. Similarly if we interact
 the PGS with age of leaving full time education and a quadratic in age,
-the interaction with age leaving FTE remains significant at
+the interaction with age leaving full time education remains significant at
 0.05/`r n_regs_educ` for `r n_sig_educ` out of `r n_regs_educ` regressions.
 
 Selection effects are also different between men and women (Appendix Figure
@@ -563,10 +565,10 @@ including major depressive disorder (MDD), schizophrenia and neuroticism, while
 extraversion is more selected for among men. Scores for waist circumference and
 waist-hip ratio are less selected for among women, and scores for educational
 attainment are more selected against, though the difference is only significant
-for the "EA3" educational attainment PGS of @lee2018gene . One possible reason
-for these sex differences is that polygenic scores may affect fertility via
-success in marriage markets, and men and women may value different
-characteristics in these.
+for the ("EA3") educational attainment score of @lee2018gene. One
+possible reason for these sex differences is that polygenic scores may affect
+fertility via success in marriage markets, and men and women may value different
+characteristics in these. 
 
 
 ```{r calc-age-flb-cross}
@@ -599,10 +601,8 @@ mothers, but selected against among the oldest two-thirds. Educational
 attainment is selected for among the oldest two-thirds of mothers, but is not
 significantly selected among the youngest third. Similarly, several polygenic
 scores for body measurements are selected against only among older mothers. The
-correlation between effect sizes for the youngest and oldest terciles is `r
-cor_age_flb`. As before, recall that polygenic scores may have two effects:
-changing the number of children within each category, and changing the number of
-children by shifting respondents between categories.
+correlation between effect sizes for the youngest and oldest terciles is 
+`r cor_age_flb`. 
 
 [^aflb-no-men]: This information is unavailable for men.
 
@@ -722,7 +722,16 @@ of `r length(score_names)` cases, effects change sign when controls are added.
 The correlation between effect sizes controlling for AFLB, and raw effect sizes,
 is `r cor_raw_flb`. Thus, selection effects seem to come through two opposing
 channels: an effect on AFLB, and an opposite-signed effect on number of children
-controlling for AFLB.
+controlling for AFLB. Note that we do not claim that AFLB is exogenous to an
+individual's polygenic scores -- indeed, our analyses show that it is not
+(Appendix Figure \@ref(fig:plot-age-flb-dv)). Rather, we argue that AFLB mediates
+part of the relationship between polygenic scores and fertility, and that
+once this is controlled for, the remaining part of the relationship has the
+opposite sign.
+
+AFLB mediates
+the relationship between polygenic scores and fertility, and that after this
+effect has been taken account of, there is a further, opposite-signed relationship.
 
 
 ```{r plot-age-flb, fig.cap = "Selection effects by age at first live birth, and controlling for age at first live birth (women only).", fig.ncol = 1,  fig.subcap = c("Effect sizes by age at first live birth terciles", "Effect sizes controlling for age at first live birth. Effect sizes without controls (for women only) shown for comparison."), fig.align = "center"}
@@ -849,19 +858,19 @@ mean_rel <- c(rel_sizes_summary[1, 1:3])
 ```
 
 
-Since UK Biobank subjects are not representative of the wider population, our
-results suggest that naïve estimates of natural selection are at risk of
-ascertainment bias. To correct for this, we weight participants using population data. We try three
-alternative weighting schemes: weighting by geography, age and
-presence/absence of a partner; weighting by age and highest educational
+Since UK Biobank participants are not representative of the wider population,
+our results suggest that naïve estimates of natural selection are at risk of
+ascertainment bias. To correct for this, we weight participants using population
+data. We try three alternative weighting schemes: weighting by geography, age
+and presence/absence of a partner; weighting by age and highest educational
 qualification; and age, highest qualification, and age at first live birth, for
-women only. Figure \@ref(fig:plot-res-wt) plots selection effects 
-among the entire sample, estimated with the three weighting schemes. 
+women only. Figure \@ref(fig:plot-res-wt) plots selection effects among the
+entire sample, estimated with the three weighting schemes.
 Mean effect sizes across all polygenic scores are
 increased by a factor of `r mean_rel$Geographical` (geographical weighting), 
 `r mean_rel[["Age/Qualification"]]` (age/qualification) or 
 `r mean_rel[["Age/Qual/AFLB"]]` (age/qualification/AFLB). Estimates might be
-further affected by weighting on other demographic variables. Since the Biobank
+further affected by weighting on other demographic variables. Since the UK Biobank
 sample seems to be ascertained in ways that shrink estimates of selection
 effects, we suspect that our weighted estimates are still conservative.[^purifying]
 
@@ -902,7 +911,8 @@ res_wt_combined %>%
     "Age/Qualification" = "circle filled", 
     "Age/Qual/AFLB" = "circle filled"
   )) + 
-  labs(x = "Effect size", y = "")
+  labs(x = "Effect size", y = "") +
+  my_theme()
 
 
 ```
@@ -935,13 +945,15 @@ correlation with childlessness, and we cannot estimate this for the parents'
 generation.
 
 Although the direction of selection effects does not change between the
-generations, there are other differences. Compared to residualized polygenic
-scores, selection effects on unresidualized scores are about ten percent higher
-on average for *n siblings*, whereas effects for *number of children* barely
-change (Appendix Figure \@ref(fig:plot-regs-controlled-pcs)). This could be
-because earlier fertility is driven more by geographically clustered deprivation
-[e.g. via an insurance motive, @rendall1998old], which may correlate with the
-broad-scale genetic variation captured by principal components, such as ancestry.
+generations, there are other differences. Compared to our standard polygenic
+scores (residualized on 100 principal components of genetic data) 
+selection effects on unresidualized scores are about ten percent higher
+on average for *number of siblings*, whereas effects for *number of children*
+barely change (Appendix Figure \@ref(fig:plot-regs-controlled-pcs)). This could
+be because earlier fertility is driven more by geographically clustered
+deprivation [e.g. via an insurance motive, @rendall1998old], which may correlate
+with the broad-scale genetic variation captured by principal components, such as
+ancestry.
 
 We also check whether selection effects differ by socio-economic status in the
 parents' generation. We have no information about parents' income, so we use the
@@ -967,18 +979,19 @@ $p < 2 \times 10^{-17}$).
 ## Economic fertility theory and natural selection
 
 These results show that selection effects are weaker, absent, or even reversed
-among some subgroups of the population. This can potentially be explained by the
-economic theory of fertility [@becker1960economic; @willis1973new;
-@becker1976child]. According to this theory, increases in a person's wage affect their
-fertility via two opposing channels. There is an *income effect* by which
-children become more affordable, like any other good. There is also a
-*substitution effect*: since childrearing has a cost in time, the opportunity
-cost of childrearing increases if one's market wage is higher. The income effect
-would lead higher earners to have more children. The substitution effect would
-lead higher earners to have fewer children. If so, then genetic variants which
-affect earnings potential in the labour market may cause opposing effects on
-fertility. The income effect will cause natural selection in favour of
-earnings-increasing variants. The substitution effect will do the reverse.
+among some subgroups of the population. One possible explanation for this is
+given by the economic theory of fertility 
+[@becker1960economic; @willis1973new;@becker1976child]. According to this theory,
+increases in a person's wage affect their fertility via two opposing channels.
+There is an *income effect* by which children become more affordable, like any
+other good. There is also a *substitution effect*: since childrearing has a cost
+in time, the opportunity cost of childrearing increases if one's market wage is
+higher. The income effect would lead higher earners to have more children. The
+substitution effect would lead higher earners to have fewer children. If so,
+then genetic variants which affect earnings potential in the labour market may
+cause opposing effects on fertility. The income effect will cause natural
+selection in favour of earnings-increasing variants. The substitution effect
+will do the reverse.
 
 This theory can explain why selection effects have opposite signs when AFLB is
 controlled for. Suppose that people are aware of their endowments of human
@@ -1011,7 +1024,7 @@ selected for nor against.
 Lastly, it is often assumed that the substitution effect will dominate for lone
 parents, or those in unstable relationships, since they have less opportunity to
 share childcare responsibilities, while the income effect will dominate for
-couples who are able to reap the gains from specialization. Indeed, US fertility
+couples who are able to reap the gains from specialization [@becker1981treatise]. Indeed, US fertility
 decreases faster with education among single mothers than married mothers
 [@baudin2015fertility]. This can explain why earnings-increasing genetic variants 
 decrease fertility more among single parents than among couples. The same logic 
@@ -1136,21 +1149,21 @@ An alternative theory is that traits selected for are linked to externalizing
 behaviour, risk-seeking and low time discount rates, via the channel of early
 sexual behaviour [@Mills2020.05.06.081273]. The data here provide some support
 for this: scores which might plausibly be linked to externalizing behaviour,
-like ADHD and age at smoking initiation, are selected for. However, this theory
-is less good at explaining variation in selection across the full range of
-scores, including physical measures, e.g. waist-hip ratio and BMI. Externalizing
-behaviour also does not explain why selection effects should work in the
-opposite direction among older parents, whereas the economic theory can explain
-this via income effects, as described above. We test the alternative theory
-directly by re-estimating equation \@ref(eq:regression) controlling for a
-measure of risk attitude (UK Biobank field 2040). While risk attitude is always a
-highly significant predictor of number of children, it has little impact on the
-effect size or significance of the polygenic scores. The median ratio of effect sizes
-between regressions with and without controls is `r median(ratio)`; all scores
-which are significant at $p \le 0.05/33$ in uncontrolled regressions remain so
-when controlling for risk attitude. Thus, although risk attitude does predict
-number of children, it appears not to mediate selection effects. Overall, we
-believe that the economic theory is the most likely explanation.
+like ADHD and (younger) age at smoking initiation, are selected for. However,
+this theory is less good at explaining variation in selection across the full
+range of scores, including physical measures, e.g. waist-hip ratio and BMI.
+Externalizing behaviour also does not explain why selection effects should work
+in the opposite direction among older parents, whereas the economic theory can
+explain this via income effects, as described above. We test the alternative
+theory directly by re-estimating equation \@ref(eq:regression) controlling for a
+measure of risk attitude (UK Biobank field 2040). While risk attitude is always
+a highly significant predictor of number of children, it has little impact on
+the effect size or significance of the polygenic scores. The median ratio of
+effect sizes between regressions with and without controls is `r median(ratio)`;
+all scores which are significant at $p \le 0.05/33$ in uncontrolled regressions
+remain so when controlling for risk attitude. Thus, although risk attitude does
+predict number of children, it appears not to mediate selection effects.
+Overall, we believe that the economic theory is the most likely explanation.
 
 
 # Discussion
@@ -1208,7 +1221,7 @@ natural selection increases inequality for 29 out of 33 polygenic scores
 (Appendix Table \@ref(tab:tbl-inequality-effects)).
 
 
-```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean PGS for educational attainment (EA3) of children by household income group. Blue is actual. Grey is hypothetical in the absence of selection effects.", fig.width = 4}
+```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean polygenic score for educational attainment (EA3) of children by household income group. Blue is actual. Grey is hypothetical in the absence of selection effects.", fig.width = 4}
 income_EA3 <- famhist %>% 
       filter(! is.na(n_children), ! is.na(income_cat)) %>% 
       mutate(
@@ -1295,7 +1308,7 @@ Super Output Areas, sex and presence/absence of a partner.
 
 # Acknowledgements
 
-Abdel Abdellaoui is supported by the Foundation Volksbond Rotterdam and by ZonMw grant 849200011 from The Netherlands Organisation for Health Research and Development. This study was conducted using UK Biobank resources under application number 40310.
+AA is supported by the Foundation Volksbond Rotterdam and by ZonMw grant 849200011 from The Netherlands Organisation for Health Research and Development. This study was conducted using UK Biobank resources under application numbers 40310 and 19127.
 
 \FloatBarrier
 \clearpage
@@ -1467,10 +1480,10 @@ To learn about this, we compare effect sizes excluding and including childless
 people in the *current* generation. The correlation
 between the two sets of effect sizes is `r cor_inc_vs_excl_childless`. So, patterns across
 different scores are broadly similar whether the childless are counted or not. 
-Unfortunately, however, absolute effect sizes are smaller when the
+However, absolute effect sizes are smaller when the
 childless are excluded, for `r n_smaller` out of 33 scores; the median
 percentage change is `r percent(median_pct_diff)`. The fact that childless
-people have such a strong effect on estimates makes it hard to compare absolute
+people have such a strong effect on estimates makes it hard to compare total
 effect sizes across generations. In particular, since the parents' generation has
 a different distribution of numbers of children, childless people may have had 
 more or less effect in that generation.
@@ -1544,12 +1557,11 @@ stopifnot(sum(summary_period$Change_Respondents == "Change sign") == 1)
 stopifnot(sum(summary_period$Change_Respondents == "Insignificant") == 28)
 ```
 
-As an alternative approach, , we run
-regressions interacting polygenic scores with birth year, median split at 1950
-("early born" versus "late born"). We use both *number of children* and
-*number of siblings* as a dependent variable. We weight using
-age/qualification cells, and further adjust for selection in the
-parents' generation (see above).
+As an alternative approach, we run regressions interacting polygenic scores with
+birth year, median split at 1950 ("early born" versus "late born"). We use both
+*number of children* and *number of siblings* as a dependent variable. We weight
+using age/qualification cells, and further adjust for selection in the parents'
+generation (see above).
 
 Tables \@ref(tab:tbl-siblings-by-period) and
 \@ref(tab:tbl-children-by-period) summarize the results. There is no
@@ -1692,7 +1704,7 @@ res_all %>%
       ggplot(aes(y = term, x = estimate, fill = reg.type, 
         colour = p < 0.05/{{n_regs}})) +
         my_vline + 
-        facet_wrap(vars(dep.var), scales = "free_y") +
+        facet_wrap(vars(dep.var), scales = "free") +
         pval_geom_point(position = position_dodge(0.4), alpha = 0.8) +
         my_labs() +
         pval_scale() +
@@ -1795,7 +1807,8 @@ res_age_birth_parents %>%
       my_vline +
       my_fill_scale(2) +
       pval_scale() +
-      my_labs()
+      my_labs() +
+      my_theme()
 
 ```
 
@@ -1826,12 +1839,15 @@ cor_flb_moth <- with(compare_flb_dv %>% filter(dep.var == "moth_age_birth"),
 
 Our results suggest that polygenic scores may directly correlate with age at
 first live birth. Figure \@ref(fig:plot-age-flb-dv) plots estimated effect sizes
-from bivariate regressions for respondents, and Figure
-\@ref(fig:plot-age-birth-parents-dv) does the same for their parents. Effect
-sizes are reasonably large. They are also very highly correlated across
-generations. Effect sizes of polygenic scores on father's age at own birth, and
-on own age at first live birth, have a correlation of `r cor_flb_fath`; for
-mother's age and own age it is `r cor_flb_moth`.
+from bivariate regressions for respondents. Figure
+\@ref(fig:plot-age-birth-parents-dv) does the same for their parents, using only
+eldest siblings.[^only-eldest] Effect sizes are reasonably large. They are also
+highly correlated across generations. Effect sizes of polygenic scores on
+father's age at own birth, and on own age at first live birth, have a
+correlation of `r cor_flb_fath`; for mother's age and own age it is 
+`r cor_flb_moth`.
+
+[^only-eldest]: Parental AFLB can only be calculated for this group.
 
 ```{r plot-age-flb-dv, fig.cap = "Effects of polygenic scores on age at first live birth."}
 
@@ -1873,7 +1889,8 @@ res_age_birth_parents_dv %>%
         pval_geom_point() +
         pval_scale() +
         my_fill_scale(n = 2) +
-        my_labs()
+        my_labs() +
+        my_theme()
 
 ```
 
@@ -1917,12 +1934,13 @@ standard_ggplot(res_compare, fill_col = Regression, n_regs = 33) +
 \clearpage
 ## Genetic correlations with EA3
 
-Another way to examine the "earnings" theory of natural selection is to
-compare selection effects of PGS with their genetic correlation with
-educational attainment (EA3). Since EA3 strongly predicts earnings, if
-earnings drives differences in fertility, we'd expect a correlation
-between the two sets of results. Figure
-\@ref(fig:plot-rgs-by-effect-size) shows this is so.
+Another way to examine the "earnings" theory of natural selection is to compare
+selection effects of PGS with their genetic correlation with educational
+attainment (EA3). Since EA3 strongly predicts earnings, if earnings drives
+differences in fertility, we'd expect a correlation between the two sets of
+results. Figure \@ref(fig:plot-rgs-by-effect-size) shows this is so. Genetic
+correlations were calculated using LD score regression from GWAS summary
+statistics.
 
 
 
@@ -1943,7 +1961,7 @@ rgs %>%
         geom_point() +
         my_vline +
         my_hline +
-        labs(x = "rG with EA3", y = "Effect on number of children")
+        labs(x = "Genetic correlation with EA3", y = "Effect on number of children")
           
 ```
 
@@ -1953,10 +1971,10 @@ rgs %>%
 ## Effects on inequality
 
 Table \@ref(tab:tbl-inequality-effects) estimates differences in children's mean
-polygenic scores between the highest and lowest income groups. Column "Actual"
-uses respondents' scores weighted by Age/Qualification times number of
-children. Column "Without selection" uses scores weighted by Age/Qualification
-only, i.e. if all couples had the same number of children.
+polygenic scores between the highest and lowest income groups. Column "With
+selection" uses respondents' scores weighted by Age/Qualification times number
+of children. Column "Without selection" uses scores weighted by
+Age/Qualification only, i.e. if all couples had the same number of children.
 
 
 ```{r tbl-inequality-effects}
@@ -1991,6 +2009,7 @@ ineq_comp %>%
       set_number_format(everywhere, 2:3, 3) %>% 
       set_number_format(everywhere, 4, 1) %>% 
       set_caption("Differences in polygenic scores between highest and lowest income group.") %>% 
+      set_width(0.6) %>% 
       theme_compact() %>% 
       set_bottom_border(final(1), everywhere)
 ```
