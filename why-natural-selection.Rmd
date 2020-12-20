@@ -23,6 +23,7 @@ editor_options:
     wrap: 72
   chunk_output_type: console
 mainfont: Baskerville
+mathfont: Baskerville
 sansfont: "Gill Sans"
 ---
 
@@ -728,10 +729,6 @@ individual's polygenic scores -- indeed, our analyses show that it is not
 part of the relationship between polygenic scores and fertility, and that
 once this is controlled for, the remaining part of the relationship has the
 opposite sign.
-
-AFLB mediates
-the relationship between polygenic scores and fertility, and that after this
-effect has been taken account of, there is a further, opposite-signed relationship.
 
 
 ```{r plot-age-flb, fig.cap = "Selection effects by age at first live birth, and controlling for age at first live birth (women only).", fig.ncol = 1,  fig.subcap = c("Effect sizes by age at first live birth terciles", "Effect sizes controlling for age at first live birth. Effect sizes without controls (for women only) shown for comparison."), fig.align = "center"}
