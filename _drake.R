@@ -551,10 +551,16 @@ plan <- drake_plan(
           left_join(age_qual_weights, by = "f.eid") %>% 
           filter(! is.na(n_children), ! is.na(income_cat), ! is.na(weights)) %>% 
           group_by(income_cat) %>% 
+          mutate(
+            parent_weights = weights/n_sibs,
+            parent_weights = ifelse(is.na(parent_weights), 0, parent_weights)
+          ) %>% 
           summarize(across(all_of(score_names), 
                     list(
-                      unw = ~ weighted.mean(.x, weights, na.rm = TRUE),
-                      wtd = ~ weighted.mean(.x, weights * n_children, 
+                      unw     = ~ weighted.mean(.x, weights, na.rm = TRUE),
+                      wtd     = ~ weighted.mean(.x, weights * n_children, 
+                                              na.rm = TRUE),
+                      parents = ~ weighted.mean(.x, parent_weights, 
                                               na.rm = TRUE)
                     )
           )) %>% 

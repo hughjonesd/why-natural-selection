@@ -943,7 +943,7 @@ generation.
 
 Although the direction of selection effects does not change between the
 generations, there are other differences. Compared to our standard polygenic
-scores (residualized on 100 principal components of genetic data) 
+scores (residualized on 100 principal components of genetic data), 
 selection effects on unresidualized scores are about ten percent higher
 on average for *number of siblings*, whereas effects for *number of children*
 barely change (Appendix Figure \@ref(fig:plot-regs-controlled-pcs)). This could
@@ -1208,7 +1208,7 @@ bias.
 Because selection effects are concentrated in poorer groups, they may also increase
 inequality with respect to polygenic scores. For example, Figure
 \@ref(fig:plot-mean-EA3-by-income) graphs mean polygenic scores for educational
-attainment (EA3), for children in households of different income groups. The
+attainment (EA3) among children from households of different income groups. The
 blue bars show the actual means, i.e. parents' mean polygenic score weighted by
 number of children. The grey bars show the hypothetical means if all households
 had equal numbers of children. Natural selection against genes associated with 
@@ -1234,7 +1234,7 @@ income_EA3 <- famhist %>%
       ) %>% 
       tidyr::pivot_longer(-`Household income`) %>% 
       rename(
-        `Children's mean EA3`     = value
+        `Children's mean EA3` = value
       )
 
 income_EA3 %>% 
