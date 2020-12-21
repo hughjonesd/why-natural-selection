@@ -1610,7 +1610,7 @@ summary_period %>%
       period_table("Change in selection effects between early and late born respondents (regressions on number of children).")
 ```
 
-Figure \@ref(fig:plot-siblings-townsend) plots effects on *n siblings* by
+Figure \@ref(fig:plot-siblings-townsend) plots effects on *number of siblings* by
 Townsend deprivation quintile of birth area.
 
 ```{r plot-siblings-townsend, fig.cap = "Selection effects in the parents' generation by Townsend deprivation quintile of birth area", fig.align = "center"}
@@ -2006,8 +2006,9 @@ ineq_comp %>%
       set_number_format(everywhere, 2:3, 3) %>% 
       set_number_format(everywhere, 4, 1) %>% 
       set_caption("Differences in polygenic scores between highest and lowest income group.") %>% 
-      set_width(0.6) %>% 
       theme_compact() %>% 
+      set_width(0.9) %>% 
+      set_col_width(c(.35, .15, .15 , .15)) %>% 
       set_bottom_border(final(1), everywhere)
 ```
 
