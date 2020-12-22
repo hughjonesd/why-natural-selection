@@ -162,6 +162,10 @@ make_rgs <- function (rgs_file) {
     autism_2017.ipsych.pgc     = "autism_2017",
   ) %>% {sub("\\.GPC\\.23andme$", "", .)}
   
+  reverse_coded <- c("ai_substance_use", "dpw_substance_use", 
+                       "cpd_substance_use", "si_substance_use")
+  rgs$rg[rgs$p2 %in% reverse_coded] <- rgs$rg[rgs$p2 %in% reverse_coded] * -1
+  
   rgs
 }
 

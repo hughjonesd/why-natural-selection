@@ -1968,7 +1968,7 @@ selection effects of polygenic scores with their genetic correlation with educat
 attainment (EA3). Since EA3 strongly predicts earnings, if earnings drives
 differences in fertility, we'd expect a correlation between the two sets of
 results. Figure \@ref(fig:plot-rgs-by-effect-size) shows this is so: the 
-correlation is `r rgs_cor$estimate`. Genetic
+correlation, after excluding EA2, is `r rgs_cor$estimate`. Genetic
 correlations were calculated using LD score regression from GWAS summary
 statistics.
 
