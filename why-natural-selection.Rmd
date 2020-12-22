@@ -608,7 +608,7 @@ correlation between effect sizes for the youngest and oldest terciles is
 [^aflb-no-men]: This information is unavailable for men.
 
 
-```{r plot-n-partners, fig.cap = "Selection effects by number of sexual partners, household type, and age at first live birth.", fig.subcap = c("Lifetime number of sexual partners", "Household type", "Age at first live birth, females"), fig.ncol = 1, fig.align = "center"}
+```{r plot-n-partners, fig.cap = "Selection effects by number of sexual partners and household type.", fig.subcap = c("Lifetime number of sexual partners", "Household type"), fig.ncol = 1, fig.align = "center"}
 
 sexes_theme <-  my_theme(
                   plot.margin          = unit(c(1, 1, 0, 1), "lines"),
@@ -731,7 +731,7 @@ fertility, and that once this is controlled for, the remaining part of the
 relationship has the opposite sign.
 
 
-```{r plot-age-flb, fig.cap = "Selection effects by age at first live birth, and controlling for age at first live birth (women only).", fig.ncol = 1,  fig.subcap = c("Effect sizes by age at first live birth terciles", "Effect sizes controlling for age at first live birth. Effect sizes without controls (for women only) shown for comparison."), fig.align = "center"}
+```{r plot-age-flb, fig.cap = "Selection effects by age at first live birth, and controlling for age at first live birth (women only).", fig.ncol = 1,  fig.subcap = c("Effect sizes by age at first live birth terciles (women only)", "Effect sizes controlling for age at first live birth. Effect sizes without controls (for women only) shown for comparison."), fig.align = "center"}
 
 drake::loadd(res_age_flb_cross)
 
