@@ -2,7 +2,7 @@
 title: "Natural selection in contemporary humans is linked to income and substitution effects"
 author: "David Hugh-Jones \\thanks{Corresponding author. School of Economics, University of East Anglia, Norwich, UK. Email: D.Hugh-Jones@uea.ac.uk}, Abdel Abdellaoui \\thanks{Department of Psychiatry, Amsterdam UMC, University of Amsterdam, Amsterdam, The Netherlands. Email: a.abdellaoui@amsterdamumc.nl}"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
-abstract: "Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection through the association between 33 polygenic scores and fertility, across two generations, using data from UK Biobank (N = 409,629 British subjects with European ancestry). Consistently over time, polygenic scores which predict lower (higher) earnings and education are selected for (against). Selection effects are concentrated among lower-income and less educated people, younger parents, people with more lifetime sexual partners, and people not living with a partner. Effect sizes are substantially larger after correcting for ascertainment bias. The direction of natural selection is reversed among older parents, or after controlling for age at first live birth. These patterns are in line with economic theories of fertility, in which higher earnings may either increase or decrease fertility via income and substitution effects in the labour market. We find evidence in modern day Great Britain for multiple natural selection pressures that vary between subgroups in the direction and strength of their effects and that are strongly related to the socio-economic system."
+abstract: "\\noindent Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection through the association between 33 polygenic scores and fertility, across two generations, using data from UK Biobank (N = 409,629 British subjects with European ancestry). Consistently over time, polygenic scores which predict lower (higher) earnings and education are selected for (against). Selection effects are concentrated among lower-income and less educated people, younger parents, people with more lifetime sexual partners, and people not living with a partner. Effect sizes are substantially larger after correcting for ascertainment bias. The direction of natural selection is reversed among older parents (22+), or after controlling for age at first live birth. These patterns are in line with economic theories of fertility, in which higher earnings may either increase or decrease fertility via income and substitution effects in the labour market. We find evidence in modern day Great Britain for multiple natural selection pressures that vary between subgroups in the direction and strength of their effects, that are strongly related to the socio-economic system, and that may contribute to health inequalities across income groups."
 bibliography: "negative-selection.bib"
 output: 
   bookdown::pdf_document2:
@@ -406,8 +406,9 @@ These patterns are in line with economic theories of fertility
 effects on fertility: a fertility-increasing *income effect* (higher income
 makes children more affordable), and a fertility-lowering *substitution effect*
 (time spent on childrearing has a higher cost in foregone earnings). Our
-results suggest that the substitution effect dominates for single parents,
-while the income effect is stronger for couples.
+results suggest that the substitution effect dominates for single parents and
+younger parents, while among couples and older parents (22+) effects are more
+evenly balanced.
 
 
 # Results
@@ -608,20 +609,21 @@ correlation between effect sizes for the youngest and oldest terciles is
 [^aflb-no-men]: This information is unavailable for men.
 
 
-```{r plot-n-partners, fig.cap = "Selection effects by number of sexual partners and household type.", fig.subcap = c("Lifetime number of sexual partners", "Household type"), fig.ncol = 1, fig.align = "center"}
+```{r plot-n-partners, fig.cap = "Selection effects by number of sexual partners and household type.", fig.subcap = c("Lifetime number of sexual partners", "Household type"), fig.ncol = 1, fig.align = "center", fig.height = 4}
 
 sexes_theme <-  my_theme(
                   plot.margin          = unit(c(1, 1, 0, 1), "lines"),
                   legend.position      = "bottom", 
                   legend.box.spacing   = unit(0, "lines"),
-                  legend.box.margin    = margin(-5, 0, 0, -5),
+                  legend.box.margin    = margin(-5, 0, 0, -85),
                   legend.margin        = margin(0, 0, 0, 0),
                   legend.box.just      = "left",
-                  legend.justification = "left"
+                  legend.justification = "left",
+                  legend.spacing       = unit(1.5, "lines")
                 )
 sexes_guides <- guides(
-                  # fill  = guide_legend(title.position = "top"),
-                  # color = guide_legend(title.position = "top")
+                  # fill  = guide_legend(ncol = 1),
+                  # color = guide_legend(ncol = 1)
                 )
 
 drake::loadd(res_partners)
@@ -1091,12 +1093,14 @@ genetic variants will be selected for (or against) in proportion to their effect
 on earnings. Figure \@ref(fig:plot-cors-earnings-educ) plots selection effects
 on each polygenic score against that score's correlation with earnings in a respondent's first
 job, and against its correlation with educational attainment, a
-predictor of lifetime earnings. The raw relationships (left column) are strongly
+predictor of lifetime earnings.^[animation] The raw relationships (left column) are strongly
 negative. If we plot selection effects controlling for age at first live birth
 (right column), the effect reverses and becomes positive. Thus, the labour
 market appears to play an important role in natural selection. Substitution
 effects dominate income effects overall, which fits the known association
 between income and lower fertility [@becker1960economic;@jones2006economic].
+
+^[animation]: See also the supplementary animation at https://xxx.xxx.xxx
 
 
 ```{r calc-res-earn-educ}
@@ -1170,7 +1174,7 @@ underlying polygenic traits [@beauchamp2016genetic; @kong2017selection;
 @sanjak2018evidence]. We show that correlations between polygenic scores and
 fertility are highly concentrated among specific subgroups of the population,
 including people with lower income, lower education, younger first parenthood, 
-and more lifetime sexual partners. Indeed, among older mothers, selection effects are
+and more lifetime sexual partners. Indeed, among older mothers (22+), selection effects are
 actually reversed. Furthermore, the size of selection effects on a polygenic
 score correlates with that score's association with labour market earnings. The
 economic theory of fertility provides a parsimonious explanation for this.
@@ -1205,17 +1209,22 @@ Nevertheless, we note that selection effects on our measured polygenic scores
 are still relatively small, even after reweighting to account for ascertainment
 bias.
 
-Because selection effects are concentrated in poorer groups, they may also increase
-inequality with respect to polygenic scores. For example, Figure
+Because selection effects are concentrated in lower-income groups, they may also
+increase inequality with respect to polygenic scores. For example, Figure
 \@ref(fig:plot-mean-EA3-by-income) graphs mean polygenic scores for educational
 attainment (EA3) among children from households of different income groups. The
 blue bars show the actual means, i.e. parents' mean polygenic score weighted by
 number of children. The grey bars show the hypothetical means if all households
-had equal numbers of children. Natural selection against genes associated with 
-educational attainment, which lowers the mean, is stronger at the bottom of the 
-income distribution, and this increases the differences between groups.  Overall,
-natural selection increases inequality for 29 out of 33 polygenic scores 
-(Appendix Table \@ref(tab:tbl-inequality-effects)).
+had equal numbers of children. Natural selection against genes associated with
+educational attainment, which lowers the mean, is stronger at the bottom of the
+income distribution, and this increases the differences between groups.
+Overall, natural selection increases inequality for 29 out of 33 polygenic
+scores (Appendix Table \@ref(tab:tbl-inequality-effects)). Since many polygenic
+scores are predictive of disease risk, this increase in inequality could
+potentially increase health inequalities. In general, the demographic history of
+anatomically modern humans is related to disease risk [@benton2021influence];
+understanding the role of contemporary natural selection may help in the design
+of health policies.
 
 
 ```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean polygenic score for educational attainment (EA3) of children by household income group. Blue is actual. Grey is hypothetical in the absence of selection effects.", fig.width = 4}
