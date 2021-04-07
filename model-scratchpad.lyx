@@ -1,0 +1,3485 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "times" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Thoughts
+\end_layout
+
+\begin_layout Itemize
+Model below has 
+\series bold
+less
+\series default
+ effect of 
+\begin_inset Formula $h$
+\end_inset
+
+ on 
+\begin_inset Formula $N$
+\end_inset
+
+ among low-educated, because low education path does not translate 
+\begin_inset Formula $h$
+\end_inset
+
+ into wages.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+The reality is that controlling for wages gets rid of the effect of PSEA.
+ So, does PSEA have less effect on wages depending on education?
+\end_layout
+
+\begin_layout Itemize
+Actually, if income_cat is the d.v., then PSEA has about 20% 
+\bar under
+higher
+\bar default
+ effect if you didn't go to university.
+\end_layout
+
+\begin_layout Itemize
+But if first_job_pay (estimated by SOC code) is the d.v., then PSEA effect
+ is about 40% 
+\bar under
+lower
+\bar default
+ if you didn't go to university; whether or not you use logs.
+ For last_job_pay there's no effect; for cur_job_pay the PSEA effect is
+ about 50% 
+\bar under
+higher
+\bar default
+ if you didn't go to university, but only significant when estimated in
+ logs.
+\end_layout
+
+\begin_layout Itemize
+If you use age_fte_cat instead of university, then more education makes
+ the PSEA effect stronger for cur_job_pay; and for first_job_pay; and for
+ income_cat; no effect for last_job_pay.
+ (Why is age_fte_cat so different from university?)
+\end_layout
+
+\begin_layout Itemize
+All these are just quick pooled regressions.
+\end_layout
+
+\begin_layout Itemize
+Overall, evidence broadly favours that more education makes PSEA effect
+ on 
+\series bold
+income
+\series default
+ steeper.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+So then 
+\series bold
+why is PSEA effect on 
+\bar under
+fertility
+\bar default
+ steeper with 
+\bar under
+less
+\bar default
+ education
+\series default
+?
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+No evidence that gender matters much here.
+ Both men and women show very similar effects.
+\end_layout
+
+\begin_layout Itemize
+One point is that LOTS of the PSEA effect on fertility must go 
+\bar under
+via
+\bar default
+ education.
+ (Big -ve university dummy.)
+\end_layout
+
+\begin_layout Itemize
+The effect of first_job_pay on children is 
+\series bold
+positive
+\series default
+; and (a) steeper at the bottom; and (b) flat for women, steep for men.
+\end_layout
+
+\begin_layout Itemize
+The effect of age leaving education is 
+\series bold
+large
+\series default
+ and 
+\series bold
+negative
+\series default
+; and larger for women; and there's a 
+\series bold
+bigger gap
+\series default
+ between <16 and 16-18 than between 16-18 and >18.
+ This continues to hold when we control for age, though the gap size is
+ more even.
+\end_layout
+
+\begin_layout Itemize
+Obvious conclusion: education choices, more than wages, drive the PSEA-fertility
+ link.
+\end_layout
+
+\end_deeper
+\begin_layout Section
+Model
+\end_layout
+
+\begin_layout Standard
+First, people observe their own human capital 
+\begin_inset Formula $h$
+\end_inset
+
+ and choose a low- or high-education career path.
+ The low-education career pays a wage 
+\begin_inset Formula $w$
+\end_inset
+
+ in both periods.
+ The high-education career pays 
+\begin_inset Formula $e<w$
+\end_inset
+
+ in period 1, and 
+\begin_inset Formula $h$
+\end_inset
+
+ in period 2.
+\end_layout
+
+\begin_layout Standard
+In each period, people decide how many children to have.
+ Each child has a cost 
+\begin_inset Formula $b$
+\end_inset
+
+ in time and 
+\begin_inset Formula $m$
+\end_inset
+
+ in money.
+ Write 
+\begin_inset Formula $N_{1},N_{2}$
+\end_inset
+
+ for the number of children in each period.
+\end_layout
+
+\begin_layout Standard
+Utility is given by 
+\begin_inset Formula 
+\[
+u(W_{1}(1-bN_{1})-mN_{1})+u(W_{2}(1-bN_{2})-mN_{2})+\alpha_{1}N_{1}+\alpha_{2}N_{2}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\alpha_{1},\alpha_{2}$
+\end_inset
+
+ parametrize the payoff from having children in each period and 
+\begin_inset Formula $W_{1},W_{2}$
+\end_inset
+
+ are the wages in each period.
+ 
+\begin_inset Formula $u$
+\end_inset
+
+ is utility of consumption, assumed concave.
+ We assume no borrowing is possible.
+ As a result the choices of 
+\begin_inset Formula $N_{1},N_{2}$
+\end_inset
+
+ can be worked out separately.
+ In each period 
+\begin_inset Formula $t=1,2$
+\end_inset
+
+ the FOC gives
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+easy to add 
+\begin_inset Formula $\delta$
+\end_inset
+
+ time preference
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+u'(W_{t}(1-bN_{t})-mN_{t})=\frac{\alpha_{t}}{m+bW_{t}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Log utility
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $u(C)=log(C)$
+\end_inset
+
+ then the FOC works out to 
+\begin_inset Formula 
+\[
+W_{t}(1-bN_{t})-mN_{t}=\frac{m+bW_{t}}{\alpha_{t}}
+\]
+
+\end_inset
+
+which can be solved for 
+\begin_inset Formula $N_{t}$
+\end_inset
+
+ explicitly, dropping subscripts:
+\begin_inset Formula 
+\[
+N^{*}=\frac{W(1-b/\alpha)-m/\alpha}{Wb+m}.
+\]
+
+\end_inset
+
+Per-period utility can also be written:
+\begin_inset Formula 
+\begin{align*}
+ & \log(W(1-bN)-mN)+\alpha N\\
+= & \log(W-(bW+m)N)+\alpha N\\
+= & \log(\frac{Wb+m}{\alpha})+\frac{W(\alpha-b)-m}{Wb+m}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Total utility for the high-education path is then
+\begin_inset Formula 
+\[
+\log(\frac{w_{1}b+m}{\alpha})+\frac{w_{1}(\alpha-b)-m}{w_{1}b+m}+\log(\frac{hb+m}{\alpha})+\frac{h(\alpha-b)-m}{hb+m}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Total utility for the low-education path is
+\begin_inset Formula 
+\[
+2\left(\log(\frac{wb+m}{\alpha})+\frac{w(\alpha-b)-m}{wb+m}\right).
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+There is a value of 
+\begin_inset Formula $h$
+\end_inset
+
+ where these will be the same.
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Explicit solution, probably not.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+
+\series bold
+Goals
+\end_layout
+
+\begin_layout Itemize
+if you choose higher education, you have children later.
+\end_layout
+
+\begin_layout Itemize
+The number of children in period 2 is increasing in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ (Including both education paths!)
+\end_layout
+
+\begin_layout Itemize
+On the high education path, the total number of children is increasing in
+ 
+\begin_inset Formula $h$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+Overall [sometimes? May need to let curvature of utility vary, hence isoelastic
+ as below] the total number of children is decreasing in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Isoelastic utility
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $u(C)=\frac{C^{1-\sigma}-1}{1-\sigma}$
+\end_inset
+
+ for 
+\begin_inset Formula $\sigma\ge0$
+\end_inset
+
+ then 
+\begin_inset Formula $u'(C)=C^{-\sigma}$
+\end_inset
+
+ and the FOC becomes
+\begin_inset Formula 
+\[
+W(1-bN)-mN=\left(\frac{m+bW}{\alpha}\right)^{1/\sigma}.
+\]
+
+\end_inset
+
+Rearranging gives
+\begin_inset Formula 
+\[
+N^{*}=\frac{W-\left(\frac{m+bW}{\alpha}\right)^{1/\sigma}}{Wb+m}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $m=0$
+\end_inset
+
+, then this reduces to 
+\begin_inset Formula 
+\[
+N^{*}=\frac{W-\left(\frac{bW}{\alpha}\right)^{1/\sigma}}{Wb}=\frac{1}{b}-\frac{\left(bW\right)^{(1-\sigma)/\sigma}}{\alpha^{1/\sigma}}.
+\]
+
+\end_inset
+
+which is increasing in 
+\begin_inset Formula $W$
+\end_inset
+
+ for 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+, constant for 
+\begin_inset Formula $\sigma=1$
+\end_inset
+
+, and decreasing in 
+\begin_inset Formula $W$
+\end_inset
+
+ for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Isoelastic subutility functions
+\end_layout
+
+\begin_layout Standard
+Rewrite the utility function as 
+\begin_inset Formula 
+\[
+u(W_{1}(1-bN_{1})-mN_{1})+\alpha_{1}v(N_{1})+u(W_{2}(1-bN_{2})-mN_{2})+\alpha_{2}v(N_{2})
+\]
+
+\end_inset
+
+so the interior FOC in either period becomes:
+\begin_inset Formula 
+\[
+(m+bW)u'(C)=\alpha v'(N)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $C\equiv W(1-bN)-mN$
+\end_inset
+
+ is consumption.
+ A nice way to write this might be
+\begin_inset Formula 
+\[
+\frac{MV(C)}{MV(N)}=\frac{1}{m+bW}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $MV$
+\end_inset
+
+ is the marginal value of consumption or children respectively, and the
+ RHS is (1 over) the marginal effect of children on consumption.
+ 
+\end_layout
+
+\begin_layout Standard
+Suppose both 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ are isoelastic.
+ Note that both of these have Inada conditions, so we are guaranteed an
+ interior optimum, with positive 
+\begin_inset Formula $W$
+\end_inset
+
+ and 
+\begin_inset Formula $N$
+\end_inset
+
+.
+ Then the FOC is
+\begin_inset Formula 
+\[
+(m+bW)C^{-\sigma}=\alpha N^{-\sigma}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+which solves to
+\begin_inset Formula 
+\[
+N=\frac{QW}{1+Q(Wb+m)}
+\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $Q=\left(\frac{\alpha}{m+bW}\right)^{1/\sigma}$
+\end_inset
+
+.
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+(m+bW)C^{-\sigma} & =\alpha N^{-\sigma}\\
+(m+bW)N^{\sigma} & =\alpha(W(1-bN)-mN)^{\sigma}\\
+\frac{N^{\sigma}}{(W(1-bN)-mN)^{\sigma}} & =\frac{\alpha}{m+bW}\\
+\frac{N}{(W(1-bN)-mN)} & =Q
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+N & =Q(W(1-bN)-mN)\\
+N & =\frac{QW}{1+Q(Wb+m)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+A single utility for children
+\end_layout
+
+\begin_layout Standard
+If we have non-linear utility for children it seems natural to have a single
+ argument for 
+\begin_inset Formula $N\equiv N_{1}+N_{2}$
+\end_inset
+
+.
+ If so:
+\begin_inset Formula 
+\[
+u(W_{1}(1-bN_{1})-mN_{1})+u(W_{2}(1-bN_{2})-mN_{2})+\alpha v(N).
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The FOC is now unified:
+\begin_inset Formula 
+\begin{align*}
+(W_{1}b+m)u'(C_{1}) & =\alpha v'(N)\textrm{ if }N_{1}>0\\
+(W_{2}b+m)u'(C_{2}) & =\alpha v'(N)\textrm{ if }N_{2}>0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+implying equal marginal utility if you have children in both periods.
+ Indeed, if you have 
+\begin_inset Formula $W_{1}=W_{2}$
+\end_inset
+
+ then you're going to have equal numbers of children in each period.
+ If 
+\begin_inset Formula $N_{1}=0$
+\end_inset
+
+ then the first equality becomes a > sign, similarly for 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Single utility, no 
+\begin_inset Formula $m$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let's set 
+\begin_inset Formula $m=0$
+\end_inset
+
+ and both 
+\begin_inset Formula $u$
+\end_inset
+
+ and 
+\begin_inset Formula $v$
+\end_inset
+
+ to be CRRA with risk aversion 
+\begin_inset Formula $\sigma$
+\end_inset
+
+.
+ Utility is
+\begin_inset Formula 
+\[
+u(W_{1}(1-bN_{1}))+u(W_{2}(1-bN_{2}))+\alpha u(N)
+\]
+
+\end_inset
+
+with 
+\begin_inset Formula $u(x)=\frac{x^{1-\sigma}-1}{1-\sigma}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The FOC is
+\begin_inset Formula 
+\begin{align*}
+W_{1}bC_{1}^{-\sigma} & \ge\alpha N^{-\sigma}\textrm{, with equality if }N_{1}>0;\\
+W_{2}bC_{2}^{-\sigma} & \ge\alpha N^{-\sigma}\textrm{, with equality if }N_{2}>0.
+\end{align*}
+
+\end_inset
+
+with 
+\begin_inset Formula $C_{t}=W_{t}-bN_{t}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+
+\series bold
+Low-education career.
+ Suppose 
+\begin_inset Formula $W_{1}=W_{2}=w$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Then suppose 
+\begin_inset Formula $N_{1}<N_{2}$
+\end_inset
+
+.
+ Hence 
+\begin_inset Formula $C_{1}>C_{2}$
+\end_inset
+
+.
+ Hence 
+\begin_inset Formula $W_{1}bC_{1}^{-\sigma}<W_{2}bC_{2}^{-\sigma}=\alpha N^{-\sigma}$
+\end_inset
+
+, contradicting the above.
+ A similar argument works if 
+\begin_inset Formula $N_{1}>N_{2}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Thus it must be that 
+\begin_inset Formula $N_{1}=N_{2}$
+\end_inset
+
+ and hence 
+\begin_inset Formula $C_{1}=C_{2}$
+\end_inset
+
+.
+ Rearranging the FOC gives
+\begin_inset Formula 
+\begin{align*}
+wb(w-bN_{1})^{-\sigma} & =\alpha(2N_{1})^{-\sigma}\\
+\left(\frac{wb}{\alpha}\right)^{1/\sigma} & =\frac{w-bN_{1}}{2N_{1}}\\
+N_{1}=N_{2} & =\frac{w}{b+2\left(\frac{wb}{\alpha}\right)^{1/\sigma}}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From this we can work out
+\begin_inset Formula 
+\[
+\frac{dN_{1}}{dw}=\frac{2(\sigma-1)\left(\frac{wb}{\alpha}\right)^{1/\sigma}+b\sigma}{\sigma(b+2\left(\frac{wb}{\alpha}\right)^{1/\sigma})^{2}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is positive if
+\begin_inset Formula 
+\begin{align*}
+2(\sigma-1)\left(\frac{wb}{\alpha}\right)^{1/\sigma}+b\sigma & >0\\
+\Leftrightarrow\sigma & >\frac{\left(\frac{wb}{\alpha}\right)^{1/\sigma}}{\left(\frac{wb}{\alpha}\right)^{1/\sigma}+b/2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+which always holds for 
+\begin_inset Formula $\sigma\ge1$
+\end_inset
+
+, and holds for any 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ when 
+\begin_inset Formula $w$
+\end_inset
+
+ is small enough .
+ 
+\end_layout
+
+\begin_layout Standard
+Note that here fertility doesn't easily decrease with 
+\begin_inset Formula $w$
+\end_inset
+
+.
+ However, on the low-education path, 
+\begin_inset Formula $w$
+\end_inset
+
+ doesn't vary (across people), so this doesn't matter, and in particular
+ 
+\begin_inset Formula $w$
+\end_inset
+
+ doesn't vary with 
+\begin_inset Formula $h$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Some special cases:
+\end_layout
+
+\begin_layout Itemize
+For log utility, 
+\begin_inset Formula $N=N_{1}+N_{2}=\frac{2w}{b+2\left(\frac{wb}{\alpha}\right)}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+As 
+\begin_inset Formula $\sigma\rightarrow\infty$
+\end_inset
+
+, 
+\begin_inset Formula $N\rightarrow2w/(b+2).$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+As 
+\begin_inset Formula $\sigma\rightarrow0$
+\end_inset
+
+, if 
+\begin_inset Formula $wb>\alpha$
+\end_inset
+
+ then 
+\begin_inset Formula $N\rightarrow0$
+\end_inset
+
+; if 
+\begin_inset Formula $wb<\alpha$
+\end_inset
+
+ then 
+\begin_inset Formula $N\rightarrow2w/b$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+
+\series bold
+High-education career.
+ Suppose
+\series default
+ 
+\begin_inset Formula $W_{1}=e,W_{2}=h$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The FOC is
+\begin_inset Formula 
+\begin{align*}
+ebC_{1}^{-\sigma} & \ge\alpha N^{-\sigma}\textrm{, with equality if }N_{1}>0;\\
+hbC_{2}^{-\sigma} & \ge\alpha N^{-\sigma}\textrm{, with equality if }N_{2}>0.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+What are the conditions for 
+\begin_inset Formula $N_{1}=0$
+\end_inset
+
+ or 
+\begin_inset Formula $N_{2}=0$
+\end_inset
+
+? (Can't be both because of Inada-ish utility.)
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $eb/C_{1}^{\sigma}>hb/C_{2}^{\sigma}$
+\end_inset
+
+ then we can have 
+\begin_inset Formula $N_{1}=0$
+\end_inset
+
+ (but not 
+\begin_inset Formula $N_{2}=0$
+\end_inset
+
+); if its the other way round we can have 
+\begin_inset Formula $N_{2}=0$
+\end_inset
+
+ but not 
+\begin_inset Formula $N_{1}=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+First 
+\series bold
+assume both 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ are positive
+\series default
+.
+ This implies
+\begin_inset Formula 
+\begin{align*}
+eb/(e-bN_{1})^{\sigma} & =hb/(h-bN_{2})^{\sigma}\\
+\left(\frac{e}{h}\right)^{1/\sigma} & =\frac{e-bN_{1}}{h-bN_{2}}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+In general as 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ increases, the LHS goes to 1; as it decreases the LHS goes to zero which
+ means (?) that 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ approaches 
+\begin_inset Formula $e/b$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+As 
+\begin_inset Formula $\sigma\rightarrow\infty$
+\end_inset
+
+ this reduces to 
+\begin_inset Formula $e-bN_{1}=h-bN_{2}$
+\end_inset
+
+ hence 
+\begin_inset Formula $N_{2}=N_{1}+\frac{h-e}{b}.$
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Itemize
+For log utility with 
+\begin_inset Formula $\sigma=1$
+\end_inset
+
+ we get 
+\begin_inset Formula $N_{2}=(h/e)N_{1}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+As 
+\begin_inset Formula $\sigma\rightarrow0$
+\end_inset
+
+, the left hand side goes to zero; 
+\begin_inset Formula $N_{1}\rightarrow e/b;$
+\end_inset
+
+ then solving for 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ gives 
+\begin_inset Formula $N_{2}\rightarrow P+Re/b.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above relates 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ to 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+.
+ In fact we can solve explicitly for 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ as an affine function of 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+:
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+checked that this reduces to the above for 
+\begin_inset Formula $\sigma=\infty,1$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+N_{2}=P+RN_{1}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula $P=\frac{h-e(h/e)^{1/\sigma}}{b}$
+\end_inset
+
+, 
+\begin_inset Formula $R=\left(\frac{h}{e}\right)^{1/\sigma}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Now the conditions for both to be positive are 
+\begin_inset Formula 
+\begin{align*}
+eb(e-bN_{1})^{-\sigma} & =\alpha(N_{1}+N_{2})^{-\sigma}\\
+eb(e-bN_{1})^{-\sigma} & =\alpha(N_{1}+N_{2})^{-\sigma}\\
+\frac{eb}{\alpha} & =\left(\frac{e-bN_{1}}{N_{1}+N_{2}}\right)^{\sigma}\\
+Q & =\frac{e-bN_{1}}{N_{1}+N_{2}}\textrm{ where }Q\equiv\left(\frac{eb}{\alpha}\right)^{1/\sigma}\\
+Q(N_{1}+N_{2}) & =e-bN_{1}\\
+Q(N_{1}+P+RN_{1}) & =e-bN_{1}\\
+N_{1} & =\frac{e-QP}{Q(1+R)+b}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Some special cases:
+\end_layout
+
+\begin_layout Itemize
+For log utility, 
+\begin_inset Formula $Q=\frac{eb}{\alpha},P=0;R=h/e$
+\end_inset
+
+.
+ 
+\begin_inset Formula $N_{1}=\frac{e}{b[(e+h)/\alpha+1]}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}=\frac{h}{b[(e+h)/\alpha+1]}.$
+\end_inset
+
+ Total 
+\begin_inset Formula $N=\frac{e+h}{b[(e+h)/\alpha+1]}$
+\end_inset
+
+.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Differentiating 
+\begin_inset Formula $N$
+\end_inset
+
+ wrt 
+\begin_inset Formula $h$
+\end_inset
+
+ gives that it is signed by 
+\begin_inset Formula $b$
+\end_inset
+
+, hence always positive.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+As 
+\begin_inset Formula $\sigma\rightarrow\infty$
+\end_inset
+
+, 
+\begin_inset Formula $Q\rightarrow1$
+\end_inset
+
+;
+\begin_inset Formula $P\rightarrow\frac{h-e}{b}$
+\end_inset
+
+; and 
+\begin_inset Formula $R\rightarrow1$
+\end_inset
+
+.
+ Hence 
+\begin_inset Formula $N_{1}\rightarrow\frac{e-(h-e)/b}{2+b}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}\rightarrow N_{1}+\frac{h-e}{b}$
+\end_inset
+
+, giving:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Formula $N=2\frac{e-(h-e)/b}{2+b}+\frac{h-e}{b}$
+\end_inset
+
+.
+ Differentiating wrt 
+\begin_inset Formula $h$
+\end_inset
+
+ gives 
+\begin_inset Formula $dN/dh=\frac{1}{b}(1-2/(2+b))>0.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Intuitively: when you're 
+\begin_inset Quotes eld
+\end_inset
+
+risk averse
+\begin_inset Quotes erd
+\end_inset
+
+, having more money makes it much less costly to have children.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+As 
+\begin_inset Formula $\sigma\rightarrow0$
+\end_inset
+
+: 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+I think!
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula $N_{1}\rightarrow e/b$
+\end_inset
+
+.
+ 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ goes to zero because 
+\begin_inset Formula $P\rightarrow-\infty$
+\end_inset
+
+, at which point these equations break down.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+From computing, for low values of 
+\begin_inset Formula $\sigma$
+\end_inset
+
+, it's possible to get fertility declining in 
+\begin_inset Formula $h$
+\end_inset
+
+ while both 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ are positive.
+\end_layout
+
+\begin_layout Itemize
+e.g.
+ for 
+\begin_inset Formula $e=0.5,\alpha=.5,b=0.8,\sigma=0.5$
+\end_inset
+
+, and 
+\begin_inset Formula $h$
+\end_inset
+
+ less than about 1.2.
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+
+\series bold
+What will overall profile of fertility look like with respect to 
+\begin_inset Formula $h$
+\end_inset
+
+?
+\end_layout
+
+\begin_layout Itemize
+Within the low-education group (which will be low 
+\begin_inset Formula $h$
+\end_inset
+
+), fertility is flat in 
+\begin_inset Formula $h$
+\end_inset
+
+ and is given by
+\begin_inset Formula 
+\[
+N_{1}=N_{2}=\frac{w}{b+2\left(\frac{wb}{\alpha}\right)^{1/\sigma}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Within the high-education group, fertility can be going up or down in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+
+\series bold
+Special-case to log utility.
+\end_layout
+
+\begin_layout Itemize
+Within the low-education group, 
+\begin_inset Formula $N=\frac{2w}{b+2wb/\alpha}.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Within the high-education group: 
+\begin_inset Formula $N_{1}=\frac{e}{b[(e+h)/\alpha+1]}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}=\frac{h}{b[(e+h)/\alpha+1]}.$
+\end_inset
+
+ Total 
+\begin_inset Formula $N=\frac{e+h}{b+b(e+h)/\alpha}$
+\end_inset
+
+.
+ Notice the similarity in form between the two groups.
+ In particular, high education have more kids whenever 
+\begin_inset Formula $(e+h)/2>w$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
+We now have: conditional on low education, 
+\begin_inset Formula $N$
+\end_inset
+
+ is flat in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ Conditional on high education, it's increasing.
+ But overall, fix 
+\begin_inset Formula $h^{*}$
+\end_inset
+
+ as the level of human capital at which people choose the high education
+ career.
+ Then if 
+\begin_inset Formula $(e+h^{*})/2<w$
+\end_inset
+
+, fertility jumps down at this point.
+ It then increases.
+ 
+\end_layout
+
+\begin_layout Standard
+When do people switch?
+\end_layout
+
+\begin_layout Standard
+Utility for the low education track is
+\begin_inset Formula 
+\begin{align*}
+ & 2\log(w(1-bN_{1}))+\alpha\log(2N_{1})\\
+= & 2\log w+2\log(1-bN_{1})+\alpha\log(2N_{1})\\
+= & 2\log w+2\log(1-\frac{w}{1+2w/\alpha})+\alpha\log(\frac{1}{b}\frac{2w}{1+2w/\alpha})\\
+= & 2\log w+2\log(1-\frac{w}{1+2w/\alpha})+\alpha\log(\frac{1}{b})+\alpha\log(\frac{2w}{1+2w/\alpha}).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Utility for the high education track depends on 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ It is 
+\begin_inset Formula 
+\begin{align*}
+ & \log(e(1-bN_{1}))+\log(h(1-bN_{2}))+\alpha\log(N)\\
+= & \log(e(1-\frac{e}{(e+h)/\alpha+1}))+\log(h(1-\frac{h}{[(e+h)/\alpha+1]}))+\alpha\log(\frac{e+h}{b(1+(e+h)/\alpha)})
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Intuition: look at the two utilities and spot a way to make them comparable,
+ e.g.
+ when 
+\begin_inset Formula $e+h=2w$
+\end_inset
+
+ the last terms are the same.
+ Possibly whenever you change you also have more kids in this setup.
+\end_layout
+
+\begin_layout Standard
+Other intuition.
+ Higher education have more kids whenever 
+\begin_inset Formula $(e+h)/2>w$
+\end_inset
+
+ equivalently 
+\begin_inset Formula $h>2w-e$
+\end_inset
+
+.
+ So just check when switching point is less than 
+\begin_inset Formula $2w-e$
+\end_inset
+
+.
+ In particular, if you plug 
+\begin_inset Formula $h=2w-e$
+\end_inset
+
+ into the higher education utility, do you always get more utility than
+ for lower education?
+\end_layout
+
+\begin_layout Section
+One period model
+\end_layout
+
+\begin_layout Standard
+Here's a very simple model in which people choose number of children overall.
+ 
+\begin_inset Formula 
+\[
+u(W-bWN-mN)+\alpha u(N)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Start with 
+\begin_inset Formula $u=\log$
+\end_inset
+
+.
+ Differentiate by 
+\begin_inset Formula $N$
+\end_inset
+
+ to find the FOC:
+\begin_inset Formula 
+\[
+\frac{bW+m}{W-bWN-mN}=\frac{\alpha}{N}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that if 
+\begin_inset Formula $m=0$
+\end_inset
+
+ the 
+\begin_inset Formula $W$
+\end_inset
+
+'s cancel out and 
+\begin_inset Formula $dN^{*}/dW=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If not, then we can solve to:
+\begin_inset Formula 
+\[
+N^{*}=\frac{\alpha}{1+\alpha}\frac{W}{bW+m}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Differentiating with respect to 
+\begin_inset Formula $W$
+\end_inset
+
+ gives.
+ 
+\begin_inset Formula 
+\[
+\frac{dN^{*}}{dW}=\frac{\alpha}{1+\alpha}\frac{m}{(bW+m)^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is signed by 
+\begin_inset Formula $m$
+\end_inset
+
+; and approaches 0 as 
+\begin_inset Formula $W$
+\end_inset
+
+ increases.
+ Thus if 
+\begin_inset Formula $m$
+\end_inset
+
+ is negative – for example if people receive cash benefits for children
+ – then we get the pattern we observe.
+ 
+\end_layout
+
+\begin_layout Standard
+More generally for
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+u(x)=\frac{x^{1-\sigma}-1}{1-\sigma}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+the FOC is
+\begin_inset Formula 
+\begin{align*}
+(W-bWN-mN)^{-\sigma}(bW+m) & =\alpha N^{-\sigma}\\
+(N/(W-bWN-mN))^{\sigma} & =\alpha/(bW+m)\\
+(N/(W-bWN-mN)) & =1/Q\\
+Q & =(W-bWN-mN)/N\\
+NQ & =(W-bWN-mN)\\
+N(Q+bW+m) & =W\\
+N^{*} & =W/(Q+bW+m).
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where 
+\begin_inset Formula 
+\[
+Q\equiv[(bW+m)/\alpha]^{1/\sigma}.
+\]
+
+\end_inset
+
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Check this for 
+\begin_inset Formula $\sigma=1$
+\end_inset
+
+: it reduces to the expression for log utility above.
+\begin_inset Formula 
+\[
+N^{*}=\frac{\alpha}{1+\alpha}\frac{W}{bW+m}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The derivative of this is
+\begin_inset Formula 
+\begin{align*}
+\frac{dN^{*}}{dW} & =\frac{1}{(Q+bW+m)^{2}}[Q+bW+m-W(Q'+b)]\\
+ & =\frac{1}{(Q+bW+m)^{2}}[Q+m-WQ']
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Where 
+\begin_inset Formula 
+\begin{align*}
+Q'\equiv\frac{dQ}{dW} & =(1/\sigma)(b/\alpha)[(bW+m)/\alpha]^{1/\sigma-1}\\
+ & =(1/\sigma)(b/\alpha)Q\frac{\alpha}{bW+m}\\
+ & =\frac{1}{\sigma}Q\frac{b}{bW+m}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Hence
+\begin_inset Formula 
+\[
+\frac{dN^{*}}{dW}=\frac{1}{(Q+bW+m)^{2}}[Q+m-\frac{1}{\sigma}Q\frac{bW}{bW+m}]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can try a couple of reductions.
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+First if 
+\begin_inset Formula $\sigma=1$
+\end_inset
+
+ this becomes
+\begin_inset Formula 
+\begin{align*}
+ & \frac{1}{((1+1/\alpha)(bW+m))^{2}}[(bW+m)/\alpha+m-bW/\alpha]\\
+= & \frac{1}{((1+1/\alpha)(bW+m))^{2}}[m(\alpha+1)/\alpha]
+\end{align*}
+
+\end_inset
+
+which indeed is signed by 
+\begin_inset Formula $m$
+\end_inset
+
+ and reduces to the log expression above.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Second, if 
+\begin_inset Formula $m=0$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align*}
+\frac{dN^{*}}{dW} & =\frac{1}{(Q+bW)^{2}}[Q-W(\frac{1}{\sigma}Q\frac{b}{bW})]\\
+ & =\frac{1}{(Q+bW)^{2}}\frac{\sigma-1}{\sigma}Q
+\end{align*}
+
+\end_inset
+
+This is now signed by 
+\begin_inset Formula $\sigma-1$
+\end_inset
+
+.
+ (Thus, if kids only cost time, then what matters is the degree if risk
+ aversion.
+ But most estimates of 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ have it greater than 1.
+ A possible argument is that the human capital-fertility relationship is
+ more negative for riskloving people, and risk aversion might correlate
+ with income.
+ That's like the economic interpretation of your 
+\begin_inset Quotes eld
+\end_inset
+
+alternative argument
+\begin_inset Quotes erd
+\end_inset
+
+, and you can rule it out – to some degree – with the risk question.) 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+\begin_inset Quotes eld
+\end_inset
+
+The magnitude of effects also decrease with 
+\begin_inset Formula $W$
+\end_inset
+
+, since 
+\begin_inset Formula $Q/(Q+bW)^{2}$
+\end_inset
+
+ decreases with 
+\begin_inset Formula $W$
+\end_inset
+
+.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Check on the computer.
+ Hmm.
+ Not for 
+\begin_inset Formula $\alpha=0.1,b=0.1,\sigma=0.2,m=0$
+\end_inset
+
+ and 
+\begin_inset Formula $W<0.5$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Probably could figure out 
+\begin_inset Formula $d^{2}N^{*}/dWdm$
+\end_inset
+
+.
+ Computer shows that it isn't always increasing.
+\end_layout
+
+\begin_layout Section
+Linear in children
+\end_layout
+
+\begin_layout Standard
+The logic is that you want to display the income and substitution effects
+ very simply.
+ For this you only need utility in income to be nonlinear.
+ Similarly, get rid of money costs as they aren't needed to display the
+ substitution effect.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+u(W-bNW)+aN
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with 
+\begin_inset Formula $u$
+\end_inset
+
+ CRRA gives FOC
+\begin_inset Formula 
+\[
+\frac{bW}{(W-bNW)^{\sigma}}=a
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Rearrange to
+\begin_inset Formula 
+\begin{align*}
+Q\equiv\left(\frac{b}{a}W\right)^{1/\sigma} & =(W-bNW)\\
+N^{*} & =\frac{W-Q}{bW}\\
+ & =\frac{1}{b}-\frac{Q}{bW}\\
+ & =\frac{1}{b}-\frac{b^{(1-\sigma)/\sigma}}{a^{1/\sigma}}W^{(1-\sigma)/\sigma}
+\end{align*}
+
+\end_inset
+
+We can then differentiate 
+\begin_inset Formula 
+\[
+\frac{dN^{*}}{dW}=-\frac{b^{(1-\sigma)/\sigma}}{a^{1/\sigma}}\frac{1-\sigma}{\sigma}W^{(1-2\sigma)/\sigma}
+\]
+
+\end_inset
+
+which is signed by 
+\begin_inset Formula $\sigma-1$
+\end_inset
+
+.
+ So, if you're not very risk averse (
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+) then fertility decreases in wages.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+NB: if 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+ then you may have negative 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+...
+ at 
+\begin_inset Formula $\sigma=1$
+\end_inset
+
+, 
+\begin_inset Formula $N^{*}=1/b-1/a$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+Also 
+\begin_inset Formula 
+\[
+\frac{d^{2}N^{*}}{dW^{2}}\textrm{ is signed by }(\sigma-1)(1-2\sigma)
+\]
+
+\end_inset
+
+where the second term comes from the exponent on 
+\begin_inset Formula $W$
+\end_inset
+
+.
+ For 
+\begin_inset Formula $1>\sigma>1/2$
+\end_inset
+
+, this is positive, so the effect of fertility on wages shrinks towards
+ zero as wages increase.
+ For 
+\begin_inset Formula $\sigma<1/2$
+\end_inset
+
+ the effect gets more negative as wages increase.
+\end_layout
+
+\begin_layout Standard
+We can also check how 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+ is affected by other variables.
+ Unsurprisingly, it decreases in 
+\begin_inset Formula $b$
+\end_inset
+
+ and increases in 
+\begin_inset Formula $a$
+\end_inset
+
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+check 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ Presumably even if 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+ the 
+\begin_inset Formula $1/b$
+\end_inset
+
+ term dominates
+\end_layout
+
+\end_inset
+
+.
+ For 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ write
+\begin_inset Formula 
+\[
+N^{*}=\frac{1}{b}-\left(\frac{bW}{a}\right)^{1/\sigma}\frac{1}{bW}.
+\]
+
+\end_inset
+
+Thus 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+ increases in 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ if 
+\begin_inset Formula $W>a/b$
+\end_inset
+
+ and decreases otherwise.
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+It's possible for either of these to take place while 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+ is positive.
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+Education model
+\end_layout
+
+\begin_layout Standard
+Suppose there are two periods.
+ For convenience we ignore time discounting and assume the interest rate
+ is 0; we also assume that there are no credit markets.
+ Write
+\begin_inset Formula 
+\[
+U(N_{1},N_{2})=u(\bar{W}_{1})+u(\bar{W}_{2})+a(N_{1}+N_{2})
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\bar{W_{t}}=W_{t}(1-bN_{t})$
+\end_inset
+
+.
+ We continue to assume CRRA utility.
+ The choice problems of 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ are separable, and the per-period optimal fertility is
+\begin_inset Formula 
+\[
+N_{t}^{*}=\max\left\{ \frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}W_{t}^{(1-\sigma)/\sigma}\right),0\right\} 
+\]
+
+\end_inset
+
+just as before.
+ Write
+\begin_inset Formula 
+\begin{align*}
+W_{t} & =w_{t}(h,e)
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $h\ge0$
+\end_inset
+
+ is an individual's human capital and 
+\begin_inset Formula $e\in[0,1]$
+\end_inset
+
+ is a choice variable representing the level of education.
+ We assume that 
+\begin_inset Formula $w_{1}$
+\end_inset
+
+ is decreasing in 
+\begin_inset Formula $e$
+\end_inset
+
+ while 
+\begin_inset Formula $w_{2}$
+\end_inset
+
+ is increasing in 
+\begin_inset Formula $e$
+\end_inset
+
+; that both 
+\begin_inset Formula $w_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{2}$
+\end_inset
+
+ are weakly increasing in 
+\begin_inset Formula $h$
+\end_inset
+
+; and that 
+\begin_inset Formula $d^{2}w_{t}/dedh\ge0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Suppose that 
+\begin_inset Formula $N_{t}^{*}>0$
+\end_inset
+
+.
+ Then we can apply the envelope theorem to show that 
+\begin_inset Formula 
+\[
+\frac{dU}{dW_{t}}=\frac{\partial U}{\partial W_{t}}
+\]
+
+\end_inset
+
+since 
+\begin_inset Formula $N_{t}^{*}$
+\end_inset
+
+ is at an interior optimum.
+ Writing 
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial u}{\partial W_{t}} & =(1-bN_{t})(W_{t}(1-bN_{t}))^{-\sigma}\\
+ & =(1-bN_{t})^{1-\sigma}W_{t}{}^{-\sigma}
+\end{align*}
+
+\end_inset
+
+we can calculate
+\begin_inset Formula 
+\[
+\frac{\partial u}{\partial e}=\frac{\partial w_{t}}{\partial e}(e,h)\times(1-bN_{t})^{1-\sigma}w_{t}(e,h){}^{-\sigma}
+\]
+
+\end_inset
+
+for 
+\begin_inset Formula $t=1,2$
+\end_inset
+
+.
+ An internal optimum choice of education 
+\begin_inset Formula $e$
+\end_inset
+
+ then solves
+\begin_inset Formula 
+\[
+\frac{\partial w_{1}}{\partial e}(e,h)\times(1-bN_{1}^{*})^{1-\sigma}w_{1}(e,h){}^{-\sigma}=-\frac{\partial w_{2}}{\partial e}(e,h)\times(1-bN_{2}^{*})^{1-\sigma}w_{2}(e,h){}^{-\sigma}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+First try
+\end_layout
+
+\begin_layout Standard
+Suppose
+\begin_inset Formula 
+\begin{align*}
+w_{1}(e,h) & =1-e\\
+w_{2}(e,h) & =1+\gamma e+\eta eh
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then the above becomes
+\begin_inset Formula 
+\[
+-(1-bN_{1}^{*})^{1-\sigma}(1-e){}^{-\sigma}=-(\gamma+\eta h)(1-bN_{2}^{*})^{1-\sigma}(1+\gamma e+\eta eh){}^{-\sigma}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Rewrite this as:
+\begin_inset Formula 
+\begin{align}
+\frac{(1-bN_{1}^{*})^{1/\sigma-1}}{(1-bN_{2}^{*})^{1/\sigma-1}} & =\frac{(1-e)(\gamma+\eta h)^{1/\sigma}}{1+e(\gamma+\eta h)}\label{eq:e-implicit}\\
+\nonumber 
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can also write 
+\begin_inset Formula 
+\begin{align*}
+N_{1}^{*} & =\max\left\{ \frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}(1-e)^{(1-\sigma)/\sigma}\right),0\right\} \\
+N_{2}^{*} & =\max\left\{ \frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}(1+\gamma e+\eta eh)^{(1-\sigma)/\sigma}\right),0\right\} 
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Assume for the moment that both the above are positive, then 
+\begin_inset Formula $1-bN_{1}^{*}=\left(\frac{b}{a}\right)^{1/\sigma}(1-e)^{(1-\sigma)/\sigma}$
+\end_inset
+
+ and 
+\begin_inset Formula $1-bN_{2}^{*}=\left(\frac{b}{a}\right)^{1/\sigma}(1+\gamma e+\eta eh)^{(1-\sigma)/\sigma}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+So plug these in to (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:e-implicit"
+
+\end_inset
+
+) and simplify, to get
+\begin_inset Formula 
+\[
+\frac{(1-e)^{(1-\sigma)^{2}/\sigma^{2}}}{(1+e(\gamma+\eta h))^{(1-\sigma)^{2}/\sigma^{2}}}=\frac{(1-e)(\gamma+\eta h)^{1/\sigma}}{1+e(\gamma+\eta h)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and simplify a bit more
+\begin_inset Formula 
+\[
+\frac{(1-e)}{(1+e(\gamma+\eta h))}=(\gamma+\eta h){}^{\sigma/[(1-\sigma)^{2}-\sigma^{2}]}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Write 
+\begin_inset Formula 
+\[
+R\equiv(\gamma+\eta h){}^{\sigma/(1-2\sigma)}
+\]
+
+\end_inset
+
+, which is the RHS of the above.
+ Then
+\begin_inset Formula 
+\begin{align*}
+\frac{(1-e)}{(1+e(\gamma+\eta h))} & =R\\
+e & =\frac{1-R}{1+R(\gamma+\eta h)}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that for 
+\begin_inset Formula $\sigma>1/2$
+\end_inset
+
+, 
+\begin_inset Formula $R$
+\end_inset
+
+ is decreasing in 
+\begin_inset Formula $\gamma,\eta$
+\end_inset
+
+ and 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ Note also that (in this case) 
+\begin_inset Formula $e<0$
+\end_inset
+
+ if and only if 
+\begin_inset Formula $\gamma+\eta h<1$
+\end_inset
+
+.
+ In fact, we can write
+\begin_inset Formula 
+\[
+e^{*}=\min\left\{ 1,\max\left\{ 0,\frac{1-R}{1+R(\gamma+\eta h)}\right\} .\right\} 
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For 
+\begin_inset Formula $\sigma>1/2$
+\end_inset
+
+, this is increasing in 
+\begin_inset Formula $\gamma,\eta$
+\end_inset
+
+ and 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ In particular, if 
+\begin_inset Formula $h<\frac{1-\gamma}{\eta}$
+\end_inset
+
+ then 
+\begin_inset Formula $e^{*}=0$
+\end_inset
+
+.
+ 
+\series bold
+We don't want to allow that because it ends up with flat wages in 
+\begin_inset Formula $h$
+\end_inset
+
+, and flat 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+ in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+We can assume that 
+\begin_inset Formula $\gamma>1$
+\end_inset
+
+.
+ So even if you have 
+\begin_inset Formula $h=0$
+\end_inset
+
+, it's still worth getting 
+\series bold
+some
+\series default
+ education.
+\end_layout
+
+\begin_layout Standard
+Plugging 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ into wages gives
+\begin_inset Formula 
+\begin{align*}
+W_{1} & =1-e^{*}=\frac{R(1+\gamma+\eta h)}{1+R(\gamma+\eta h)};\\
+W_{2} & =1+\gamma e^{*}+\eta e^{*}h=1+(\gamma+\eta h)\frac{1-R}{1+R(\gamma+\eta h)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Might also write this in terms of 
+\begin_inset Formula $S=\gamma+\eta h$
+\end_inset
+
+ as
+\begin_inset Formula 
+\begin{align*}
+R & =S^{\sigma/(1-2\sigma)};\\
+e^{*} & =\frac{1-S^{\sigma/(1-2\sigma)}}{1+S^{(1-\sigma)/(1-2\sigma)}};\\
+W_{1} & =\frac{1+S}{S+S^{-\sigma/(1-2\sigma)}}=\frac{1+1/S}{1+1/S^{(1-\sigma)/(1-2\sigma)}};\\
+W_{2} & =\frac{1+S}{1+S^{(1-\sigma)/(1-2\sigma)}}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Surprisingly, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+\frac{de^{*}}{dh} & =\frac{de^{*}}{dR}\frac{dR}{dh}\\
+\frac{dR}{dh} & =\eta\frac{\sigma}{1-2\sigma}(\gamma+\eta h){}^{\sigma/(1-2\sigma)-1}=\eta\frac{\sigma}{1-2\sigma}\frac{R}{\gamma+\eta h}\\
+\frac{de^{*}}{dR} & =\frac{d}{dR}\frac{1-R}{1+R(\gamma+\eta h)}\\
+ & =\frac{1}{[1+R(\gamma+\eta h)]^{2}}[-1(1+R(\gamma+\eta h))-(1-R)(\gamma+\eta h)]\\
+ & =\frac{-1-(\gamma+\eta h)}{[1+R(\gamma+\eta h)]^{2}}\\
+\frac{de^{*}}{dh} & =\frac{1+(\gamma+\eta h)}{[1+R(\gamma+\eta h)]^{2}}\eta\frac{\sigma}{2\sigma-1}\frac{R}{\gamma+\eta h}\\
+ & =\frac{1+(\gamma+\eta h)}{[1+(\gamma+\eta h)^{(1-\sigma)/(1-2\sigma)}]^{2}}\eta\frac{\sigma}{2\sigma-1}(\gamma+\eta h){}^{(3\sigma-1)/(1-2\sigma)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Note that for 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+, this is positive since 
+\begin_inset Formula $\frac{\sigma}{2\sigma-1}>0$
+\end_inset
+
+; also that 
+\begin_inset Formula $dR/dh<0$
+\end_inset
+
+ for 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+
+\series bold
+Oh yeah? So how come when you plot it for e.g.
+ 
+\begin_inset Formula $\gamma=5$
+\end_inset
+
+ you get 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ downward sloping?
+\end_layout
+
+\begin_layout Plain Layout
+Note also: rewrite as
+\begin_inset Formula 
+\begin{align*}
+\frac{de^{*}}{dh} & =\frac{R(1+\gamma+\eta h)}{(\gamma+\eta h)[1+R(\gamma+\eta h)]^{2}}\eta\frac{\sigma}{2\sigma-1}\\
+ & =\frac{(\gamma+\eta h){}^{\sigma/(1-2\sigma)}(1+\gamma+\eta h)}{(\gamma+\eta h)[1+(\gamma+\eta h){}^{(1-\sigma)/(1-2\sigma)}]^{2}}\eta\frac{\sigma}{2\sigma-1}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+The derivative of the first factor wrt 
+\begin_inset Formula $h$
+\end_inset
+
+ is signed by
+\begin_inset Formula 
+\begin{align*}
+ & f'g-fg'\\
+= & (\gamma+\eta h)[1+(\gamma+\eta h){}^{(1-\sigma)/(1-2\sigma)}]^{2}[f']-(\gamma+\eta h){}^{\sigma/(1-2\sigma)}(1+\gamma+\eta h)[g']\\
+= & (\gamma+\eta h)[1+R(\gamma+\eta h)]^{2}[f']-R(1+\gamma+\eta h)[g']
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+where
+\begin_inset Formula 
+\begin{align*}
+f & =(\gamma+\eta h){}^{\sigma/(1-2\sigma)}(1+\gamma+\eta h)\\
+ & =(\gamma+\eta h){}^{\sigma/(1-2\sigma)}+(\gamma+\eta h)^{1+\sigma/(1-2\sigma)}\\
+f' & =\eta\frac{\sigma}{1-2\sigma}(\gamma+\eta h)^{^{\sigma/(1-2\sigma)-1}}+\eta\frac{1-\sigma}{1-2\sigma}(\gamma+\eta h)^{\sigma/(1-2\sigma)}\\
+ & =\eta\frac{\sigma}{1-2\sigma}\frac{R}{\gamma+\eta h}+\eta\frac{1-\sigma}{1-2\sigma}R\\
+ & =\eta R\left(\frac{\sigma(1/(\gamma+\eta h)-1)+1}{1-2\sigma}\right)\\
+ & <0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+where the inequality is because 
+\begin_inset Formula $\sigma(1/(\gamma+\eta h)-1)>-1$
+\end_inset
+
+, while 
+\begin_inset Formula $1-2\sigma<0$
+\end_inset
+
+, both by 
+\begin_inset Formula $0.5<\sigma<1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+Now 
+\begin_inset Formula 
+\begin{align*}
+g & =(\gamma+\eta h)[1+(\gamma+\eta h){}^{(1-\sigma)/(1-2\sigma)}]^{2}\\
+g' & =\eta[1+(\gamma+\eta h){}^{(1-\sigma)/(1-2\sigma)}]^{2}+(\gamma+\eta h)2[1+(\gamma+\eta h){}^{(1-\sigma)/(1-2\sigma)}]\eta\frac{1-\sigma}{1-2\sigma}(\gamma+\eta h)^{\sigma/(1-2\sigma)}\\
+ & =\eta[1+R(\gamma+\eta h)]\{[1+R(\gamma+\eta h)]+(\gamma+\eta h)2\frac{1-\sigma}{1-2\sigma}R\}\\
+ & =\eta[1+R(\gamma+\eta h)]\{1+R(\gamma+\eta h)[1+2\frac{1-\sigma}{1-2\sigma}]\}\\
+ & \eta[1+R(\gamma+\eta h)]\{1+R(\gamma+\eta h)[\frac{3-4\sigma}{1-2\sigma}]\}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Hmph.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Problem with the above: needs limits 
+\begin_inset Formula $e\in[0,1]$
+\end_inset
+
+ which is a hassle and ends up requiring e.g.
+ 
+\begin_inset Formula $\gamma>1$
+\end_inset
+
+.
+ Maths unbeautiful though manageable just.
+\end_layout
+
+\begin_layout Subsection
+Second try
+\end_layout
+
+\begin_layout Standard
+Write
+\begin_inset Formula 
+\[
+U(N_{1},N_{2})=u(\bar{W}_{1})+u(\bar{W}_{2})+a(N_{1}+N_{2})
+\]
+
+\end_inset
+
+We continue to assume CRRA utility.
+ But now assume
+\begin_inset Formula 
+\begin{align*}
+\bar{W}_{1} & =1-e-bN_{1}\\
+\bar{W}_{2} & =w(e,h)(1-bN_{2})
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $w$
+\end_inset
+
+ is increasing in its arguments.
+ Thus, some time is spent on education in the first period.
+ Again we require 
+\begin_inset Formula $e\ge0$
+\end_inset
+
+ and 
+\begin_inset Formula $1-e-bN_{1}\ge0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The choice problems of 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ are separable.
+ Rearranging the FOC for 
+\begin_inset Formula $N_{1}^{*}$
+\end_inset
+
+ gives:
+\begin_inset Formula 
+\[
+N_{1}^{*}=\max\left\{ 0,\frac{1}{b}\left(1-e-\left(\frac{b}{a}\right)^{1/\sigma}\right)\right\} .
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset Formula $N_{1}^{*}$
+\end_inset
+
+ is decreasing in 
+\begin_inset Formula $e$
+\end_inset
+
+, strictly when positive.
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Standard
+For 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ given 
+\begin_inset Formula $W_{2}=w(e,h)$
+\end_inset
+
+ we have
+\begin_inset Formula 
+\[
+N_{2}^{*}=\max\left\{ 0,\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}w(e,h)^{(1-\sigma)/\sigma}\right)\right\} .
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Assume for now that 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{1}^{*}$
+\end_inset
+
+ are both positive.
+ Then by the envelope theorem, 
+\begin_inset Formula 
+\[
+\frac{dU}{de}=\frac{\partial U}{\partial e}
+\]
+
+\end_inset
+
+since 
+\begin_inset Formula $\partial U/\partial N_{t}^{*}=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Write this partial derivative as
+\begin_inset Formula 
+\[
+-(1-e-bN_{1}){}^{-\sigma}+\frac{\partial w}{\partial e}(e,h)(1-bN_{2})[w(e,h)(1-bN_{2})]^{-\sigma}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and solve for 
+\begin_inset Formula $e$
+\end_inset
+
+ by setting the FOC to 0:
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial w}{\partial e}(e,h)(1-bN_{2})[w(e,h)(1-bN_{2})]^{-\sigma} & =(1-e-bN_{1}){}^{-\sigma}\\
+\frac{\frac{\partial w}{\partial e}(e,h)}{w(e,h)^{\sigma}} & =\left(1-bN_{2}\right)^{\sigma-1}(1-e-bN_{1})^{-\sigma}.
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+NB: for 
+\begin_inset Formula $\sigma=1$
+\end_inset
+
+ this is d/dx log 
+\begin_inset Formula $w$
+\end_inset
+
+ on the left, and reduces to something simple on the right.
+\end_layout
+
+\end_inset
+
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Suppose
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\[
+w(e,h)=he^{\tau}
+\]
+
+\end_inset
+
+with 
+\begin_inset Formula $0<\tau\le1$
+\end_inset
+
+....
+ 
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Then the FOC becomes 
+\begin_inset Formula 
+\begin{align*}
+(1-e-bN_{1})^{\sigma}\tau h^{1-\sigma}e^{\tau(1-\sigma)-1} & =\left(1-bN_{2}\right)^{\sigma-1}\\
+\Leftrightarrow(1-e-bN_{1})^{\sigma}e^{\tau(1-\sigma)-1} & =\left(h(1-bN_{2})\right)^{\sigma-1}\tau^{-1}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Fixing 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+, this implicitly defines a unique solution for 
+\begin_inset Formula $e$
+\end_inset
+
+, 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+, since the LHS is decreasing in 
+\begin_inset Formula $e$
+\end_inset
+
+.
+ Furthermore, for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, since the RHS is decreasing in 
+\begin_inset Formula $h$
+\end_inset
+
+, we have that 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+is increasing in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ Indeed, write
+\begin_inset Formula 
+\[
+F(e,h)\equiv(1-e-bN_{1})^{\sigma}e^{\tau(1-\sigma)-1}-\left(h(1-bN_{2})\right)^{\sigma-1}\tau^{-1}=0
+\]
+
+\end_inset
+
+; then
+\begin_inset Formula 
+\begin{align*}
+\frac{de^{*}}{dh} & =-\frac{\partial F/\partial h}{\partial F/\partial e};\\
+\partial F/\partial e & =(1-e-bN_{1})^{\sigma}(\tau(1-\sigma)-1)e^{\tau(1-\sigma)-2}-e^{\tau(1-\sigma)-1}\sigma(1-e-bN_{1})^{\sigma-1}\\
+ & =e^{\tau(1-\sigma)-2}(1-e-bN_{1})^{\sigma-1}[(\tau(1-\sigma)-1)(1-e-bN_{1})-e\sigma]\\
+\partial F/\partial h & =(1-\sigma)\left(1-bN_{2}\right)^{\sigma-1}\tau^{-1}h^{\sigma-2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Note that 
+\begin_inset Formula $\partial F/\partial h$
+\end_inset
+
+ is positive.
+ Also that 
+\begin_inset Formula $-\partial F/\partial e$
+\end_inset
+
+ is positive and constant in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ Thus if 
+\begin_inset Formula $\partial F/\partial h$
+\end_inset
+
+ is decreasing (increasing) in 
+\begin_inset Formula $h$
+\end_inset
+
+, then 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ will be concave (convex) in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ In fact it is easy to see that 
+\begin_inset Formula $\partial F/\partial h$
+\end_inset
+
+ is decreasing in 
+\begin_inset Formula $h$
+\end_inset
+
+ when 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+.
+ Hence 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ is concave in 
+\begin_inset Formula $h$
+\end_inset
+
+ (for fixed 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+).
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+note also that for 
+\begin_inset Formula $\sigma=1$
+\end_inset
+
+, 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ is flat in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Say that 
+\begin_inset Formula 
+\[
+w(e,h)=ef(h)
+\]
+
+\end_inset
+
+ for increasing 
+\begin_inset Formula $f$
+\end_inset
+
+.
+ Then the FOC reduces to
+\begin_inset Formula 
+\begin{align*}
+\frac{f(h)}{e^{\sigma}f(h)^{\sigma}} & =\left(1-bN_{2}\right)^{\sigma-1}(1-e-bN_{1})^{-\sigma}\\
+\Leftrightarrow\frac{(1-e-bN_{1})^{\sigma}}{e^{\sigma}} & =\left(1-bN_{2}\right)^{\sigma-1}f(h)^{\sigma-1}\\
+\Leftrightarrow\frac{(1-e-bN_{1})}{e} & =\left(\left(1-bN_{2}\right)f(h)\right)^{1-1/\sigma}\\
+\Leftrightarrow\frac{1-bN_{1}}{e} & =1+\left(\left(1-bN_{2}\right)f(h)\right)^{1-1/\sigma}\\
+\Leftrightarrow e & =\frac{1-bN_{1}}{1+\left((1-bN_{2})f(h)\right)^{1-1/\sigma}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We now have three explicit equations for our choice variables, at an interior
+ equilibrium:
+\begin_inset Formula 
+\begin{align*}
+N_{1}^{*} & =\frac{1}{b}\left(1-e-\left(\frac{b}{a}\right)^{1/\sigma}\right);\\
+N_{2}^{*} & =\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}(ef(h))^{(1-\sigma)/\sigma}\right);\\
+e^{*} & =\frac{1-bN_{1}}{1+\left((1-bN_{2})f(h)\right)^{1-1/\sigma}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that 
+\begin_inset Formula $h$
+\end_inset
+
+ only enters in one place in all of this.
+ So we may as well identify 
+\begin_inset Formula $h$
+\end_inset
+
+ with 
+\begin_inset Formula $f(h)$
+\end_inset
+
+.
+ We do that from now on.
+ We can also simplify
+\begin_inset Formula 
+\[
+e^{*}=\frac{e^{*}+\left(\frac{b}{a}\right)^{1/\sigma}}{1+\left(\left(\frac{b}{a}\right)^{1/\sigma}e^{*(1-\sigma)/\sigma}h{}^{1/\sigma}\right)^{1-1/\sigma}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+which simplifies to
+\begin_inset Formula 
+\[
+e^{*}=\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\sigma)/(2\sigma-1)}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Again note that for 
+\begin_inset Formula $1>\sigma>0.5$
+\end_inset
+
+ 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ increases in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Why not for 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+? Presumably 
+\begin_inset Formula $h$
+\end_inset
+
+ does you so much good that you don't need to invest in education.
+\end_layout
+
+\end_inset
+
+ Furthermore 
+\begin_inset Formula $e$
+\end_inset
+
+ is convex in 
+\begin_inset Formula $h$
+\end_inset
+
+ if 
+\begin_inset Formula $1/2<\sigma<2/3$
+\end_inset
+
+, and concave otherwise.
+\end_layout
+
+\begin_layout Standard
+Now we can write
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Pleasingly CORRECT for positive values of N, checked computationally in
+ julia.
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+N_{1}^{*} & =\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\sigma)/(2\sigma-1)}-\left(\frac{b}{a}\right)^{1/\sigma}\right);\\
+w(e^{*},h) & =\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{\sigma/(2\sigma-1)};\\
+N_{2}^{*} & =\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\sigma)/(2\sigma-1)}\right).
+\end{align*}
+
+\end_inset
+
+Observe that 
+\begin_inset Formula $w(e^{*},h)$
+\end_inset
+
+ is increasing in 
+\begin_inset Formula $h$
+\end_inset
+
+ for 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+, and convex iff 
+\begin_inset Formula $0.5<\sigma<1$
+\end_inset
+
+.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+for 
+\begin_inset Formula $\sigma=0.5$
+\end_inset
+
+, there's a problem
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+....
+ Indeed, if we use the first form, 
+\begin_inset Formula $e$
+\end_inset
+
+ cancels out
+\begin_inset Formula 
+\begin{align*}
+e^{*} & =\frac{e^{*}+\left(\frac{b}{a}\right)^{2}}{1+\left(\left(\frac{b}{a}\right)^{2}e^{*}h{}^{2}\right)^{-1}};\\
+h^{-1} & =\left(\frac{b}{a}\right)^{2}
+\end{align*}
+
+\end_inset
+
+which is obv wrong....
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ Also observe that 
+\begin_inset Formula $N_{1}^{*}<N_{2}^{*}$
+\end_inset
+
+ if 
+\begin_inset Formula $N_{2}^{*}>0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+While 
+\begin_inset Formula $N_{1}^{*}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ are positive, they have the same derivative with respect to 
+\begin_inset Formula $h$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\frac{dN_{t}^{*}}{dh}=-\frac{1}{b}\left(\frac{b}{a}\right)^{1/(2\sigma-1)}\frac{1-\sigma}{2\sigma-1}h^{(1-\sigma)/(2\sigma-1)-1}
+\]
+
+\end_inset
+
+which is negative for 
+\begin_inset Formula $1>\sigma>0.5$
+\end_inset
+
+; also 
+\begin_inset Formula $N_{t}^{*}$
+\end_inset
+
+ is convex for 
+\begin_inset Formula $1/2<\sigma<2/3$
+\end_inset
+
+, and concave otherwise.
+\end_layout
+
+\begin_layout Subsubsection
+Case that 
+\begin_inset Formula $N_{1}^{*}=0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Suppose 
+\begin_inset Formula $N_{1}^{*}$
+\end_inset
+
+ as derived above is negative.
+ Then we consider 
+\begin_inset Formula $N_{1}^{*}=0$
+\end_inset
+
+.
+ We can enter that into the equation for 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ and solve it to find
+\begin_inset Formula 
+\[
+e^{*}=\frac{1}{1+\left((1-bN_{2})h\right)^{1-1/\sigma}}.
+\]
+
+\end_inset
+
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+I checked this from the start, it's fine....
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now as before, if 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ is positive, we have 
+\begin_inset Formula 
+\[
+N_{2}^{*}=\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}(eh)^{(1-\sigma)/\sigma}\right);
+\]
+
+\end_inset
+
+Plugging this into 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ gives
+\begin_inset Formula 
+\begin{align*}
+e^{*} & =\frac{1}{1+\left(\frac{bh}{a}\right)^{(\sigma-1)/\sigma^{2}}(e^{*}){}^{-(1-\sigma)^{2}/\sigma^{2}}}
+\end{align*}
+
+\end_inset
+
+which can be rearranged to
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Proof:
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+e & =\frac{e^{(1-\sigma)^{2}/\sigma^{2}}}{e^{(1-\sigma)^{2}/\sigma^{2}}+X}\textrm{ where }X=\left(\frac{bh}{a}\right)^{(\sigma-1)/\sigma^{2}};\\
+1 & =\frac{e^{(1-\sigma)^{2}/\sigma^{2}-1}}{e^{(1-\sigma)^{2}/\sigma^{2}}+X};\\
+e^{(1-\sigma)^{2}/\sigma^{2}-1} & =e^{(1-\sigma)^{2}/\sigma^{2}}+X\\
+e^{(1-2\sigma)/\sigma^{2}}(1-e) & =X
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+(1-e^{*})(e^{*})^{(1-2\sigma)/\sigma^{2}}=\left(\frac{a}{bh}\right)^{(1-\sigma)/\sigma^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+implicitly solving for 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+We can then plug the solution back in to the expression for 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To find how 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ changes with 
+\begin_inset Formula $h$
+\end_inset
+
+, note that the RHS decreases in 
+\begin_inset Formula $h$
+\end_inset
+
+ for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+.
+ So if 
+\begin_inset Formula $h$
+\end_inset
+
+ goes up the RHS goes down.
+ Differentiate the LHS to get
+\begin_inset Formula 
+\begin{align*}
+ & \frac{1-2\sigma}{\sigma^{2}}(1-e)e^{(1-2\sigma)/\sigma^{2}-1}-1(e^{(1-2\sigma)/\sigma^{2}})\\
+= & \frac{1-2\sigma}{\sigma^{2}}e^{(1-2\sigma)/\sigma^{2}-1}-\frac{1-2\sigma+\sigma^{2}}{\sigma^{2}}e^{(1-2\sigma)/\sigma^{2}}\\
+= & =\frac{1-2\sigma}{\sigma^{2}}e^{(1-2\sigma)/\sigma^{2}-1}-\frac{(1-\sigma)^{2}}{\sigma^{2}}e^{(1-2\sigma)/\sigma^{2}}
+\end{align*}
+
+\end_inset
+
+This is negative if
+\begin_inset Formula 
+\begin{align*}
+e & >\frac{1-2\sigma}{(1-\sigma)^{2}}
+\end{align*}
+
+\end_inset
+
+which is always true for 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+.
+ Thus the LHS is decreasing in 
+\begin_inset Formula $e$
+\end_inset
+
+.
+ Thus if 
+\begin_inset Formula $h$
+\end_inset
+
+ increases, then the RHS and LHS decrease, and 
+\begin_inset Formula $e$
+\end_inset
+
+ must increase.
+\end_layout
+
+\begin_layout Subsubsection
+Case that 
+\begin_inset Formula $N_{1}=N_{2}=0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Finding 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ as above, and plugging it into 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+, may give a negative number.
+ If so, then it must be that 
+\begin_inset Formula $N_{1}=N_{2}=0$
+\end_inset
+
+.
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Right? Seems so after playing with Julia.
+ But the proof is imprecise.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In this case, 
+\begin_inset Formula 
+\[
+e^{*}=\frac{1}{1+h^{(\sigma-1)/\sigma}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Again 
+\begin_inset Formula $e$
+\end_inset
+
+ increases in 
+\begin_inset Formula $h$
+\end_inset
+
+ as we'd expect for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+.
+\end_layout
+
+\end_body
+\end_document

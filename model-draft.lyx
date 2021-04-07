@@ -1,0 +1,579 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "times" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+To show how income and substitution effects can lead to our results, we
+ write down a simple model of fertility choices.
+ 
+\begin_inset Formula $W$
+\end_inset
+
+ is an individual's wage.
+ Raising a child takes time 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ People maximize utility composed of two subcomponents, earnings and the
+ number of children 
+\begin_inset Formula $N$
+\end_inset
+
+.
+ An individual's payoff is
+\begin_inset Formula 
+\[
+U(N)=u(\bar{W})+aN
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\bar{W}\equiv(1-bN)W$
+\end_inset
+
+ is earnings from time not allocated to childcare, and 
+\begin_inset Formula $a$
+\end_inset
+
+ captures the strength of preference for children.
+ 
+\begin_inset Formula $u(\cdot)$
+\end_inset
+
+ is concave and increasing.
+ We treat 
+\begin_inset Formula $N$
+\end_inset
+
+ as continuous, in line with the literature: this can be thought of as the
+ expected number of children among people who share the same characteristics.
+ The marginal benefit of an extra child is
+\begin_inset Formula 
+\[
+\frac{dU}{dN}=-bWu'(\bar{W})+a
+\]
+
+\end_inset
+
+and the effect of an increase in wages on this marginal benefit is
+\begin_inset Formula 
+\[
+\frac{d^{2}U}{dNdW}=\underbrace{-bu'(\bar{W})}_{\textrm{Substitution effect}}\underbrace{-b\bar{W}u''(\bar{W})}_{\textrm{Income effect}}.
+\]
+
+\end_inset
+
+The first term is negative and reflects that when 
+\begin_inset Formula $W$
+\end_inset
+
+ increases, time devoted to childcare costs more.
+ The second term is positive, and reflects that when 
+\begin_inset Formula $W$
+\end_inset
+
+ is higher, the marginal loss of wages from childcare has less effect on
+ overall utility – as captured by the concavity of 
+\begin_inset Formula $u$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+To solve the model explicitly, we let 
+\begin_inset Formula $u(\cdot)$
+\end_inset
+
+ be the 
+\emph on
+constant relative risk aversion
+\emph default
+ function 
+\begin_inset Formula 
+\[
+u(w)=\frac{w^{1-\sigma}-1}{1-\sigma}.
+\]
+
+\end_inset
+
+Here 
+\begin_inset Formula $\sigma\ge0$
+\end_inset
+
+ parametrizes the level of risk aversion in wages, and 
+\begin_inset Formula $u'(w)=w^{-\sigma}$
+\end_inset
+
+.
+ Differentiating and setting 
+\begin_inset Formula $\frac{dU}{dN}=0$
+\end_inset
+
+ gives the first order condition for an optimal choice of children 
+\begin_inset Formula $N^{*}>0$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{bW}{(W(1-bN^{*}))^{\sigma}}=a.
+\]
+
+\end_inset
+
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+Q\equiv\left(\frac{b}{a}W\right)^{1/\sigma} & =(W-bNW)\\
+N^{*} & =\frac{W-Q}{bW}\\
+ & =\frac{1}{b}-\frac{Q}{bW}\\
+ & =\frac{1}{b}-\frac{b^{(1-\sigma)/\sigma}}{a^{1/\sigma}}W^{(1-\sigma)/\sigma}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+Rearranging gives
+\begin_inset Formula 
+\[
+N^{*}=\max\left\{ \frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}W^{(1-\sigma)/\sigma}\right),0\right\} .
+\]
+
+\end_inset
+
+Differentiating gives the effect of wages on fertility for 
+\begin_inset Formula $N^{*}>0$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{dN^{*}}{dW}=-\frac{1}{b}\left(\frac{b}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}W^{(1-2\sigma)/\sigma}
+\]
+
+\end_inset
+
+which is signed by 
+\begin_inset Formula $\sigma-1$
+\end_inset
+
+.
+ Thus, when risk aversion is low (
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+), fertility decreases in wages.
+ Also, 
+\begin_inset Formula 
+\[
+\frac{d^{2}N^{*}}{dW^{2}}\textrm{ is signed by }(\sigma-1)(1-2\sigma)
+\]
+
+\end_inset
+
+where the second term comes from the exponent on 
+\begin_inset Formula $W$
+\end_inset
+
+.
+ For 
+\begin_inset Formula $1>\sigma>1/2$
+\end_inset
+
+, this is positive, so the effect of fertility on wages shrinks towards
+ zero as wages increase.
+ Lastly, we consider the time cost of children 
+\begin_inset Formula $b$
+\end_inset
+
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+\frac{dN^{*}}{dW} & =-\frac{1}{b}\left(\frac{b}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}W^{(1-2\sigma)/\sigma}\\
+ & =-b^{(1-\sigma)/\sigma}\left(\frac{1}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}W^{(1-2\sigma)/\sigma}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+hence
+\begin_inset Formula 
+\[
+\frac{d^{2}N^{*}}{dbdW}=-\left(\frac{1}{a}\right)^{1/\sigma}\left(\frac{1-\sigma}{\sigma}\right)^{2}W^{(1-2\sigma)/\sigma}b^{(1-2\sigma)/\sigma}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\frac{d^{2}N^{*}}{dWdb}=-\left(\frac{1}{a}\right)^{1/\sigma}\left(\frac{1-\sigma}{\sigma}\right)^{2}(Wb)^{(1-2\sigma)/\sigma}<0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Thus, if 
+\begin_inset Formula $b$
+\end_inset
+
+ is higher for single parents than for couples, then the effect of wages
+ on fertility will be more negative for single parents.
+ 
+\end_layout
+
+\begin_layout Standard
+To sum up, in this model, for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, fertility decreases in market wage 
+\begin_inset Formula $W$
+\end_inset
+
+.
+ Wages are known to be affected by human capital, including genetic components
+ of human capital.
+ Polygenic scores which cause, or even correlate with, variation in 
+\begin_inset Formula $W$
+\end_inset
+
+ would then show the pattern we observe in our data: a negative correlation
+ with fertility at low income levels, and a smaller or zero correlation
+ at high income levels.
+ Also, the fertility decrease is steeper when the time burden of children
+ is larger, and for 
+\begin_inset Formula $0.5<\sigma<1$
+\end_inset
+
+, the fertility decrease is steeper at lower wages.
+ These predictions fit the patterns in our data.
+\end_layout
+
+\begin_layout Standard
+This model is meant as a simple 
+\begin_inset Quotes eld
+\end_inset
+
+toy
+\begin_inset Quotes erd
+\end_inset
+
+ illustration of how the interaction between fertility and wages can explain
+ the patterns we observe.
+ In the appendix, we extend it to examine birth timing, education, and marriage.
+ We also discuss other economic models of fertility from the literature,
+ as well as causal evidence for the relationship between earnings and fertility.
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+We can also check how 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+ is affected by other variables.
+ Unsurprisingly, it decreases in 
+\begin_inset Formula $b$
+\end_inset
+
+ and increases in 
+\begin_inset Formula $a$
+\end_inset
+
+.
+ For 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ write
+\begin_inset Formula 
+\[
+N^{*}=\frac{1}{b}-\left(\frac{bW}{a}\right)^{1/\sigma}\frac{1}{bW}.
+\]
+
+\end_inset
+
+Thus 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+ increases in 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ if 
+\begin_inset Formula $W>a/b$
+\end_inset
+
+ and decreases otherwise.
+ In particular, at low wage levels, fertility may decrease with risk aversion.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Timing and education
+\end_layout
+
+\begin_layout Standard
+We next consider the effect of education.
+ Instead of identifying human capital with wages, we treat it and education
+ as complementary inputs to productivity.
+\end_layout
+
+\begin_layout Standard
+Suppose there are two periods.
+ For convenience we ignore time discounting and assume the interest rate
+ is 0; we also assume that there are no credit markets.
+ Write
+\begin_inset Formula 
+\[
+U(N_{1},N_{2})=u(\bar{W}_{1})+u(\bar{W}_{2})+a(N_{1}+N_{2})
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\bar{W_{t}}=W_{t}(1-bN_{t})$
+\end_inset
+
+.
+ We continue to assume CRRA utility.
+ The choice problems of 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ are separable, and the per-period optimal fertility is
+\begin_inset Formula 
+\[
+N_{t}^{*}=\max\left\{ \frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}W_{t}^{(1-\sigma)/\sigma}\right),0\right\} 
+\]
+
+\end_inset
+
+just as before.
+ Write
+\begin_inset Formula 
+\begin{align*}
+W_{t} & =w_{t}(h,e)
+\end{align*}
+
+\end_inset
+
+where 
+\begin_inset Formula $h\ge0$
+\end_inset
+
+ is an individual's human capital and 
+\begin_inset Formula $e\in[0,1]$
+\end_inset
+
+ is a choice variable representing the level of education.
+ We assume that 
+\begin_inset Formula $w_{1}$
+\end_inset
+
+ is decreasing in 
+\begin_inset Formula $e$
+\end_inset
+
+ while 
+\begin_inset Formula $w_{2}$
+\end_inset
+
+ is increasing in 
+\begin_inset Formula $e$
+\end_inset
+
+; that both 
+\begin_inset Formula $w_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $w_{2}$
+\end_inset
+
+ are weakly increasing in 
+\begin_inset Formula $h$
+\end_inset
+
+; and that 
+\begin_inset Formula $d^{2}w_{t}/dedh\ge0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Suppose that 
+\begin_inset Formula $N_{t}^{*}>0$
+\end_inset
+
+.
+ Then we can apply the envelope theorem to show that 
+\begin_inset Formula 
+\[
+\frac{dU}{dW_{t}}=\frac{\partial U}{\partial W_{t}}
+\]
+
+\end_inset
+
+since 
+\begin_inset Formula $N_{t}^{*}$
+\end_inset
+
+ is at an interior optimum.
+ Writing 
+\begin_inset Formula 
+\begin{align*}
+\frac{\partial u}{\partial W_{t}} & =(1-bN_{t})(W_{t}(1-bN_{t}))^{-\sigma}\\
+ & =(1-bN_{t})^{1-\sigma}W_{t}{}^{-\sigma}
+\end{align*}
+
+\end_inset
+
+we can calculate
+\begin_inset Formula 
+\[
+\frac{\partial u}{\partial e}=\frac{\partial w_{t}}{\partial e}(e,h)\times(1-bN_{t})^{1-\sigma}w_{t}(e,h){}^{-\sigma}
+\]
+
+\end_inset
+
+for 
+\begin_inset Formula $t=1,2$
+\end_inset
+
+.
+ An internal optimum choice of education 
+\begin_inset Formula $e$
+\end_inset
+
+ then solves
+\begin_inset Formula 
+\[
+\frac{\partial w_{1}}{\partial e}(e,h)\times(1-bN_{1}^{*})^{1-\sigma}w_{1}(e,h){}^{-\sigma}=-\frac{\partial w_{2}}{\partial e}(e,h)\times(1-bN_{2}^{*})^{1-\sigma}w_{2}(e,h){}^{-\sigma}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
