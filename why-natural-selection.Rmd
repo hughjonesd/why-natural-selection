@@ -1315,7 +1315,10 @@ Super Output Areas, sex and presence/absence of a partner.
 
 # Acknowledgements
 
-AA is supported by the Foundation Volksbond Rotterdam and by ZonMw grant 849200011 from The Netherlands Organisation for Health Research and Development. This study was conducted using UK Biobank resources under application numbers 40310 and 19127.
+AA is supported by the Foundation Volksbond Rotterdam and by ZonMw grant 
+849200011 from The Netherlands Organisation for Health Research and Development. 
+This study was conducted using UK Biobank resources under application numbers 
+40310 and 19127.
 
 \FloatBarrier
 \clearpage
