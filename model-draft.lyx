@@ -175,7 +175,7 @@ u(w)=\frac{w^{1-\sigma}-1}{1-\sigma}.
 \end_inset
 
 Here 
-\begin_inset Formula $\sigma\ge0$
+\begin_inset Formula $\sigma>0$
 \end_inset
 
  parametrizes the level of risk aversion in wages, and 
@@ -358,19 +358,54 @@ To sum up, in this model, for
 \end_layout
 
 \begin_layout Standard
-This model is meant as a simple 
-\begin_inset Quotes eld
-\end_inset
-
-toy
-\begin_inset Quotes erd
-\end_inset
-
- illustration of how the interaction between fertility and wages can explain
- the patterns we observe.
+This model is a simple illustration of how the interaction between fertility
+ and wages can explain the patterns we observe.
  In the appendix, we extend it to examine birth timing, education, and marriage.
- We also discuss other economic models of fertility from the literature,
+ We also discuss other models of fertility from the economic literature,
  as well as causal evidence for the relationship between earnings and fertility.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+The basic relationship is robust to arbitrary functional forms for preference
+ for children.
+\end_layout
+
+\begin_layout Plain Layout
+If
+\begin_inset Formula 
+\[
+U(N)=\frac{(W(1-bN))^{1-\sigma}-1}{1-\sigma}+af(N)
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $f$
+\end_inset
+
+ is concave and guarantees an interior equilibrium; then you will again
+ get that 
+\begin_inset Formula $dN^{*}/dW$
+\end_inset
+
+ is signed by 
+\begin_inset Formula $\sigma-1$
+\end_inset
+
+; and that for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+ the relationship will be concave.
+\end_layout
+
+\end_inset
+
+
 \begin_inset Note Note
 status open
 
@@ -444,135 +479,1398 @@ U(N_{1},N_{2})=u(\bar{W}_{1})+u(\bar{W}_{2})+a(N_{1}+N_{2})
 
 \end_inset
 
-where 
-\begin_inset Formula $\bar{W_{t}}=W_{t}(1-bN_{t})$
+We continue to assume CRRA utility.
+ We now normalize period 1 wages to 1, and allow individuals to choose a
+ level of education 
+\begin_inset Formula $e\in[0,1]$
+\end_inset
+
+, which has a cost in time in period 1.
+ Education increases period 2 wages, and is complementary to an individual's
+ human capital 
+\begin_inset Formula $h>0$
+\end_inset
+
+, so that the net wage in period 2 is 
+\begin_inset Formula $w(e,h)$
 \end_inset
 
 .
- We continue to assume CRRA utility.
- The choice problems of 
-\begin_inset Formula $N_{1}$
+ We assume the simple functional form 
+\begin_inset Formula $w(e,h)=eh$
 \end_inset
 
- and 
-\begin_inset Formula $N_{2}$
-\end_inset
-
- are separable, and the per-period optimal fertility is
-\begin_inset Formula 
-\[
-N_{t}^{*}=\max\left\{ \frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}W_{t}^{(1-\sigma)/\sigma}\right),0\right\} 
-\]
-
-\end_inset
-
-just as before.
- Write
+.
+ Thus:
 \begin_inset Formula 
 \begin{align*}
-W_{t} & =w_{t}(h,e)
+\bar{W}_{1} & =1-e-bN_{1}\\
+\bar{W}_{2} & =w(e,h)(1-bN_{2})
 \end{align*}
 
 \end_inset
 
-where 
-\begin_inset Formula $h\ge0$
+
+\end_layout
+
+\begin_layout Standard
+To ensure concavity of the problem, we assume 
+\begin_inset Formula $\sigma\ge0.5$
 \end_inset
 
- is an individual's human capital and 
-\begin_inset Formula $e\in[0,1]$
+.
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Is the problem globally concave? Or Q-C? Have to check the bordered Hessian:
+\end_layout
+
+\begin_layout Plain Layout
+https://mjo.osborne.economics.utoronto.ca/index.php/tutorial/index/1/qcc/t
+\end_layout
+
+\begin_layout Plain Layout
+Horrible attempt to prove concavity of the whole damn thing at once.
+ Do not do this:
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Total of four checks to do.
+\end_layout
+
+\begin_layout Plain Layout
+The Hessian is
+\begin_inset Formula 
+\[
+\left[\begin{array}{ccc}
+d^{2}U/dN_{1}^{2} & d^{2}U/dN_{1}dN_{2} & d^{2}U/dN_{1}de\\
+d^{2}U/dN_{1}dN_{2} & d^{2}U/dN_{2}^{2} & d^{2}U/dN_{2}de\\
+d^{2}U/dN_{1}de & d^{2}U/dN_{2}de & d^{2}U/de^{2}
+\end{array}\right]
+\]
+
 \end_inset
 
- is a choice variable representing the level of education.
- We assume that 
-\begin_inset Formula $w_{1}$
+
+\end_layout
+
+\begin_layout Plain Layout
+Which is
+\begin_inset Formula 
+\[
+\left[\begin{array}{ccc}
+-\sigma b^{2}\bar{W_{1}}^{-\sigma-1} & 0 & -\sigma b\bar{W_{1}}^{-\sigma-1}\\
+0 & -\sigma(beh)^{2}\bar{W_{2}}^{-\sigma-1} & -bh(\bar{W}_{2}^{-\sigma}-\sigma eh(1-bN_{2})\bar{W}_{2}^{-\sigma-1})\\
+-\sigma b\bar{W_{1}}^{-\sigma-1} & -bh(\bar{W}_{2}^{-\sigma}-\sigma eh(1-bN_{2})\bar{W}_{2}^{-\sigma-1}) & -\sigma\left(\bar{W_{1}}^{-\sigma-1}+(h(1-bN_{2}))^{2}\bar{W_{2}}^{-\sigma-1}\right)
+\end{array}\right]
+\]
+
 \end_inset
 
- is decreasing in 
-\begin_inset Formula $e$
+
+\end_layout
+
+\begin_layout Plain Layout
+where we have used
+\begin_inset Formula 
+\begin{align*}
+dU/dN_{2} & =-beh\bar{W}_{2}^{-\sigma}+a\\
+d^{2}U/dN_{2}de & =-bh(\bar{W}_{2}^{-\sigma}-\sigma eh(1-bN_{2})\bar{W}_{2}^{-\sigma-1}).
+\end{align*}
+
 \end_inset
 
- while 
-\begin_inset Formula $w_{2}$
+
+\end_layout
+
+\begin_layout Plain Layout
+It's easy to see that the first two leading principal minors have determinant
+ negative and positive respectively.
+ What about the third determinant? If it's negative we are happy.
+\end_layout
+
+\begin_layout Plain Layout
+This equals
+\begin_inset Formula 
+\begin{align*}
+ & (-\sigma b^{2}\bar{W_{1}}^{-\sigma-1})\det\left[\begin{array}{cc}
+-\sigma(beh)^{2}\bar{W_{2}}^{-\sigma-1} & -bh(\bar{W}_{2}^{-\sigma}-\sigma eh(1-bN_{2})\bar{W}_{2}^{-\sigma-1})\\
+-bh(\bar{W}_{2}^{-\sigma}-\sigma eh(1-bN_{2})\bar{W}_{2}^{-\sigma-1}) & -\sigma\left(\bar{W_{1}}^{-\sigma-1}+(h(1-bN_{2}))^{2}\bar{W_{2}}^{-\sigma-1}\right)
+\end{array}\right]\\
+ & -(0)\det\textrm{(hessian with middle column and row 1 deleted)}\\
+ & +(-\sigma b\bar{W_{1}}^{-\sigma-1})\det\left[\begin{array}{cc}
+0 & -\sigma(beh)^{2}\bar{W_{2}}^{-\sigma-1}\\
+-\sigma b\bar{W_{1}}^{-\sigma-1} & -bh(\bar{W}_{2}^{-\sigma}-\sigma eh(1-bN_{2})\bar{W}_{2}^{-\sigma-1})
+\end{array}\right]
+\end{align*}
+
 \end_inset
 
- is increasing in 
-\begin_inset Formula $e$
+
+\end_layout
+
+\begin_layout Plain Layout
+which equals
+\begin_inset Formula 
+\begin{align*}
+ & -\sigma b^{2}\bar{W_{1}}^{-\sigma-1}\left(-\sigma(beh)^{2}\bar{W_{2}}^{-\sigma-1}(-\sigma\left(\bar{W_{1}}^{-\sigma-1}+(h(1-bN_{2}))^{2}\bar{W_{2}}^{-\sigma-1}\right))-(-bh(\bar{W}_{2}^{-\sigma}-\sigma eh(1-bN_{2})\bar{W}_{2}^{-\sigma-1}))^{2}\right)\\
+ & -\sigma b\bar{W_{1}}^{-\sigma-1}\left(-\sigma b\bar{W_{1}}^{-\sigma-1}\right)^{2}
+\end{align*}
+
 \end_inset
 
-; that both 
-\begin_inset Formula $w_{1}$
+
+\end_layout
+
+\begin_layout Plain Layout
+which equals
+\begin_inset Formula 
+\begin{align*}
+ & -\sigma b^{2}\bar{W_{1}}^{-\sigma-1}\left(\sigma^{2}(beh)^{2}\bar{W_{2}}^{-\sigma-1}\left(\bar{W_{1}}^{-\sigma-1}+(h(1-bN_{2}))^{2}\bar{W_{2}}^{-\sigma-1}\right)-(bh(\bar{W}_{2}^{-\sigma}-\sigma eh(1-bN_{2})\bar{W}_{2}^{-\sigma-1}))^{2}\right)\\
+ & -\sigma b\bar{W_{1}}^{-\sigma-1}\left(\sigma b\bar{W_{1}}^{-\sigma-1}\right)^{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+which equals
+\begin_inset Formula 
+\begin{align*}
+ & -\sigma b\bar{W_{1}}^{-\sigma-1}\left\{ b\left(\sigma^{2}(beh)^{2}\bar{W_{2}}^{-\sigma-1}(\bar{W_{1}}^{-\sigma-1}+(h(1-bN_{2}))^{2}\bar{W_{2}}^{-\sigma-1})-(bh(\bar{W}_{2}^{-\sigma}-\sigma eh(1-bN_{2})\bar{W}_{2}^{-\sigma-1}))^{2}\right)+\left(\sigma b\bar{W_{1}}^{-\sigma-1}\right)^{2}\right\} 
+\end{align*}
+
+\end_inset
+
+which has the opposite sign from
+\begin_inset Formula 
+\begin{align*}
+ & b\left(\sigma^{2}(beh)^{2}\bar{W_{2}}^{-\sigma-1}(\bar{W_{1}}^{-\sigma-1}+(h(1-bN_{2}))^{2}\bar{W_{2}}^{-\sigma-1})-(bh(\bar{W}_{2}^{-\sigma}-\sigma eh(1-bN_{2})\bar{W}_{2}^{-\sigma-1}))^{2}\right)+\left(\sigma b\bar{W_{1}}^{-\sigma-1}\right)^{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+For simplicity write 
+\begin_inset Formula $X=\bar{W_{2}}^{-\sigma-1},Y=\bar{W_{1}}^{-\sigma-1},Z=1-bN_{2}$
+\end_inset
+
+, this becomes
+\begin_inset Formula 
+\begin{align*}
+ & b\left(\sigma^{2}(beh)^{2}X(Y+(hZ)^{2}X)-(bh(\bar{W}_{2}X-\sigma ehZX))^{2}\right)+\left(\sigma bY\right)^{2}\\
+= & b^{2}\left(b[\sigma^{2}(eh)^{2}X(Y+(hZ)^{2}X)-h^{2}(\bar{W}_{2}X-\sigma ehZX)^{2}]+\sigma^{2}Y^{2}\right)\\
+= & b^{2}\left(bh^{2}[\sigma^{2}e{}^{2}X(Y+(hZ)^{2}X)-(\bar{W}_{2}X-\sigma ehZX)^{2}]+\sigma^{2}Y^{2}\right)
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+which is signed by
+\begin_inset Formula 
+\begin{align*}
+ & bh^{2}\left(\sigma^{2}e{}^{2}(XY+(hZ)^{2}X^{2})-(\bar{W}_{2}X-\sigma ehZX)^{2}\right)+\sigma^{2}Y^{2}\\
+= & bh^{2}\left(\sigma^{2}e{}^{2}XY+X^{2}[\sigma^{2}e{}^{2}(hZ)^{2}-(\bar{W}_{2}-\sigma ehZ)^{2}]\right)+\sigma^{2}Y^{2}\\
+= & bh^{2}\left(\sigma^{2}e{}^{2}XY+X^{2}[\sigma^{2}e{}^{2}(hZ)^{2}-(\bar{W}_{2}^{2}-2\bar{W}_{2}\sigma ehZ+(\sigma^{2}e^{2}(hZ)^{2})]\right)+\sigma^{2}Y^{2}\\
+= & bh^{2}X\left(\sigma^{2}e{}^{2}Y+X[2\bar{W}_{2}(\sigma ehZ-\bar{W}_{2})]\right)+\sigma^{2}Y^{2}\\
+= & bh^{2}X\left(\sigma^{2}e{}^{2}Y+X[2\bar{W}_{2}(\sigma eh(1-bN_{2})-eh(1-bN_{2})]\right)+\sigma^{2}Y^{2}\textrm{, replacing }Z\textrm{ and }\bar{W}_{2}\\
+= & bh^{2}X\left(\sigma^{2}e{}^{2}Y+X[2\bar{W}_{2}(\sigma-1)eh(1-bN_{2})]\right)+\sigma^{2}Y^{2}\\
+= & bh^{2}X\left(\sigma^{2}e{}^{2}Y+X[2(\sigma-1)e^{2}h^{2}(1-bN_{2})^{2}]\right)+\sigma^{2}Y^{2}\\
+= & bh^{2}e^{2}X\left(\sigma^{2}Y+X[2(\sigma-1)h^{2}(1-bN_{2})^{2}]\right)+\sigma^{2}Y^{2}\\
+= & bh^{2}e^{2}[2(\sigma-1)h^{2}(1-bN_{2})^{2}]X^{2}+bh^{2}e^{2}\sigma^{2}XY+\sigma^{2}Y^{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Instead, observe that you just need to prove the individual functions are
+ globally concave.
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $u(\bar{W}_{1})=(1-e-bN_{1})^{1-\sigma}/(1-\sigma)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+The hessian of this is 
+\begin_inset Formula 
+\[
+\left[\begin{array}{cc}
+d^{2}u/dN_{1}^{2} & d^{2}u/dedN_{1}\\
+d^{2}u/dedN_{1} & d^{2}u/de^{2}
+\end{array}\right]=\left[\begin{array}{cc}
+-\sigma b^{2} & -\sigma b\\
+-\sigma b & -\sigma
+\end{array}\right]\bar{W}_{1}^{-\sigma-1}
+\]
+
+\end_inset
+
+with determinant 
+\begin_inset Formula 
+\[
+(\sigma^{2}b^{2}-\sigma^{2}b^{2})\bar{W}_{1}^{-2\sigma-2}=0.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Since 
+\begin_inset Formula $d^{2}u/dN_{1}^{2}<0$
 \end_inset
 
  and 
-\begin_inset Formula $w_{2}$
+\begin_inset Formula $d^{2}u/de^{2}<0$
 \end_inset
 
- are weakly increasing in 
+, first period utility is negative semidefinite.
+\end_layout
+
+\begin_layout Plain Layout
+And for 
+\begin_inset Formula $u(\bar{W}_{2})$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\left[\begin{array}{cc}
+d^{2}u/dN_{2}^{2} & d^{2}u/dedN_{2}\\
+d^{2}u/dedN_{2} & d^{2}u/de^{2}dN_{2}
+\end{array}\right]=\left[\begin{array}{cc}
+-\sigma(beh)^{2}\bar{W}_{2}^{-\sigma-1} & -(1-\sigma)bh\bar{W}_{2}^{-\sigma}\\
+-(1-\sigma)bh\bar{W}_{2}^{-\sigma} & -\sigma[h(1-bN_{2}^{*})]^{2}\bar{W}_{2}^{-\sigma-1}
+\end{array}\right]
+\]
+
+\end_inset
+
+with determinant
+\begin_inset Formula 
+\begin{align*}
+ & (-\sigma(beh)^{2}\bar{W}_{2}^{-\sigma-1})(-\sigma[h(1-bN_{2}^{*})]^{2}\bar{W}_{2}^{-\sigma-1})-(-(1-\sigma)bh\bar{W}_{2}^{-\sigma})^{2}\\
+= & \sigma^{2}(beh)^{2}[h(1-bN_{2}^{*})]^{2}\bar{W}_{2}^{-2\sigma-2}-(1-\sigma)^{2}(bh)^{2}\bar{W}_{2}^{-2\sigma}\\
+= & \sigma^{2}(bh)^{2}[eh(1-bN_{2}^{*})]^{2}\bar{W}_{2}^{-2\sigma-2}-(1-\sigma)^{2}(bh)^{2}\bar{W}_{2}^{-2\sigma}\\
+= & \sigma^{2}(bh)^{2}[\bar{W}_{2}]^{2}\bar{W}_{2}^{-2\sigma-2}-(1-\sigma)^{2}(bh)^{2}\bar{W}_{2}^{-2\sigma}\\
+= & \sigma^{2}(bh)^{2}\bar{W}_{2}^{-2\sigma}-(1-\sigma)^{2}(bh)^{2}\bar{W}_{2}^{-2\sigma}\\
+= & (bh)^{2}\bar{W}_{2}^{-2\sigma}(\sigma^{2}-(1-\sigma)^{2})
+\end{align*}
+
+\end_inset
+
+which is negative iff 
+\begin_inset Formula $\sigma<0.5$
+\end_inset
+
+.
+ Thus, if 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+ then period 2 utility is negative definite.
+\end_layout
+
+\begin_layout Plain Layout
+Utility 
+\begin_inset Formula $a(N_{1}+N_{2})$
+\end_inset
+
+ is obviously weakly concave since it is linear.
+\end_layout
+
+\begin_layout Plain Layout
+Overall, for 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+ utility is strictly concave.
+\end_layout
+
+\end_inset
+
+ Write the Lagrangian as 
+\begin_inset Formula 
+\[
+\mathcal{L}(N_{1},N_{2},e)=u(\bar{W}_{1})+u(\bar{W}_{2})+a(N_{1}+N_{2})+\lambda_{1}N_{1}+\lambda_{2}N_{2}+\lambda_{3}(\frac{1}{b}-N_{2})+\mu e
+\]
+
+\end_inset
+
+and the KKT conditions for an optimum 
+\begin_inset Formula $(N_{1}^{*},N_{2}^{*},e^{*})$
+\end_inset
+
+ as:
+\begin_inset Formula 
+\begin{align}
+\frac{d\mathcal{L}}{dN_{1}}=-b\bar{W}_{1}^{-\sigma}+a+\lambda_{1} & =0\textrm{, with }\lambda_{1}=0\textrm{ if }N_{1}^{*}>0;\label{eq:kkt1}\\
+\frac{d\mathcal{L}}{dN_{2}}=-be^{*}h\bar{W}_{2}^{-\sigma}+a+\lambda_{2} & -\lambda_{3}=0\textrm{, with }\lambda_{2}=0\textrm{ if }N_{2}^{*}>0,\lambda_{3}=0\textrm{ if }N_{2}^{*}<\frac{1}{b};\label{eq:kkt2}\\
+\frac{d\mathcal{L}}{de}=-\bar{W}_{1}^{-\sigma}+h(1-bN_{2}^{*})\bar{W}_{2}^{-\sigma}+\mu & =0;\label{eq:kkt3}\\
+N_{1}^{*},N_{2}^{*},e^{*},\lambda_{1},\lambda_{2},\lambda_{3},\mu & \ge0;N_{2}^{*}\le\frac{1}{b}.
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the Inada condition (
+\begin_inset Formula $\lim_{x\rightarrow0}u'(x)=\infty$
+\end_inset
+
+) for period 1 rules out 
+\begin_inset Formula $e^{*}=1$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{1}=1/b$
+\end_inset
+
+, so we need not impose these constraints explicitly.
+ Also, so long as 
+\begin_inset Formula $N_{2}^{*}<1/b$
+\end_inset
+
+, the same condition rules out 
+\begin_inset Formula $e^{*}=0$
+\end_inset
+
+.
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+For 
+\begin_inset Formula $e=0$
+\end_inset
+
+, intuitively, the relevant part of utility is:
+\begin_inset Formula 
+\[
+\frac{(1-e)^{1-\sigma}}{1-\sigma}+\frac{(eh(1-bN_{2}))^{1-\sigma}}{1-\sigma}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Differentiate to get
+\begin_inset Formula 
+\[
+-(1-e)^{-\sigma}+h(eh(1-bN_{2}))^{-\sigma}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+and note that the second part goes to infinity as 
+\begin_inset Formula $e\rightarrow0$
+\end_inset
+
+...
+ so long as 
+\begin_inset Formula $bN_{2}<1$
+\end_inset
+
+?
+\end_layout
+
+\end_inset
+
+ We consider four cases.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $N_{1}^{*}=0,N_{2}^{*}=0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We can solve for 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+by substituting values of 
+\begin_inset Formula $\bar{W}_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\bar{W}_{2}$
+\end_inset
+
+ into (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:kkt3"
+
+\end_inset
+
+):
+\begin_inset Formula 
+\[
+-(1-e^{*}){}^{-\sigma}+h(e^{*}h)^{-\sigma}=0
+\]
+
+\end_inset
+
+which rearranges to 
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Solve:
+\begin_inset Formula 
+\begin{align*}
+h(e^{*}h)^{-\sigma} & =(1-e^{*}){}^{-\sigma}\\
+h & =(e^{*}h)^{\sigma}(1-e^{*}){}^{-\sigma}\\
+h^{1/\sigma} & =(e^{*}h)/(1-e^{*})\\
+(1-e^{*})h^{1/\sigma} & =e^{*}h\\
+h^{(1-\sigma)/\sigma} & =e^{*}/(1-e^{*})\\
+e^{*} & =\frac{h^{(1-\sigma)/\sigma}}{1+h^{(1-\sigma)/\sigma}}\\
+e^{*} & =\frac{1}{1+h^{(\sigma-1)/\sigma}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+e^{*}=\frac{1}{1+h^{(\sigma-1)/\sigma}}.\label{eq:estar1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Conditions (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:kkt1"
+
+\end_inset
+
+) and (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:kkt2"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) become:
+\begin_inset Formula 
+\begin{align*}
+-b(1-e^{*})^{-\sigma}+a & \le0\\
+-be^{*}h(e^{*}h)^{-\sigma}+a & \le0
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+equivalently
+\begin_inset Formula 
+\begin{align*}
+\frac{a}{b} & \le(1-e^{*})^{-\sigma}\\
+\frac{a}{b} & \le e^{*}h(e^{*}h)^{-\sigma}
+\end{align*}
+
+\end_inset
+
+which can both be satisfied for 
+\begin_inset Formula $a/b$
+\end_inset
+
+ close enough to zero.
+ Note from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:estar1"
+
+\end_inset
+
+) that as 
+\begin_inset Formula $h\rightarrow\infty$
+\end_inset
+
+, 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ increases towards 1 for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, and decreases towards 0 for 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+.
+ Note also that the right hand side of the first inequality above approaches
+ infinity as 
+\begin_inset Formula $e^{*}\rightarrow1$
+\end_inset
+
+, therefore also as 
+\begin_inset Formula $h\rightarrow\infty$
+\end_inset
+
+ for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+.
+ Rewrite the second inequality as
+\begin_inset Formula 
+\[
+\frac{a}{b}<(e^{*}h)^{1-\sigma}=\left(\frac{h}{1+h^{(\sigma-1)/\sigma}}\right)^{1-\sigma}=\left(h^{-1}+h^{-1/\sigma}\right)^{\sigma-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and note that again, as 
+\begin_inset Formula $h\rightarrow\infty$
+\end_inset
+
+, the RHS increases towards infinity for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, and decreases towards zero otherwise.
+ Thus, for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, both equations will be satisfied for 
 \begin_inset Formula $h$
 \end_inset
 
-; and that 
-\begin_inset Formula $d^{2}w_{t}/dedh\ge0$
+ high enough.
+ For 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+, they will be satisfied for 
+\begin_inset Formula $h$
+\end_inset
+
+ low enough.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $N_{1}^{*}>0,N_{2}^{*}=0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Rearranging the first order conditions for 
+\begin_inset Formula $N_{1}^{*}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ gives
+\begin_inset Formula 
+\begin{align*}
+\frac{a}{b} & =(1-e^{*}-bN_{1}^{*})^{-\sigma}\\
+\frac{a}{b} & \le e^{*}h\bar{W}_{2}^{-\sigma}
+\end{align*}
+
+\end_inset
+
+hence
+\begin_inset Formula 
+\begin{align*}
+(1-e^{*}-bN_{1}^{*})^{-\sigma} & \le e^{*}h\bar{W}_{2}^{-\sigma}=(e^{*}h)^{1-\sigma}\\
+\Leftrightarrow(1-e^{*}-bN_{1}^{*})^{\sigma} & \ge(e^{*}h)^{\sigma-1}\\
+\Leftrightarrow1-e^{*}-bN_{1}^{*} & \ge(e^{*}h)^{1-1/\sigma}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now rearrange the first order condition for 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:kkt3"
+
+\end_inset
+
+), noting that since 
+\begin_inset Formula $N_{2}^{*}=0$
+\end_inset
+
+, 
+\begin_inset Formula $e^{*}>0$
+\end_inset
+
+ by the Inada condition.
+\begin_inset Formula 
+\begin{align*}
+h^{1/\sigma-1}(1-e^{*}-bN_{1}^{*}) & =e^{*}\\
+1-e^{*}-bN_{1}^{*} & =e^{*}h^{1-1/\sigma}
+\end{align*}
+
+\end_inset
+
+This, combined with the previous inequality, implies 
+\begin_inset Formula 
+\begin{align*}
+(e^{*}h)^{1-1/\sigma} & \le e^{*}h^{1-1/\sigma}\\
+\Leftrightarrow(e^{*})^{-1/\sigma} & \le1
+\end{align*}
+
+\end_inset
+
+which cannot hold since 
+\begin_inset Formula $0<e^{*}<1$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $N_{1}^{*}=0,N_{2}^{*}>0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Replace 
+\begin_inset Formula $N_{1}^{*}=0$
+\end_inset
+
+ into the first order condition for 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:kkt3"
+
+\end_inset
+
+), and rearrange to give:
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Proof:
+\begin_inset Formula 
+\begin{align*}
+-\bar{W}_{1}^{-\sigma}+h(1-bN_{2}^{*})\bar{W}_{2}^{-\sigma} & =0\\
+-(1-e^{*})^{-\sigma}+h(1-bN_{2}^{*})[(he^{*})(1-bN_{2}^{*})]^{-\sigma} & =0\\
+h(1-bN_{2}^{*})[(he^{*})(1-bN_{2}^{*})]^{-\sigma} & =(1-e^{*})^{-\sigma}\\
+h(1-bN_{2}^{*})(1-e^{*})^{\sigma} & =[(he^{*})(1-bN_{2}^{*})]^{\sigma}\\{}
+[h(1-bN_{2}^{*})]^{1/\sigma}(1-e^{*}) & =e^{*}h(1-bN_{2}^{*})\\{}
+[h(1-bN_{2}^{*})]^{1/\sigma} & =e^{*}\left\{ h(1-bN_{2}^{*})+[h(1-bN_{2}^{*})]^{1/\sigma}\right\} \\
+e^{*} & =\frac{(h(1-bN_{2}^{*}))^{1/\sigma}}{h(1-bN_{2}^{*})+(h(1-bN_{2}^{*}))^{1/\sigma}}\\
+ & =\frac{1}{1+\left((1-bN_{2})h\right)^{1-1/\sigma}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+e^{*}=\frac{1}{1+\left((1-bN_{2})h\right)^{1-1/\sigma}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now since 
+\begin_inset Formula $N_{2}^{*}>0$
+\end_inset
+
+, we can rearrange (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:kkt2"
+
+\end_inset
+
+) to give 
+\begin_inset Formula 
+\[
+N_{2}^{*}=\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}(e^{*}h)^{(1-\sigma)/\sigma}\right).
+\]
+
+\end_inset
+
+Plugging this into 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ gives
+\begin_inset Formula 
+\begin{align*}
+e^{*} & =\frac{1}{1+\left(\frac{bh}{a}\right)^{(\sigma-1)/\sigma^{2}}(e^{*}){}^{-(1-\sigma)^{2}/\sigma^{2}}}
+\end{align*}
+
+\end_inset
+
+which can be rearranged to
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Proof:
+\begin_inset Formula 
+\begin{align*}
+e & =\frac{e^{(1-\sigma)^{2}/\sigma^{2}}}{e^{(1-\sigma)^{2}/\sigma^{2}}+X}\textrm{ where }X=\left(\frac{bh}{a}\right)^{(\sigma-1)/\sigma^{2}};\\
+1 & =\frac{e^{(1-\sigma)^{2}/\sigma^{2}-1}}{e^{(1-\sigma)^{2}/\sigma^{2}}+X};\\
+e^{(1-\sigma)^{2}/\sigma^{2}-1} & =e^{(1-\sigma)^{2}/\sigma^{2}}+X\\
+e^{(1-2\sigma)/\sigma^{2}}(1-e) & =X
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+(1-e^{*})(e^{*})^{(1-2\sigma)/\sigma^{2}}=\left(\frac{a}{bh}\right)^{(1-\sigma)/\sigma^{2}}.\label{eq:estar2}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Differentiate the left hand side of the above to get
+\begin_inset Formula 
+\begin{align*}
+ & \frac{1-2\sigma}{\sigma^{2}}(1-e)e^{(1-2\sigma)/\sigma^{2}-1}-e^{(1-2\sigma)/\sigma^{2}}\\
+= & \frac{1-2\sigma}{\sigma^{2}}e^{(1-2\sigma)/\sigma^{2}-1}-\frac{\sigma^{2}+1-2\sigma}{\sigma^{2}}e^{(1-2\sigma)/\sigma^{2}}\\
+= & \frac{1-2\sigma}{\sigma^{2}}e^{(1-2\sigma)/\sigma^{2}-1}-\frac{(1-\sigma)^{2}}{\sigma^{2}}e^{(1-2\sigma)/\sigma^{2}}.
+\end{align*}
+
+\end_inset
+
+This is negative if and only if
+\begin_inset Formula 
+\begin{align*}
+e^{*} & >\frac{1-2\sigma}{(1-\sigma)^{2}}
+\end{align*}
+
+\end_inset
+
+which is always true since 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+.
+ Note also that since 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+, then the left hand side of (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:estar2"
+
+\end_inset
+
+) approaches infinity as 
+\begin_inset Formula $e^{*}\rightarrow0$
+\end_inset
+
+ and approaches 0 as 
+\begin_inset Formula $e^{*}\rightarrow1$
+\end_inset
+
+.
+ Thus, (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:estar2"
+
+\end_inset
+
+) implicitly defines the unique solution for 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+\begin_inset Quotes eld
+\end_inset
+
+If 
+\begin_inset Formula $\sigma<0.5$
+\end_inset
+
+ then the left hand side of (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:estar2"
+
+\end_inset
+
+) approaches 0 as 
+\begin_inset Formula $e^{*}\rightarrow1$
+\end_inset
+
+ or 
+\begin_inset Formula $e^{*}\rightarrow0$
+\end_inset
+
+; in between these values it increases then decreases.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+When 
+\begin_inset Formula $\sigma<0.5$
+\end_inset
+
+: sometimes no solution, but sometimes two? Computing gives wacky solutions
+ around 
+\begin_inset Formula $\sigma=0.5$
+\end_inset
+
+, but reasonable ones for lower values.
+ It can also give 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ close to 0.
+ (But not 0, it seems.)
+\end_layout
+
+\begin_layout Plain Layout
+Note that if 
+\begin_inset Formula $e^{*}=0$
+\end_inset
+
+, then 
+\begin_inset Formula $N_{2}^{*}=1/b$
+\end_inset
+
+.
+ This does sometimes occur for 
+\begin_inset Formula $\sigma<0.5$
+\end_inset
+
+.
+ (But is the function globally concave anyway?)
+\end_layout
+
+\begin_layout Plain Layout
+Indeed, if we allow 
+\begin_inset Formula $N_{2}^{*}>1/b$
+\end_inset
+
+ then with 
+\begin_inset Formula $e^{*}=0$
+\end_inset
+
+, utility is unbounded above.
+ But we've banned that now.
+ So we are good – we always have an interior local optimum for 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+, as per the above, and therefore this is the unique global optimum, because
+ the problem is strictly concave.
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+We can then plug the solution back into the expression for 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+To find how 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ changes with 
+\begin_inset Formula $h$
+\end_inset
+
+, note that the right hand side of the above decreases in 
+\begin_inset Formula $h$
+\end_inset
+
+ for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, and increases in 
+\begin_inset Formula $h$
+\end_inset
+
+ for 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+.
+ Putting these facts together: for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, when 
+\begin_inset Formula $h$
+\end_inset
+
+ increases the RHS of (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:estar2"
+
+\end_inset
+
+) decreases, hence the LHS decreases and 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ increases, i.e.
+ 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ is increasing in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ For 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+, 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+is decreasing in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+\begin_inset Formula $N_{1}^{*}>0,N_{2}^{*}>0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Rearranging (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:kkt1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+), (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:kkt2"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) and (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:kkt3"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) gives:
+\begin_inset Formula 
+\begin{align*}
+N_{1}^{*} & =\frac{1}{b}\left(1-e^{*}-\left(\frac{b}{a}\right)^{1/\sigma}\right);\\
+N_{2}^{*} & =\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}(e^{*}h)^{(1-\sigma)/\sigma}\right);\\
+e^{*} & =\frac{1-bN_{1}^{*}}{1+\left((1-bN_{2}^{*})h\right)^{1-1/\sigma}}.
+\end{align*}
+
+\end_inset
+
+Plugging the expressions for 
+\begin_inset Formula $N_{1}^{*}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ into 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+gives
+\begin_inset Formula 
+\[
+e^{*}=\frac{e^{*}+\left(\frac{b}{a}\right)^{1/\sigma}}{1+\left(\left(\frac{b}{a}\right)^{1/\sigma}e^{*(1-\sigma)/\sigma}h{}^{1/\sigma}\right)^{1-1/\sigma}}
+\]
+
+\end_inset
+
+which simplifies to
+\begin_inset Formula 
+\[
+e^{*}=\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\sigma)/(2\sigma-1)}.
+\]
+
+\end_inset
+
+Again note that for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ increases in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ Furthermore 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ is convex in 
+\begin_inset Formula $h$
+\end_inset
+
+ if 
+\begin_inset Formula $\sigma<2/3$
+\end_inset
+
+, and concave otherwise.
+\end_layout
+
+\begin_layout Standard
+Now we can write
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Pleasingly CORRECT for positive values of N, checked computationally in
+ julia.
+\end_layout
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+N_{1}^{*} & =\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\sigma)/(2\sigma-1)}-\left(\frac{b}{a}\right)^{1/\sigma}\right);\\
+w(e^{*},h)\equiv e^{*}h & =\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{\sigma/(2\sigma-1)};\\
+N_{2}^{*} & =\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\sigma)/(2\sigma-1)}\right).
+\end{align*}
+
+\end_inset
+
+Observe that 
+\begin_inset Formula $w(e^{*},h)$
+\end_inset
+
+ is increasing in 
+\begin_inset Formula $h$
+\end_inset
+
+ for 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+, and convex iff 
+\begin_inset Formula $0.5<\sigma<1$
+\end_inset
+
+.
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+for 
+\begin_inset Formula $\sigma=0.5$
+\end_inset
+
+, there's a problem
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+....
+ Indeed, if we use the first form, 
+\begin_inset Formula $e$
+\end_inset
+
+ cancels out
+\begin_inset Formula 
+\begin{align*}
+e^{*} & =\frac{e^{*}+\left(\frac{b}{a}\right)^{2}}{1+\left(\left(\frac{b}{a}\right)^{2}e^{*}h{}^{2}\right)^{-1}};\\
+h^{-1} & =\left(\frac{b}{a}\right)^{2}
+\end{align*}
+
+\end_inset
+
+which is obv wrong....
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ Also observe that 
+\begin_inset Formula $N_{1}^{*}<N_{2}^{*}$
+\end_inset
+
+ if 
+\begin_inset Formula $N_{2}^{*}>0$
 \end_inset
 
 .
 \end_layout
 
 \begin_layout Standard
-Suppose that 
-\begin_inset Formula $N_{t}^{*}>0$
+While 
+\begin_inset Formula $N_{1}^{*}$
 \end_inset
 
-.
- Then we can apply the envelope theorem to show that 
+ and 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ are positive, they have the same derivative with respect to 
+\begin_inset Formula $h$
+\end_inset
+
+:
 \begin_inset Formula 
 \[
-\frac{dU}{dW_{t}}=\frac{\partial U}{\partial W_{t}}
+\frac{dN_{t}^{*}}{dh}=-\frac{1}{b}\left(\frac{b}{a}\right)^{1/(2\sigma-1)}\frac{1-\sigma}{2\sigma-1}h^{(1-\sigma)/(2\sigma-1)-1}
 \]
 
 \end_inset
 
-since 
+which is negative for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+; also 
 \begin_inset Formula $N_{t}^{*}$
 \end_inset
 
- is at an interior optimum.
- Writing 
-\begin_inset Formula 
-\begin{align*}
-\frac{\partial u}{\partial W_{t}} & =(1-bN_{t})(W_{t}(1-bN_{t}))^{-\sigma}\\
- & =(1-bN_{t})^{1-\sigma}W_{t}{}^{-\sigma}
-\end{align*}
-
+ is convex in 
+\begin_inset Formula $h$
 \end_inset
 
-we can calculate
-\begin_inset Formula 
-\[
-\frac{\partial u}{\partial e}=\frac{\partial w_{t}}{\partial e}(e,h)\times(1-bN_{t})^{1-\sigma}w_{t}(e,h){}^{-\sigma}
-\]
-
+ for 
+\begin_inset Formula $\sigma<2/3$
 \end_inset
 
-for 
-\begin_inset Formula $t=1,2$
+, and concave otherwise.
+\end_layout
+
+\begin_layout Section
+Comparative statics
+\end_layout
+
+\begin_layout Standard
+Plan: focus on 
+\begin_inset Formula $\sigma<1$
 \end_inset
 
 .
- An internal optimum choice of education 
-\begin_inset Formula $e$
+ Show that as 
+\begin_inset Formula $h$
 \end_inset
 
- then solves
-\begin_inset Formula 
-\[
-\frac{\partial w_{1}}{\partial e}(e,h)\times(1-bN_{1}^{*})^{1-\sigma}w_{1}(e,h){}^{-\sigma}=-\frac{\partial w_{2}}{\partial e}(e,h)\times(1-bN_{2}^{*})^{1-\sigma}w_{2}(e,h){}^{-\sigma}.
-\]
-
+ increases, you move from both children positive, to just 
+\begin_inset Formula $N_{2}$
 \end_inset
 
+, to neither; total fertility 
+\begin_inset Formula $N^{*}$
+\end_inset
 
+ decreases constantly.
+\end_layout
+
+\begin_layout Standard
+Observe that for 
+\begin_inset Formula $\sigma<2/3$
+\end_inset
+
+, 
+\begin_inset Formula $N_{t}^{*}$
+\end_inset
+
+ is globally convex in 
+\begin_inset Formula $h$
+\end_inset
+
+, and hence so is total 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Observe that 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ increases in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ Thus for 
+\begin_inset Formula $\sigma<2/3$
+\end_inset
+
+, there is a positive correlation between 
+\begin_inset Formula $e^{*}$
+\end_inset
+
+ and 
+\begin_inset Formula $dN^{*}/dh$
+\end_inset
+
+ (which increases towards zero).
+\end_layout
+
+\begin_layout Standard
+Observe that, taking averages over a wide enough range of 
+\begin_inset Formula $h$
+\end_inset
+
+, 
+\begin_inset Formula $dN_{1}^{*}/dh<dN_{2}^{*}/dh$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Check whether comparative statics in 
+\begin_inset Formula $b$
+\end_inset
+
+ still hold.
+ 
 \end_layout
 
 \end_body

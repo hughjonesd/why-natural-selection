@@ -24,7 +24,15 @@ set_optimizer_attribute(model, "print_level", 0)
     a * (N₁ + N₂)
 )
 
-function ipopt_solve(H::Float64, A::Float64, B::Float64, S::Float64)
+
+function U(N₁::Real, N₂::Real, e::Real, h::Real, a::Real, b::Real, σ::Real)
+    (1 - e - b * N₁)^(1 - σ)/(1 - σ) +
+    ((e * h) * (1 - b * N₂))^(1 - σ)/(1 - σ) + 
+    a * (N₁ + N₂)
+end
+
+
+function ipopt_solve(H::Real, A::Real, B::Real, S::Real)
 
     set_value(h, H)
     set_value(a, A)
@@ -43,15 +51,15 @@ function solve_e(h, a, b, σ)
     f(e) = (1 - e) * e ^ ((1 - 2σ)/σ^2) - rhs
 
     es = find_zeros(f, 0.001, 1)
-    if size(es) != (1,)
-        @warn "Found more or less than 1 value for e"
+    if length(es) != 1
+        @warn "Found $(length(es)) values for e"
         @warn "h $h; a $a; b $b; σ $σ"
     end
 
     es[1]
 end
 
-function theory_solve(h::Float64, a::Float64, b::Float64, σ::Float64)
+function theory_solve(h::Real, a::Real, b::Real, σ::Real)
 
     N₁ = 1/b * (1 - (b/a) ^ (1/(2σ - 1)) * h ^ ((1 - σ)/(2σ - 1))) - 
          (1/b) * (b/a) ^ (1/σ)
@@ -83,7 +91,7 @@ function plot_solutions(hmin, hmax, a, b, σ; theory = true)
 
     for (ix, h) = zip(1:len, hs) 
         ipopt_result[:, ix]  = ipopt_solve(h, a, b, σ)
-        theory_result[:, ix] = theory_solve(h, a, b, σ)
+        theory && (theory_result[:, ix] = theory_solve(h, a, b, σ))
     end
 
     p = plot(hs, ipopt_result[1, :], label = "N1")

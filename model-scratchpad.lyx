@@ -3481,5 +3481,71 @@ Again
 .
 \end_layout
 
+\begin_layout Section
+Proving uniqueness
+\end_layout
+
+\begin_layout Standard
+One approach: 
+\begin_inset Quotes eld
+\end_inset
+
+we know 
+\begin_inset Formula $U$
+\end_inset
+
+ is differentiable, and we know 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ are below (some) upper bounds.
+ So it must have a global maximum.
+ If we find a unique local maximum (via the necessary conditions) then we
+ know that this is the global maximum.
+\begin_inset Quotes erd
+\end_inset
+
+ This seems to work for 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Another approach: recursively show that there's a unique maximum 
+\begin_inset Formula $e$
+\end_inset
+
+ given 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+; then a unique maximum 
+\begin_inset Formula $(e,N_{2})$
+\end_inset
+
+ given 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+; and then a unique maximum.
+ 
+\end_layout
+
+\begin_layout Standard
+Or: prove quasiconcavity via the bordered Hessian.
+ D1<0 (ad-bc); D2 > 0; D3 < 0 suffices.
+ But has to hold everywhere which seems hard for D1.
+\end_layout
+
 \end_body
 \end_document
