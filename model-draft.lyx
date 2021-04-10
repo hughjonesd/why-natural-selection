@@ -211,18 +211,14 @@ To solve the model explicitly, we let
 constant relative risk aversion
 \emph default
  function 
-\begin_inset Formula 
-\[
-u(y)=\frac{y^{1-\sigma}-1}{1-\sigma}
-\]
-
+\begin_inset Formula $u(y)=\frac{y^{1-\sigma}-1}{1-\sigma}$
 \end_inset
 
-where 
+, where 
 \begin_inset Formula $\sigma>0$
 \end_inset
 
- parametrizes the level of risk aversion in income.
+ parametrizes risk aversion in income.
  We then solve for the optimal fertility 
 \begin_inset Formula $N^{*}$
 \end_inset
@@ -232,14 +228,14 @@ where
 \end_inset
 
 .
- Since human capital 
-\begin_inset Formula $h=W$
-\end_inset
-
-, we also refer to this as the 
+ We also refer to this as the 
 \emph on
 fertility-human capital relationship
 \emph default
+, since human capital 
+\begin_inset Formula $h=W$
+\end_inset
+
 .
  We show the following facts:
 \end_layout
@@ -360,18 +356,11 @@ We can then derive conclusions about the relationship of human capital to
 \begin_inset Formula $0.5<\sigma<1$
 \end_inset
 
-, the following facts hold.
- As in the one-period model, total fertility is decreasing in human capital
- 
-\begin_inset Formula $h$
+, facts 1-3 above continue to hold (fact 2 in a neighborhood of 
+\begin_inset Formula $\sigma=1$
 \end_inset
 
-, and the fertility-human capital relationship is more negative when the
- burden of childcare 
-\begin_inset Formula $b$
-\end_inset
-
- is larger.
+).
  In addition, for 
 \begin_inset Formula $\sigma$
 \end_inset
@@ -380,15 +369,18 @@ We can then derive conclusions about the relationship of human capital to
 \end_layout
 
 \begin_layout Enumerate
-As before, the fertility-human capital relationship is weaker (closer to
- zero) at high levels of 
-\begin_inset Formula $h$
-\end_inset
+\begin_inset ERT
+status open
 
-.
+\begin_layout Plain Layout
+
+[4.]
+\backslash
+setcounter{enumi}{4}
 \end_layout
 
-\begin_layout Enumerate
+\end_inset
+
 The fertility-human capital relationship is weaker among higher earners.
 \end_layout
 
@@ -416,6 +408,51 @@ The fertility-human capital relationship is weaker among those who start
 
 \begin_layout Standard
 These facts again match the patterns in our data (Figures XXX, XXX and XXX).
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename N-plot.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Fertility vs.
+ human capital in the two-period model.
+ Parameters: 
+\begin_inset Formula $a=0.4,b=0.25,\sigma=0.7$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -580,19 +617,6 @@ Solution for the two-period model
 \end_layout
 
 \begin_layout Standard
-We show below that if 
-\begin_inset Formula $\sigma>0.5$
-\end_inset
-
-, this problem is globally concave.
- We assume 
-\begin_inset Formula $\sigma>0.5$
-\end_inset
-
- from here on.
-\end_layout
-
-\begin_layout Standard
 Write the Lagrangian of (
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -611,6 +635,44 @@ noprefix "false"
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+We show below that if 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+, this problem is globally concave.
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+indeed if 
+\begin_inset Formula $\sigma<0.5$
+\end_inset
+
+ it's not concave, see the file convex.png, produced by
+\end_layout
+
+\begin_layout Plain Layout
+plot(0:0.1:1.9, 0:0.1:0.49, (x, y) -> U(1, x, y, h = 1.2, a = 0.1, b = 0.3, 
+\begin_inset Formula $\sigma$
+\end_inset
+
+=0.2))
+\end_layout
+
+\end_inset
+
+ We assume 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+ from here on.
+\end_layout
+
+\begin_layout Standard
 Plugging (
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -628,7 +690,8 @@ reference "eq:Y2"
 
 \end_inset
 
-) into the above, we can derive the KKT conditions for an optimum 
+) into the above, we can derive the Karosh-Kuhn-Tucker conditions for an
+ optimum 
 \begin_inset Formula $(N_{1}^{*},N_{2}^{*},s^{*})$
 \end_inset
 
@@ -2031,7 +2094,196 @@ From the cases above, as
 \end_inset
 
 .
- Putting these together gives the facts mentioned in the main text.
+ To show global concavity of 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+ in 
+\begin_inset Formula $h$
+\end_inset
+
+ as 
+\begin_inset Formula $\sigma\nearrow1$
+\end_inset
+
+, all that remains is to check that the derivative is increasing around
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+joins
+\begin_inset Quotes erd
+\end_inset
+
+ where these 3 regions meet.
+ That is trivially satisfied where 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ becomes 0, since thereafter 
+\begin_inset Formula $\frac{dN^{*}}{dh}$
+\end_inset
+
+ is zero.
+ The derivative as 
+\begin_inset Formula $N_{1}^{*}$
+\end_inset
+
+ approaches zero is twice the expression in (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:dNdh1"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{equation}
+-\frac{2}{b}\left(\frac{b}{a}\right)^{1/(2\sigma-1)}\frac{1-\sigma}{2\sigma-1}h^{(1-\sigma)/(2\sigma-1)-1}\label{eq:dNonleft}
+\end{equation}
+
+\end_inset
+
+and the derivative to the right of this point is given by (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:dNdh2"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+):
+\begin_inset Formula 
+\begin{equation}
+-\frac{1}{b}\left(\frac{b}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}(s^{*}h)^{(1-2\sigma)/\sigma}(s^{*}+h\frac{ds^{*}}{dh})\label{eq:dNonright}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We want to prove that the former is larger in magnitude (i.e.
+ more negative).
+ Dividing (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:dNonleft"
+
+\end_inset
+
+) by (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:dNonright"
+
+\end_inset
+
+) gives
+\begin_inset Formula 
+\[
+2\frac{\sigma}{2\sigma-1}\left(\frac{b}{a}\right)^{(1-\sigma)/(\sigma(2\sigma-1))}\frac{h^{(1-\sigma)^{2}/(\sigma(2\sigma-1))}}{s^{*}(s^{*}+h\frac{ds^{*}}{dh})}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+NB: 
+\begin_inset Formula $(1-\sigma)^{2}/(\sigma(2\sigma-1))$
+\end_inset
+
+ is decreasing to 0 on (0.5,1] and is 0.5 for 
+\begin_inset Formula $\sigma=2/3$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula $(1-\sigma)/(\sigma(2\sigma-1))$
+\end_inset
+
+ is negative on (0.5, 1], increasing to 0, and is -1.5 for 
+\begin_inset Formula $\sigma=2/3$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+Examining (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:estar2"
+
+\end_inset
+
+) shows that as 
+\begin_inset Formula $\sigma\rightarrow1$
+\end_inset
+
+, 
+\begin_inset Formula $\sigma^{*}\rightarrow0.5$
+\end_inset
+
+ and 
+\begin_inset Formula $\frac{ds^{*}}{dh}\rightarrow0$
+\end_inset
+
+, and therefore the above approaches
+\begin_inset Formula 
+\[
+2\frac{1}{(0.5)^{2}}=8
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+so that indeed (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:dNonleft"
+
+\end_inset
+
+) is larger in magnitude than (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:dNonright"
+
+\end_inset
+
+).
+ Thus, 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+ is globally concave in 
+\begin_inset Formula $h$
+\end_inset
+
+ as 
+\begin_inset Formula $\sigma\nearrow1$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -2088,7 +2340,7 @@ status collapsed
 
 \begin_inset Formula 
 \begin{align*}
-\frac{d^{2}N_{t}^{*}}{dhdb} & =\frac{2\sigma-2}{2\sigma-1}b^{(3-4\sigma)/(2\sigma-1)}\left(\frac{1}{a}\right)^{1/(2\sigma-1)}\frac{1-\sigma}{2\sigma-1}h^{(1-\sigma)/(2\sigma-1)-1}
+\frac{d^{2}N_{t}^{*}}{dhdb} & =\frac{2\sigma-2}{2\sigma-1}b^{(3-4\sigma)/(2\sigma-1)}\left(\frac{1}{a}\right)^{1/(2\sigma-1)}\frac{1-\sigma}{2\sigma-1}h^{(\sigma-1)^{2}/(\sigma(2\sigma-1))}
 \end{align*}
 
 \end_inset

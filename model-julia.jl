@@ -3,6 +3,10 @@
 
 # ==== using Ipopt and JuMP ====
 
+module Fertility
+
+export U, ipopt_solve, theory_solve, solve_e, plot_solutions
+
 using JuMP
 using Ipopt
 using Plots
@@ -39,7 +43,7 @@ function ipopt_solve(H::Real, A::Real, B::Real, S::Real)
     set_value(b, B)
     set_value(σ, S)
 
-    optimize!(model)
+    optimize!(model::JuMP.Model)
 
     [value(N₁), value(N₂), value(e)]
 end
@@ -82,7 +86,7 @@ function theory_solve(h::Real, a::Real, b::Real, σ::Real)
     [N₁, N₂, e]
 end
 
-function plot_solutions(hmin, hmax, a, b, σ; theory = true)
+function plot_solutions(hmin, hmax, a, b, σ; theory = true, ipopt = true)
     len = 100
     hs = range(hmin, hmax, length = len)
 
@@ -90,21 +94,32 @@ function plot_solutions(hmin, hmax, a, b, σ; theory = true)
     theory_result = copy(ipopt_result)
 
     for (ix, h) = zip(1:len, hs) 
-        ipopt_result[:, ix]  = ipopt_solve(h, a, b, σ)
+        ipopt && (ipopt_result[:, ix]  = ipopt_solve(h, a, b, σ))
         theory && (theory_result[:, ix] = theory_solve(h, a, b, σ))
     end
 
-    p = plot(hs, ipopt_result[1, :], label = "N1")
-    plot!(p, hs, ipopt_result[2, :], label = "N2")
-    plot!(p, hs, ipopt_result[3, :], label = "e")
+    if ipopt
+        p = plot(hs, ipopt_result[1, :], label = "N1 ipopt")
+        plot!(p, hs, ipopt_result[2, :], label = "N2 ipopt")
+        plot!(p, hs, ipopt_result[3, :], label = "s ipopt")
+    end
     if theory
-        plot!(p, hs, theory_result[1, :], label = "N1 theory", 
-            linestyle = :dash, lw = 2)
-        plot!(p, hs, theory_result[2, :], label = "N2 theory", 
-            linestyle = :dash, lw = 2)
-        plot!(p, hs, theory_result[3, :], label = "e theory",  
-            linestyle = :dash, lw = 2)
+        if ! ipopt
+            p = plot(hs, theory_result[1, :], label = "N₁", 
+                    linestyle = :dash, lw = 2, xlabel = "h", lc = :black)
+        else
+            plot!(p, hs, theory_result[1, :], label = "N₁", 
+                linestyle = :dash, lw = 2, lc = :black)
+        end
+        plot!(p, hs, theory_result[2, :], label = "N₂", 
+            linestyle = :dashdot, lw = 2, lc = :black)
+        plot!(p, hs, theory_result[1, :] + theory_result[2, :] .+ 0.1, label = "N", 
+            linestyle = :solid, lw = 2, lc = :black)
+        # plot!(p, hs, theory_result[3, :], label = "s",  
+        #     linestyle = :dash, lw = 2)
     end
 
     display(p)
+end
+
 end
