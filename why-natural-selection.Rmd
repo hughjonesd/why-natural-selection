@@ -1,5 +1,5 @@
 ---
-title: "Natural selection in contemporary humans is linked to income and substitution effects"
+title: "Natural selection in contemporary humans is driven by correlations with human capital"
 author: "David Hugh-Jones \\thanks{Corresponding author. School of Economics, University of East Anglia, Norwich, UK. Email: D.Hugh-Jones@uea.ac.uk}, Abdel Abdellaoui \\thanks{Department of Psychiatry, Amsterdam UMC, University of Amsterdam, Amsterdam, The Netherlands. Email: a.abdellaoui@amsterdamumc.nl}"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 abstract: "\\noindent Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection through the association between 33 polygenic scores and fertility, across two generations, using data from UK Biobank (N = 409,629 British subjects with European ancestry). Consistently over time, polygenic scores associated with lower (higher) earnings, education and health are selected for (against). Selection effects are concentrated among lower SES groups, younger parents, people with more lifetime sexual partners, and people not living with a partner. The direction of natural selection is reversed among older parents (22+), or after controlling for age at first live birth. These patterns are in line with economic theories of fertility, in which higher earnings may either increase or decrease fertility via income and substitution effects in the labour market. Studying natural selection can help us understand the genetic architecture of health outcomes: we find evidence in modern day Great Britain for multiple natural selection pressures that vary between subgroups in the direction and strength of their effects, that are strongly related to the socio-economic system, and that may contribute to health inequalities across income groups."
@@ -18,6 +18,11 @@ header-includes:
   - \titleformat*{\section}{\sffamily\LARGE}
   - \titleformat*{\subsection}{\sffamily\itshape\Large}
   - \hypersetup{colorlinks = true, linkcolor = {blue}, linkbordercolor = {white}}
+  - \usepackage{amsthm}
+  - \theoremstyle{plain}
+  - \newtheorem{lem}{\protect\lemmaname}
+  - \providecommand{\lemmaname}{Lemma}
+  - \usepackage{xr-hyper}
 editor_options: 
   markdown: 
     wrap: 72
@@ -988,9 +993,98 @@ in time, the opportunity cost of childrearing increases if one's market wage is
 higher. The income effect would lead higher earners to have more children. The
 substitution effect would lead higher earners to have fewer children. If so,
 then genetic variants which affect earnings potential in the labour market may
-cause opposing effects on fertility. The income effect will cause natural
+cause opposing effects on fertility. The income effect will lead to natural
 selection in favour of earnings-increasing variants. The substitution effect
-will do the reverse.
+will do the reverse. 
+
+To demonstrate this, we write down a simple model of 
+fertility choices. $h$ is an individual's level of human capital, which 
+(for now) we identify with his or her wage $W$. Raising a child takes time $b$. People maximize utility
+from the number of children $N$, and income $Y\equiv(1-bN)W$. An
+individual's payoff is
+
+\[
+U(N)=u(Y)+aN.
+\]
+
+Here $a$ captures the strength of preference for children. $u(\cdot)$
+is concave and increasing. We treat $N$ as continuous, in line with
+the literature: this can be thought of as the expected number of children
+among similar people. The marginal benefit of an extra child is
+$\frac{dU}{dN}=-bWu'(Y)+a$. The effect of an increase in wages (or human capital) 
+on this marginal benefit is
+
+\[
+\frac{d^{2}U}{dNdh}=\underbrace{-bu'(Y)}_{\textrm{Substitution effect}}\underbrace{-bYu''(Y)}_{\textrm{Income effect}}.
+\]
+
+The *substitution effect* is negative and reflects that when
+wages increase, time devoted to childcare costs more in foregone income.
+The positive *income effect* reflects that when wage income is
+higher, the marginal loss of wages from children is less painful.
+Letting $u(\cdot)$ take the constant relative risk aversion (CRRA)
+form $u(y)=\frac{y^{1-\sigma}-1}{1-\sigma}$, where $\sigma>0$ captures
+risk aversion in income, we solve for optimal fertility $N^{*}$,
+and examine the *fertility-human capital relationship*, $\frac{dN^{*}}{dh}$.
+For moderate levels of risk aversion ($0.5<\sigma<1$):
+
+\begin{enumerate}
+\item The fertility-human capital relationship is negative: $\frac{dN^{*}}{dh}<0$.
+\item The relationship is weaker (closer to zero) at higher wages and/or
+levels of human capital.
+\item The relationship is more negative when the time burden of children,
+$b$, is larger.
+\end{enumerate}
+
+To examine education and fertility timing, we extend the model to
+two periods. For convenience we ignore time discounting, and assume
+that credit markets are imperfect so that agents cannot borrow. Write
+
+\begin{equation}
+U(N_{1},N_{2})=u(Y_{1})+u(Y_{2})+a(N_{1}+N_{2})\label{eq:U}
+\end{equation}
+
+Instead of identifying human capital $h$ with wages, we now allow
+individuals to choose a level of education $s\in[0,1]$, which has
+a time cost in period 1. Education increases period 2 wages, and is
+complementary to human capital $h>0$. For period 2 wages we assume
+the simple functional form $w(s,h)=sh$. We normalize period 1 wages
+to 1. Maintaining the assumption of CRRA utility, we examine total
+fertility $N^{*}\equiv N_{1}^{*}+N_{2}^{*}$. For $0.5<\sigma<1$,
+facts 1-3 continue to hold (fact 2 in a neighborhood of $\sigma=1$).
+In addition, for $\sigma$ in a neighborhood of 1:
+
+\begin{enumerate}
+\item [4.]\setcounter{enumi}{4}The fertility-human capital relationship
+is weaker at higher levels of education $s$.
+\item The relationship is weaker among those who start fertility in period
+2 ($N_{1}^{*}=0$) than among those who start fertility in period
+1 ($N_{1}^{*}>0$).
+\end{enumerate}
+
+Facts 1-5 match our empirical results. In this model, polygenic scores which
+correlate with human capital would have a negative correlation with fertility at
+low income and education levels, and a weaker or zero correlation at higher
+levels (Figure \@ref(fig:plot-income-educ-level)). For scores which are highly
+correlated with human capital, the correlation would also be weaker at higher
+levels of the score itself, giving rise to diversifying selection (Appendix
+Figure \@ref(fig:plot-purifying)). The correlation would be more negative when
+the time burden of children $b$ is high, e.g. for single parents (Figure
+\@ref(fig:plot-n-partners)). Lastly, the correlation would be weaker among those
+starting fertility later (Figure \@ref(fig:plot-age-flb)).
+
+An alternative theory is that polygenic scores correlate with the
+motivation to have children (parameter $a$ in the model). However, this theory
+would not explain why our results are weaker at higher incomes and education levels.
+Indeed, in the one-period model, while $\frac{dN^{*}}{da}>0$, this
+relationship actually becomes stronger at higher wages.
+
+The above does not provide a complete theory of fertility. Rather,
+it shows that a relatively simple economic model can explain many
+of our results. In the appendix, we discuss other models of fertility
+from the economic literature, as well as causal evidence for the relationship
+between human capital, income and fertility.
+
 
 This theory can explain why selection effects have opposite signs when AFLB is
 controlled for. Suppose that people are aware of their endowments of human
@@ -2033,6 +2127,16 @@ ineq_comp %>%
       set_col_width(c(.4, .2, .2, .2)) %>% 
       set_bottom_border(final(1), everywhere) %>% 
       set_position("center")
+```
+
+
+\clearpage
+\FloatBarrier
+
+# Proofs
+
+```{r include-model-appendix, child="model-appendix.Rmd"}
+
 ```
 
 \clearpage

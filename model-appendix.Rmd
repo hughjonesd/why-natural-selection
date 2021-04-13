@@ -1,0 +1,427 @@
+
+
+\externaldocument{why-natural-selection}
+
+\section*{Appendix}
+
+\section*{Solution for the one-period model}
+
+Differentiating and setting $\frac{dU}{dN}=0$ gives the first order
+condition for an optimal choice of children $N^{*}>0$:
+
+\[
+\frac{bW}{(W(1-bN^{*}))^{\sigma}}\ge a\textrm{, with equality if }N^{*}>0.
+\]
+Rearranging gives
+\begin{equation}
+N^{*}=\max\left\{ \frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}W^{(1-\sigma)/\sigma}\right),0\right\} .\label{eq:N-one-period}
+\end{equation}
+Note that when $\sigma<1$, for high enough $W$, $N^{*}=0$. Differentiating
+gives the effect of wages on fertility for $N^{*}>0$. This is also
+the fertility-human capital relationship:
+
+\begin{equation}
+\frac{dN^{*}}{dh}=\frac{dN^{*}}{dW}=-\frac{1}{b}\left(\frac{b}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}W^{(1-2\sigma)/\sigma}.\label{eq:DNdW-one-period}
+\end{equation}
+This is negative if $\sigma<1$. Also, 
+\[
+\frac{d^{2}N^{*}}{dW^{2}}=-\frac{1}{b}\left(\frac{b}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}\frac{1-2\sigma}{\sigma}W^{(1-3\sigma)/\sigma}
+\]
+For $0.5<\sigma<1$, this is positive, so the effect of fertility
+on wages shrinks towards zero as wages increase (and becomes 0 when
+$N^{*}=0$). Next, we consider the time cost of children $b$:
+\[
+\frac{d^{2}N^{*}}{dWdb}=-\left(\frac{1}{a}\right)^{1/\sigma}\left(\frac{1-\sigma}{\sigma}\right)^{2}(Wb)^{(1-2\sigma)/\sigma}<0.
+\]
+
+Lastly we consider the effect of $a$. From (\ref{eq:N-one-period}),
+$N^{*}$ is increasing in $a$. Differentiating (\ref{eq:DNdW-one-period})
+by $a$ gives
+\[
+\frac{d^{2}N^{*}}{dadW}=b^{1/\sigma-1}\frac{1-\sigma}{\sigma^{2}}W^{(1-2\sigma)/\sigma}a^{-1/\sigma-1}
+\]
+which is positive for $\sigma<1$.
+
+\section*{Solution for the two-period model}
+
+Period 1 and period 2 income are:
+\begin{align}
+Y_{1} & =1-s-bN_{1}\label{eq:Y1}\\
+Y_{2} & =w(s,h)(1-bN_{2})\label{eq:Y2}
+\end{align}
+
+Write the Lagrangian of utility $U$ (\ref{eq:U}) as 
+\[
+\mathcal{L}(N_{1},N_{2},s)=u(Y_{1})+u(Y_{2})+a(N_{1}+N_{2})+\lambda_{1}N_{1}+\lambda_{2}N_{2}+\lambda_{3}(\frac{1}{b}-N_{2})+\mu s
+\]
+
+Lemma \ref{lemma-concavity} below shows that if $\sigma>0.5$, this
+problem is globally concave, guaranteeing that the first order conditions
+identify a unique solution. We assume $\sigma>0.5$ from here on.
+
+Plugging (\ref{eq:Y1}) and (\ref{eq:Y2}) into the above, we can
+derive the Karush-Kuhn-Tucker conditions for an optimum $(N_{1}^{*},N_{2}^{*},s^{*})$
+as:
+\begin{align}
+\frac{d\mathcal{L}}{dN_{1}}=-bY_{1}^{-\sigma}+a+\lambda_{1} & =0\textrm{, with }\lambda_{1}=0\textrm{ if }N_{1}^{*}>0;\label{eq:kkt1}\\
+\frac{d\mathcal{L}}{dN_{2}}=-bs^{*}hY_{2}^{-\sigma}+a+\lambda_{2} & -\lambda_{3}=0\textrm{, with }\lambda_{2}=0\textrm{ if }N_{2}^{*}>0,\lambda_{3}=0\textrm{ if }N_{2}^{*}<\frac{1}{b};\label{eq:kkt2}\\
+\frac{d\mathcal{L}}{ds}=-Y_{1}^{-\sigma}+h(1-bN_{2}^{*})Y_{2}^{-\sigma}+\mu & =0;\label{eq:kkt3}\\
+N_{1}^{*},N_{2}^{*},s^{*},\lambda_{1},\lambda_{2},\lambda_{3},\mu & \ge0;N_{2}^{*}\le\frac{1}{b}.
+\end{align}
+Note that the Inada condition ($\lim_{x\rightarrow0}u'(x)=\infty$)
+for period 1 rules out $s^{*}=1$ and $N_{1}=1/b$, so we need not
+impose these constraints explicitly. Also, so long as $N_{2}^{*}<1/b$,
+the same condition rules out $s^{*}=0$. We consider four cases,
+of which only three can occur.
+
+\subsection*{Case 1: $N_{1}^{*}>0,N_{2}^{*}>0$}
+
+Rearranging (\ref{eq:kkt1}), (\ref{eq:kkt2}) and (\ref{eq:kkt3})
+gives:
+\begin{align}
+N_{1}^{*} & =\frac{1}{b}\left(1-s^{*}-\left(\frac{b}{a}\right)^{1/\sigma}\right);\label{eq:N11}\\
+N_{2}^{*} & =\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}(s^{*}h)^{(1-\sigma)/\sigma}\right);\label{eq:N21}\\
+s^{*} & =\frac{1-bN_{1}^{*}}{1+\left((1-bN_{2}^{*})h\right)^{1-1/\sigma}}.
+\end{align}
+Plugging the expressions for $N_{1}^{*}$ and $N_{2}^{*}$ into $s^{*}$gives
+\[
+s^{*}=\frac{s^{*}+\left(\frac{b}{a}\right)^{1/\sigma}}{1+\left(\left(\frac{b}{a}\right)^{1/\sigma}s^{*(1-\sigma)/\sigma}h{}^{1/\sigma}\right)^{1-1/\sigma}}
+\]
+which simplifies to
+\begin{equation}
+s^{*}=\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\sigma)/(2\sigma-1)}.\label{eq:s1}
+\end{equation}
+
+Plugging the above into (\ref{eq:N11}) and (\ref{eq:N21}) gives:
+\begin{align*}
+N_{1}^{*} & =\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\sigma)/(2\sigma-1)}-\left(\frac{b}{a}\right)^{1/\sigma}\right);\\
+N_{2}^{*} & =\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\sigma)/(2\sigma-1)}\right).
+\end{align*}
+Note that that $N_{1}^{*}<N_{2}^{*}$. For these both to be positive
+requires low values of $h$ if $\sigma<1$ and high values of $h$
+if $\sigma>1$. Also:
+\[
+w(s^{*},h)\equiv s^{*}h=\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{\sigma/(2\sigma-1)}.
+\]
+
+Observe that $w(s^{*},h)$ is increasing in $h$ for $\sigma>0.5$,
+and convex iff $0.5<\sigma<1$.  
+
+While $N_{1}^{*}$ and $N_{2}^{*}$ are positive, they have the same
+derivative with respect to $h$:
+\begin{equation}
+\frac{dN_{t}^{*}}{dh}=-\frac{1}{b}\left(\frac{b}{a}\right)^{1/(2\sigma-1)}\frac{1-\sigma}{2\sigma-1}h^{(1-\sigma)/(2\sigma-1)-1}\label{eq:dNdh1}
+\end{equation}
+Examining this and expression (\ref{eq:s1}) gives:
+\begin{lem}
+\label{case-1-lemma}For $\sigma<1$, case 1 holds for $h$ low enough,
+and in case 1, $N_{1}^{*}$ and $N_{2}^{*}$ decrease in $h$, while
+$s^{*}$ increases in $h$. 
+
+For $\sigma>1$, case 1 holds for $h$ high enough, and in case 1
+$N_{1}^{*}$ and $N_{2}^{*}$ increase in $h$, while $s^{*}$ decreases
+in $h$. 
+
+$N_{t}^{*}$ is convex in $h$ for $\sigma>2/3$, and concave otherwise.
+$s^{*}$ is convex in $h$ if $\sigma<2/3$, and concave otherwise.
+\end{lem}
+
+
+\subsection*{Case 2: $N_{1}^{*}=0,N_{2}^{*}>0$}
+
+Replace $N_{1}^{*}=0$ into the first order condition for $s^{*}$
+from (\ref{eq:kkt3}), and rearrange to give:
+\[
+s^{*}=\frac{1}{1+\left((1-bN_{2})h\right)^{1-1/\sigma}}.
+\]
+
+Now since $N_{2}^{*}>0$, we can rearrange (\ref{eq:kkt2}) to give
+\begin{equation}
+N_{2}^{*}=\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}(s^{*}h)^{(1-\sigma)/\sigma}\right).\label{eq:N22}
+\end{equation}
+
+Plugging this into $s^{*}$ gives
+\begin{align*}
+s^{*} & =\frac{1}{1+\left(\frac{bh}{a}\right)^{(\sigma-1)/\sigma^{2}}(s^{*}){}^{-(1-\sigma)^{2}/\sigma^{2}}}
+\end{align*}
+which can be rearranged to
+\begin{equation}
+(1-s^{*})(s^{*})^{(1-2\sigma)/\sigma^{2}}=\left(\frac{a}{bh}\right)^{(1-\sigma)/\sigma^{2}}.\label{eq:estar2}
+\end{equation}
+Differentiate the left hand side of the above to get
+\begin{align}
+ & \frac{1-2\sigma}{\sigma^{2}}(1-s^{*})(s^{*})^{(1-2\sigma)/\sigma^{2}-1}-(s^{*})^{(1-2\sigma)/\sigma^{2}}\nonumber \\
+= & \frac{1-2\sigma}{\sigma^{2}}(s^{*})^{(1-2\sigma)/\sigma^{2}-1}-\frac{\sigma^{2}+1-2\sigma}{\sigma^{2}}(s^{*})^{(1-2\sigma)/\sigma^{2}}\nonumber \\
+= & \frac{1-2\sigma}{\sigma^{2}}(s^{*})^{(1-2\sigma)/\sigma^{2}-1}-\frac{(1-\sigma)^{2}}{\sigma^{2}}(s^{*})^{(1-2\sigma)/\sigma^{2}}.\label{eq:destar-lhs}
+\end{align}
+This is negative if and only if
+\begin{align*}
+s^{*} & >\frac{1-2\sigma}{(1-\sigma)^{2}}
+\end{align*}
+which is always true since $\sigma>0.5$. Note also that since $\sigma>0.5$,
+then the left hand side of (\ref{eq:estar2}) approaches infinity
+as $s^{*}\rightarrow0$ and approaches 0 as $s^{*}\rightarrow1$.
+Thus, (\ref{eq:estar2}) implicitly defines the unique solution for
+$s^{*}$. 
+
+Conditions (\ref{eq:kkt1}) and (\ref{eq:kkt2}) give the bounds for
+this case. When $\sigma<1$, (\ref{eq:kkt1}) puts a minimum on $h$
+and (\ref{eq:kkt2}) puts a maximum on $h$. The situation is reversed
+for $\sigma>1$.
+
+To find how $s^{*}$ changes with $h$, note that the right hand side
+of the above decreases in $h$ for $\sigma<1$, and increases in $h$
+for $\sigma>1$. Putting these facts together: for $\sigma<1$, when
+$h$ increases the RHS of (\ref{eq:estar2}) decreases, hence the
+LHS decreases and $s^{*}$ increases, i.e. $s^{*}$ is increasing
+in $h$. For $\sigma>1$, $s^{*}$ is decreasing in $h$.
+
+To find how $N_{2}^{*}$ changes with $h$, we differentiate (\ref{eq:N22}):
+
+\begin{align}
+\frac{dN_{2}^{*}}{dh} & =-\frac{1}{b}\left(\frac{b}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}(s^{*}h)^{(1-2\sigma)/\sigma}(s^{*}+h\frac{ds^{*}}{dh})\label{eq:dNdh2}
+\end{align}
+which is negative for $\sigma<1$, since $\frac{ds^{*}}{dh}>0$ in
+this case. 
+
+Differentiating again:
+
+\begin{align*}
+\frac{d^{2}N_{2}}{dh^{2}} & =-X[\frac{1-2\sigma}{\sigma}(s^{*}h)^{(1-3\sigma)/\sigma}(s^{*}+h\frac{ds^{*}}{dh})^{2}+(s^{*}h)^{(1-2\sigma)/\sigma}(2\frac{ds^{*}}{dh}+h\frac{d^{2}s^{*}}{dh^{2}})]\\
+ & =X(s^{*}h)^{(1-3\sigma)/\sigma}[\frac{2\sigma-1}{\sigma}(s^{*}+h\frac{ds^{*}}{dh})^{2}-(s^{*}h)(2\frac{ds^{*}}{dh}+h\frac{d^{2}s^{*}}{dh^{2}})]
+\end{align*}
+where $X=\frac{1}{b}\left(\frac{b}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}>0$.
+Note that $\frac{d^{2}N_{2}}{dh^{2}}$ is continuous in $\sigma$
+around $\sigma=1$. Note also from (\ref{eq:estar2}) that for $\sigma=1$,
+$s^{*}$ becomes constant in $\sigma$. The term in square brackets
+then reduces to $(s^{*})^{2}>0$. Putting these facts together, for
+$\sigma$ sufficiently close to 1, $\frac{d^{2}N_{2}^{*}}{dh^{2}}>0$,
+i.e. $N_{2}^{*}$ is convex in $h$. 
+
+Summarizing:
+\begin{lem}
+\label{case-2-lemma}Case 2 holds for intermediate values of $h$.
+In case 2: for $\sigma<1$, $s^{*}$ is increasing in $h$ and $N_{2}^{*}$
+is decreasing in $h$. For $\sigma>1$, $s^{*}$is decreasing in $h$.
+For $\sigma$ close enough to 1, $N_{2}^{*}$ is convex in $h$.
+\end{lem}
+
+\subsection*{Case 3: $N_{1}^{*}=0,N_{2}^{*}=0$}
+
+We can solve for $s^{*}$ by substituting values of $Y_{1}$ and $Y_{2}$
+into (\ref{eq:kkt3}):
+\[
+-(1-s^{*}){}^{-\sigma}+h(s^{*}h)^{-\sigma}=0
+\]
+which rearranges to 
+\begin{equation}
+s^{*}=\frac{1}{1+h^{(\sigma-1)/\sigma}}.\label{eq:estar1}
+\end{equation}
+
+Conditions (\ref{eq:kkt1}) and (\ref{eq:kkt2}) become:
+\begin{align*}
+-b(1-s^{*})^{-\sigma}+a & \le0\\
+-bs^{*}h(s^{*}h)^{-\sigma}+a & \le0
+\end{align*}
+equivalently
+\begin{align*}
+\frac{a}{b} & \le(1-s^{*})^{-\sigma}\\
+\frac{a}{b} & \le s^{*}h(s^{*}h)^{-\sigma}
+\end{align*}
+which can both be satisfied for $a/b$ close enough to zero. Note
+from (\ref{eq:estar1}) that as $h\rightarrow\infty$, $s^{*}$ increases
+towards 1 for $\sigma<1$, and decreases towards 0 for $\sigma>1$.
+Note also that the right hand side of the first inequality above approaches
+infinity as $s^{*}\rightarrow1$, therefore also as $h\rightarrow\infty$
+for $\sigma<1$. Rewrite the second inequality as
+\[
+\frac{a}{b}<(s^{*}h)^{1-\sigma}=\left(\frac{h}{1+h^{(\sigma-1)/\sigma}}\right)^{1-\sigma}=\left(h^{-1}+h^{-1/\sigma}\right)^{\sigma-1}
+\]
+and note that again, as $h\rightarrow\infty$, the RHS increases towards
+infinity for $\sigma<1$, and decreases towards zero otherwise. Thus,
+for $\sigma<1$, both equations will be satisfied for $h$ high enough.
+For $\sigma>1$, they will be satisfied for $h$ low enough. Summarizing
+\begin{lem}
+\label{case-3-lemma}For $\sigma<1$, case 3 holds for $h$ high enough,
+and in case 3, $s^{*}$ increases in $h$. For $\sigma>1$, case 3
+holds for $h$ low enough and $s^{*}$ decreases in $h$.
+\end{lem}
+
+\subsection*{Case 4: $N_{1}^{*}>0,N_{2}^{*}=0$}
+
+Rearranging the first order conditions (\ref{eq:kkt1}) and (\ref{eq:kkt2})
+for $N_{1}^{*}$ and $N_{2}^{*}$ gives
+\begin{align*}
+\frac{a}{b} & =(1-s^{*}-bN_{1}^{*})^{-\sigma}\\
+\frac{a}{b} & \le s^{*}hY_{2}^{-\sigma}
+\end{align*}
+hence
+\begin{align*}
+(1-s^{*}-bN_{1}^{*})^{-\sigma} & \le s^{*}hY_{2}^{-\sigma}=(s^{*}h)^{1-\sigma}\\
+\Leftrightarrow(1-s^{*}-bN_{1}^{*})^{\sigma} & \ge(s^{*}h)^{\sigma-1}\\
+\Leftrightarrow1-s^{*}-bN_{1}^{*} & \ge(s^{*}h)^{1-1/\sigma}
+\end{align*}
+
+Now rearrange the first order condition for $s^{*}$ from (\ref{eq:kkt3}),
+noting that since $N_{2}^{*}=0$, $s^{*}>0$ by the Inada condition.
+\begin{align*}
+h^{1/\sigma-1}(1-s^{*}-bN_{1}^{*}) & =s^{*}\\
+1-s^{*}-bN_{1}^{*} & =s^{*}h^{1-1/\sigma}
+\end{align*}
+This, combined with the previous inequality, implies 
+\begin{align*}
+(s^{*}h)^{1-1/\sigma} & \le s^{*}h^{1-1/\sigma}\\
+\Leftrightarrow(s^{*})^{-1/\sigma} & \le1
+\end{align*}
+which cannot hold since $0<s^{*}<1$. 
+
+\subsection*{Comparative statics}
+
+We can now examine how the fertility-human capital relationship 
+\[
+\frac{dN^{*}}{dh},\textrm{ where }N^{*}\equiv N_{1}^{*}+N_{2}^{*},
+\]
+
+changes with respect to other parameters. We focus on the case $\sigma<1$,
+since it gives the closest match to our observations, and since it
+also generates ``reasonable'' predictions in other areas, e.g. that
+education levels increase with human capital. Figure \ref{fig:theory}
+shows how $N^{*}$ changes with $h$ for $a=0.4,b=0.25,\sigma=0.7$.
+
+\begin{figure}
+\begin{centering}
+\includegraphics[width=9cm, height=6cm]{N-plot}
+\par\end{centering}
+\caption{\label{fig:theory}Fertility vs. human capital in the two-period model
+with $a=0.4,b=0.25,\sigma=0.7$.}
+\end{figure}
+
+From Lemmas \ref{case-1-lemma}, \ref{case-2-lemma} and \ref{case-3-lemma},
+as $h$ increases we move from $N_{1}^{*},N_{2}^{*}>0$ to $N_{1}^{*}=0,N_{2}^{*}>0$
+to $N_{1}^{*}=N_{2}^{*}=0$. Furthermore, for $\sigma>2/3$, $N_{1}^{*}$
+and $N_{2}^{*}$ are convex in $h$ when they are both positive, and
+for $\sigma$ close enough to 1, $N_{2}^{*}$ is convex in $h$ when
+$N_{1}^{*}=0$. To show global concavity of $N^{*}$ in $h$ as $\sigma\nearrow1$,
+all that remains is to check that the derivative is increasing around
+the points where these 3 regions meet. That is trivially satisfied
+where $N_{2}^{*}$ becomes 0, since thereafter $\frac{dN^{*}}{dh}$
+is zero. The derivative as $N_{1}^{*}$ approaches zero is twice the
+expression in (\ref{eq:dNdh1}):
+\begin{equation}
+-\frac{2}{b}\left(\frac{b}{a}\right)^{1/(2\sigma-1)}\frac{1-\sigma}{2\sigma-1}h^{(1-\sigma)/(2\sigma-1)-1}\label{eq:dNonleft}
+\end{equation}
+and the derivative to the right of this point is given by (\ref{eq:dNdh2}):
+\begin{equation}
+-\frac{1}{b}\left(\frac{b}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}(s^{*}h)^{(1-2\sigma)/\sigma}(s^{*}+h\frac{ds^{*}}{dh})\label{eq:dNonright}
+\end{equation}
+
+We want to prove that the former is larger in magnitude (i.e. more
+negative). Dividing (\ref{eq:dNonleft}) by (\ref{eq:dNonright})
+gives
+\[
+2\frac{\sigma}{2\sigma-1}\left(\frac{b}{a}\right)^{(1-\sigma)/(\sigma(2\sigma-1))}\frac{h^{(1-\sigma)^{2}/(\sigma(2\sigma-1))}}{s^{*}(s^{*}+h\frac{ds^{*}}{dh})}
+\]
+
+Examining (\ref{eq:estar2}) shows that as $\sigma\rightarrow1$,
+$s^{*}\rightarrow0.5$ and $\frac{ds^{*}}{dh}\rightarrow0$, and therefore
+the above approaches
+\[
+2\frac{1}{(0.5)^{2}}=8.
+\]
+
+Thus, as $\sigma\nearrow1$, $N^{*}$ is guaranteed to be globally
+convex in $h$.
+
+We can now prove the facts stated in the main text.
+
+\textbf{Fact 1}: for $\sigma<1$, total fertility $N^{*}\equiv N_{1}^{*}+N_{2}^{*}$
+is decreasing in human capital $h$. 
+
+Furthermore, for $\sigma$ close enough to 1, fertility is convex
+in human capital, i.e. 
+
+\textbf{Fact 2 part 1}: the fertility-human capital relationship is
+closer to 0 at high levels of $h$.
+
+For $\sigma<1$, education levels $s^{*}$ increase in $h$, and so
+therefore do equilibrium wages $w(s^{*},h)$. This, plus fact 1, gives:
+
+\textbf{Fact 2 part 2}: for $\sigma<1$ and close to 1, the fertility-human
+capital relationship is weaker among higher earners.
+
+\textbf{Fact 4}: for $\sigma<1$ and close to 1, the fertility-human
+capital relationship is weaker at high levels of education.
+
+Next, we compare people who start fertility early ($N_{1}^{*}>0$)
+versus those who start fertility late ($N_{1}^{*}=0$). Again, for
+$\sigma<1$ the former group have lower $h$ than the latter group.
+Thus we have:
+
+\textbf{Fact 5}: for $\sigma<1$ and close to 1, the fertility-human
+capital relationship is weaker among those who start fertility late.
+
+Lastly, we prove fact 3. Differentiating $dN_{t}^{*}/dh$ in (\ref{eq:dNdh1})
+with respect to $b$, for when $N_{1}^{*}>0$ gives:
+\begin{align*}
+\frac{d^{2}N_{t}^{*}}{dhdb} & =\frac{2\sigma-2}{2\sigma-1}b^{(3-4\sigma)/(2\sigma-1)}\left(\frac{1}{a}\right)^{1/(2\sigma-1)}\frac{1-\sigma}{2\sigma-1}h^{(\sigma-1)^{2}/(\sigma(2\sigma-1))}
+\end{align*}
+
+which is negative for $0.5<\sigma<1$. When $N_{1}^{*}=0$, differentiating
+$dN_{2}^{*}/dh$ in (\ref{eq:dNdh2}) gives:
+
+\[
+\frac{d^{2}N_{2}^{*}}{dhdb}=-\frac{1-\sigma}{\sigma}b^{(1-2\sigma)/\sigma}\left(\frac{1}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}(s^{*}h)^{(1-2\sigma)/\sigma}(s^{*}+h\frac{ds^{*}}{dh})
+\]
+which again is negative for $\sigma<1$. Therefore:
+
+\textbf{Fact 3}: for $\sigma<1$, the fertility-human capital relationship
+is more negative when the burden of childcare $b$ is larger.
+
+\subsection*{Concavity}
+\begin{lem}
+\label{lemma-concavity}For $\sigma>0.5$, $U$ in equation (\ref{eq:U})
+is concave in $N_{1},N_{2}$ and $s$.
+\end{lem}
+\begin{proof}
+We examine the Hessian matrix of utility in each period. Note that
+period 1 utility is constant in $N_{2}$ and period 2 utility is constant
+in $N_{1}$. For period 1 the Hessian with respect to $N_{1}$and
+$s$ is: 
+\[
+\left[\begin{array}{cc}
+d^{2}u/dN_{1}^{2} & d^{2}u/dsdN_{1}\\
+d^{2}u/dsdN_{1} & d^{2}u/ds^{2}
+\end{array}\right]=\left[\begin{array}{cc}
+-\sigma b^{2} & -\sigma b\\
+-\sigma b & -\sigma
+\end{array}\right]Y_{1}^{-\sigma-1}
+\]
+with determinant 
+\[
+(\sigma^{2}b^{2}-\sigma^{2}b^{2})Y_{1}^{-2\sigma-2}=0.
+\]
+Thus, first period utility is weakly concave. For period 2 with respect
+to $N_{2}$ and $s$, the Hessian is:
+
+\[
+\left[\begin{array}{cc}
+d^{2}u/dN_{2}^{2} & d^{2}u/dsdN_{2}\\
+d^{2}u/dsdN_{2} & d^{2}u/ds^{2}dN_{2}
+\end{array}\right]=\left[\begin{array}{cc}
+-\sigma(bsh)^{2}Y_{2}^{-\sigma-1} & -(1-\sigma)bhY_{2}^{-\sigma}\\
+-(1-\sigma)bhY_{2}^{-\sigma} & -\sigma[h(1-bN_{2}^{*})]^{2}Y_{2}^{-\sigma-1}
+\end{array}\right]
+\]
+with determinant
+\begin{align*}
+ & (-\sigma(bsh)^{2}Y_{2}^{-\sigma-1})(-\sigma[h(1-bN_{2}^{*})]^{2}Y_{2}^{-\sigma-1})-(-(1-\sigma)bhY_{2}^{-\sigma})^{2}\\
+= & \sigma^{2}(bsh)^{2}[h(1-bN_{2}^{*})]^{2}Y_{2}^{-2\sigma-2}-(1-\sigma)^{2}(bh)^{2}Y_{2}^{-2\sigma}\\
+= & \sigma^{2}(bh)^{2}Y_{2}^{-2\sigma}-(1-\sigma)^{2}(bh)^{2}Y_{2}^{-2\sigma}\textrm{, using that }Y_{2}=(sh)(1-bN)\\
+= & (bh)^{2}Y_{2}^{-2\sigma}(\sigma^{2}-(1-\sigma)^{2})
+\end{align*}
+which is positive if and only if $\sigma>0.5$. Thus, if $\sigma>0.5$
+then the Hessian is negative definite and thus utility is concave;
+this combined with weak concavity of period 1, and linearity of $a(N_{1}+N_{2})$,
+shows that (\ref{eq:U}) is concave.
+\end{proof}
+

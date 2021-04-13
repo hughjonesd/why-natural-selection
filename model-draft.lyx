@@ -2890,7 +2890,7 @@ Thus, as
 \begin_inset Formula $N^{*}$
 \end_inset
 
- is guaranteed to be globally concave in 
+ is guaranteed to be globally convex in 
 \begin_inset Formula $h$
 \end_inset
 
