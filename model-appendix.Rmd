@@ -164,11 +164,6 @@ as $s^{*}\rightarrow0$ and approaches 0 as $s^{*}\rightarrow1$.
 Thus, (\ref{eq:estar2}) implicitly defines the unique solution for
 $s^{*}$. 
 
-Conditions (\ref{eq:kkt1}) and (\ref{eq:kkt2}) give the bounds for
-this case. When $\sigma<1$, (\ref{eq:kkt1}) puts a minimum on $h$
-and (\ref{eq:kkt2}) puts a maximum on $h$. The situation is reversed
-for $\sigma>1$.
-
 To find how $s^{*}$ changes with $h$, note that the right hand side
 of the above decreases in $h$ for $\sigma<1$, and increases in $h$
 for $\sigma>1$. Putting these facts together: for $\sigma<1$, when
@@ -197,6 +192,11 @@ $s^{*}$ becomes constant in $\sigma$. The term in square brackets
 then reduces to $(s^{*})^{2}>0$. Putting these facts together, for
 $\sigma$ sufficiently close to 1, $\frac{d^{2}N_{2}^{*}}{dh^{2}}>0$,
 i.e. $N_{2}^{*}$ is convex in $h$. 
+
+Conditions (\ref{eq:kkt1}) and (\ref{eq:kkt2}) give the bounds for
+this case. When $\sigma<1$, (\ref{eq:kkt1}) puts a minimum on $h$
+and (\ref{eq:kkt2}) puts a maximum on $h$. The situation is reversed
+for $\sigma>1$.
 
 Summarizing:
 \begin{lem}
