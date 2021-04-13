@@ -6,6 +6,9 @@
 \origin unavailable
 \textclass article
 \use_default_options true
+\begin_modules
+theorems-ams-bytype
+\end_modules
 \maintain_unincluded_children false
 \language english
 \language_package default
@@ -81,12 +84,12 @@
 To show how income and substitution effects can lead to our results, we
  write down a simple model of fertility choices.
  
-\begin_inset Formula $W$
+\begin_inset Formula $h$
 \end_inset
 
- is an individual's wage, which (for now) we identify with his or her level
- of human capital 
-\begin_inset Formula $h$
+ is an individual's level of human capital, which (for now) we identify
+ with his or her wage 
+\begin_inset Formula $W$
 \end_inset
 
 .
@@ -95,25 +98,24 @@ To show how income and substitution effects can lead to our results, we
 \end_inset
 
 .
- People maximize utility composed of two subcomponents, income and the number
- of children 
+ People maximize utility from the number of children 
 \begin_inset Formula $N$
+\end_inset
+
+, and income 
+\begin_inset Formula $Y\equiv(1-bN)W$
 \end_inset
 
 .
  An individual's payoff is
 \begin_inset Formula 
 \[
-U(N)=u(Y)+aN
+U(N)=u(Y)+aN.
 \]
 
 \end_inset
 
-where 
-\begin_inset Formula $Y\equiv(1-bN)W$
-\end_inset
-
- is income from time not allocated to childcare, and 
+Here 
 \begin_inset Formula $a$
 \end_inset
 
@@ -167,50 +169,38 @@ where
 \end_inset
 
  as continuous, in line with the literature: this can be thought of as the
- expected number of children among people who share the same characteristics.
- The marginal benefit of an extra child is
+ expected number of children among similar people.
+ The marginal benefit of an extra child is 
+\begin_inset Formula $\frac{dU}{dN}=-bWu'(Y)+a$
+\end_inset
+
+.
+ The effect of an increase in wages (or human capital) on this marginal
+ benefit is
 \begin_inset Formula 
 \[
-\frac{dU}{dN}=-bWu'(Y)+a
+\frac{d^{2}U}{dNdh}=\underbrace{-bu'(Y)}_{\textrm{Substitution effect}}\underbrace{-bYu''(Y)}_{\textrm{Income effect}}.
 \]
 
 \end_inset
 
-and the effect of an increase in wages on this marginal benefit is
-\begin_inset Formula 
-\[
-\frac{d^{2}U}{dNdW}=\underbrace{-bu'(Y)}_{\textrm{Substitution effect}}\underbrace{-bYu''(Y)}_{\textrm{Income effect}}.
-\]
-
-\end_inset
-
-The first term is negative and reflects that when 
-\begin_inset Formula $W$
-\end_inset
-
- increases, time devoted to childcare costs more in foregone income.
- The second term is positive, since 
-\begin_inset Formula $u$
-\end_inset
-
- is concave, and reflects that when 
-\begin_inset Formula $W$
-\end_inset
-
- is higher, the marginal loss of wages from childcare has less effect on
- overall utility.
-\end_layout
-
-\begin_layout Standard
-To solve the model explicitly, we let 
+The 
+\emph on
+substitution effect
+\emph default
+ is negative and reflects that when wages increase, time devoted to childcare
+ costs more in foregone income.
+ The positive
+\emph on
+ income effect
+\emph default
+ reflects that when wage income is higher, the marginal loss of wages from
+ children is less painful.
+ Letting 
 \begin_inset Formula $u(\cdot)$
 \end_inset
 
- be the 
-\emph on
-constant relative risk aversion
-\emph default
- function 
+ take the constant relative risk aversion (CRRA) form 
 \begin_inset Formula $u(y)=\frac{y^{1-\sigma}-1}{1-\sigma}$
 \end_inset
 
@@ -218,52 +208,41 @@ constant relative risk aversion
 \begin_inset Formula $\sigma>0$
 \end_inset
 
- parametrizes risk aversion in income.
- We then solve for the optimal fertility 
+ captures risk aversion in income, we solve for optimal fertility 
 \begin_inset Formula $N^{*}$
 \end_inset
 
- and examine the effect of wages on fertility, 
-\begin_inset Formula $\frac{dN^{*}}{dW}$
-\end_inset
-
-.
- We also refer to this as the 
+, and examine the 
 \emph on
 fertility-human capital relationship
 \emph default
-, since human capital 
-\begin_inset Formula $h=W$
+, 
+\begin_inset Formula $\frac{dN^{*}}{dh}$
 \end_inset
 
 .
- We show the following facts:
-\end_layout
-
-\begin_layout Enumerate
-If risk aversion is not too high (
-\begin_inset Formula $\sigma<1$
-\end_inset
-
-), the fertility-human capital relationship is negative: 
-\begin_inset Formula $\frac{dN^{*}}{dW}<0$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Enumerate
-For 
+ For moderate levels of risk aversion (
 \begin_inset Formula $0.5<\sigma<1$
 \end_inset
 
-, the fertility-human capital relationship is weaker (i.e.
- closer to zero) at higher wages.
+):
 \end_layout
 
 \begin_layout Enumerate
-The fertility-human capital relationship is more negative when the time
- burden of children, 
+The fertility-human capital relationship is negative: 
+\begin_inset Formula $\frac{dN^{*}}{dh}<0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+The relationship is weaker (closer to zero) at higher wages and/or levels
+ of human capital.
+\end_layout
+
+\begin_layout Enumerate
+The relationship is more negative when the time burden of children, 
 \begin_inset Formula $b$
 \end_inset
 
@@ -271,33 +250,9 @@ The fertility-human capital relationship is more negative when the time
 \end_layout
 
 \begin_layout Standard
-The implication of the last point is that if 
-\begin_inset Formula $b$
-\end_inset
-
- is higher for single parents than for couples, then the fertility-human
- capital relationship will be more negative for single parents.
- 
-\end_layout
-
-\begin_layout Standard
-Under these assumptions, polygenic scores which cause, or even correlate
- with, variation in human capital would show the pattern we observe in our
- data.
- They would have a negative correlation with fertility at low income levels,
- and a smaller or zero correlation at high income levels.
- The correlation would be more negative when the time burden of children
- is high, e.g.
- for single parents.
- These predictions fit the patterns in our data.
-\end_layout
-
-\begin_layout Standard
-To examine education and age at first birth, we extend this model to two
- periods.
- For convenience we ignore time discounting and assume the interest rate
- is 0; we also assume that credit markets are imperfect so that agents cannot
- save or borrow.
+To examine education and fertility timing, we extend the model to two periods.
+ For convenience we ignore time discounting; we also assume that credit
+ markets are imperfect so that agents cannot borrow.
  Write
 \begin_inset Formula 
 \begin{equation}
@@ -306,57 +261,38 @@ U(N_{1},N_{2})=u(Y_{1})+u(Y_{2})+a(N_{1}+N_{2})\label{eq:U}
 
 \end_inset
 
-We continue to assume CRRA utility.
- We now drop the identification of human capital 
+Instead of identifying human capital 
 \begin_inset Formula $h$
 \end_inset
 
- with wages.
- Instead, we allow individuals to choose a level of education 
+ with wages, we now allow individuals to choose a level of education 
 \begin_inset Formula $s\in[0,1]$
 \end_inset
 
-, which has a cost in time in period 1.
+, which has a time cost in period 1.
  Education increases period 2 wages, and is complementary to human capital
  
 \begin_inset Formula $h>0$
 \end_inset
 
 .
- Thus, we write the period 2 wage as 
-\begin_inset Formula $w(s,h)$
-\end_inset
-
-.
- We assume the simple functional form 
+ For period 2 wages we assume the simple functional form 
 \begin_inset Formula $w(s,h)=sh$
 \end_inset
 
-, and normalize period 1 wages to 1.
- Thus:
-\begin_inset Formula 
-\begin{align}
-Y_{1} & =1-s-bN_{1}\label{eq:Y1}\\
-Y_{2} & =w(s,h)(1-bN_{2})\label{eq:Y2}
-\end{align}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-We can then derive conclusions about the relationship of human capital to
- total fertility 
+.
+ We normalize period 1 wages to 1.
+ Maintaining the assumption of CRRA utility, we examine total fertility
+ 
 \begin_inset Formula $N^{*}\equiv N_{1}^{*}+N_{2}^{*}$
 \end_inset
 
 .
- For intermediate values of risk aversion, 
+ For 
 \begin_inset Formula $0.5<\sigma<1$
 \end_inset
 
-, facts 1-3 above continue to hold (fact 2 in a neighborhood of 
+, facts 1-3 continue to hold (fact 2 in a neighborhood of 
 \begin_inset Formula $\sigma=1$
 \end_inset
 
@@ -381,11 +317,7 @@ setcounter{enumi}{4}
 
 \end_inset
 
-The fertility-human capital relationship is weaker among higher earners.
-\end_layout
-
-\begin_layout Enumerate
-The fertility-human capital relationship is weaker at high levels of education
+The fertility-human capital relationship is weaker at higher levels of education
  
 \begin_inset Formula $s$
 \end_inset
@@ -394,8 +326,7 @@ The fertility-human capital relationship is weaker at high levels of education
 \end_layout
 
 \begin_layout Enumerate
-The fertility-human capital relationship is weaker among those who start
- fertility in period 2 (
+The relationship is weaker among those who start fertility in period 2 (
 \begin_inset Formula $N_{1}^{*}=0$
 \end_inset
 
@@ -407,58 +338,44 @@ The fertility-human capital relationship is weaker among those who start
 \end_layout
 
 \begin_layout Standard
-These facts again match the patterns in our data (Figures XXX, XXX and XXX).
+Facts 1-5 match our empirical results.
+ In this model, polygenic scores which correlate with human capital would
+ have a negative correlation with fertility at low income and education
+ levels, and a weaker or zero correlation at higher levels.
+ For scores which are highly correlated with human capital, the correlation
+ would also be weaker at higher levels of the score itself.
+ The correlation would be more negative when the time burden of children
+ 
+\begin_inset Formula $b$
+\end_inset
+
+ is high, e.g.
+ for single parents.
+ Lastly, the correlation would be weaker among those starting fertility
+ later.
+ 
 \end_layout
 
 \begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\noindent
-\align center
-\begin_inset Graphics
-	filename N-plot.png
-	scale 50
-
+An alternative theory is that polygenic scores correlate with the motivation
+ to have children (parameter 
+\begin_inset Formula $a$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Fertility vs.
- human capital in the two-period model.
- Parameters: 
-\begin_inset Formula $a=0.4,b=0.25,\sigma=0.7$
+ in the model).
+ But this would not explain the pattern of our results across income and
+ education.
+ Indeed, in the one-period model, while 
+\begin_inset Formula $\frac{dN^{*}}{da}>0$
 \end_inset
 
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-
-
+, this relationship actually becomes stronger at higher wages.
 \end_layout
 
 \begin_layout Standard
-The above is not meant to provide a complete theory of fertility.
+The above does not provide a complete theory of fertility.
  Rather, it shows that a relatively simple economic model can explain many
- of the features we observe empirically.
+ of our results.
  In the appendix, we discuss other models of fertility from the economic
  literature, as well as causal evidence for the relationship between human
  capital, income and fertility.
@@ -468,7 +385,7 @@ The above is not meant to provide a complete theory of fertility.
 Appendix
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Section*
 Solution for the one-period model
 \end_layout
 
@@ -514,13 +431,17 @@ N^{*} & =\frac{W-Q}{bW}\\
 
 Rearranging gives
 \begin_inset Formula 
-\[
-N^{*}=\max\left\{ \frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}W^{(1-\sigma)/\sigma}\right),0\right\} .
-\]
+\begin{equation}
+N^{*}=\max\left\{ \frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}W^{(1-\sigma)/\sigma}\right),0\right\} .\label{eq:N-one-period}
+\end{equation}
 
 \end_inset
 
-Note that for high enough 
+Note that when 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, for high enough 
 \begin_inset Formula $W$
 \end_inset
 
@@ -533,14 +454,15 @@ Note that for high enough
 \begin_inset Formula $N^{*}>0$
 \end_inset
 
-:
+.
+ This is also the fertility-human capital relationship:
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
-\[
-\frac{dN^{*}}{dW}=-\frac{1}{b}\left(\frac{b}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}W^{(1-2\sigma)/\sigma}.
-\]
+\begin{equation}
+\frac{dN^{*}}{dh}=\frac{dN^{*}}{dW}=-\frac{1}{b}\left(\frac{b}{a}\right)^{1/\sigma}\frac{1-\sigma}{\sigma}W^{(1-2\sigma)/\sigma}.\label{eq:DNdW-one-period}
+\end{equation}
 
 \end_inset
 
@@ -567,7 +489,7 @@ For
 \end_inset
 
 ).
- Lastly, we consider the time cost of children 
+ Next, we consider the time cost of children 
 \begin_inset Formula $b$
 \end_inset
 
@@ -612,12 +534,77 @@ hence
 
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Standard
+Lastly we consider the effect of 
+\begin_inset Formula $a$
+\end_inset
+
+.
+ From (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:N-one-period"
+
+\end_inset
+
+), 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+ is increasing in 
+\begin_inset Formula $a$
+\end_inset
+
+.
+ Differentiating (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:DNdW-one-period"
+
+\end_inset
+
+) by 
+\begin_inset Formula $a$
+\end_inset
+
+ gives
+\begin_inset Formula 
+\[
+\frac{d^{2}N^{*}}{dadW}=b^{1/\sigma-1}\frac{1-\sigma}{\sigma^{2}}W^{(1-2\sigma)/\sigma}a^{-1/\sigma-1}
+\]
+
+\end_inset
+
+which is positive for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section*
 Solution for the two-period model
 \end_layout
 
 \begin_layout Standard
-Write the Lagrangian of (
+Period 1 and period 2 income are:
+\begin_inset Formula 
+\begin{align}
+Y_{1} & =1-s-bN_{1}\label{eq:Y1}\\
+Y_{2} & =w(s,h)(1-bN_{2})\label{eq:Y2}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Write the Lagrangian of utility 
+\begin_inset Formula $U$
+\end_inset
+
+ (
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:U"
@@ -639,11 +626,19 @@ noprefix "false"
 \end_layout
 
 \begin_layout Standard
-We show below that if 
+Lemma 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "lemma-concavity"
+
+\end_inset
+
+ below shows that if 
 \begin_inset Formula $\sigma>0.5$
 \end_inset
 
-, this problem is globally concave.
+, this problem is globally concave, guaranteeing that the first order conditions
+ identify a unique solution.
 \begin_inset Note Note
 status collapsed
 
@@ -690,7 +685,7 @@ reference "eq:Y2"
 
 \end_inset
 
-) into the above, we can derive the Karosh-Kuhn-Tucker conditions for an
+) into the above, we can derive the Karush-Kuhn-Tucker conditions for an
  optimum 
 \begin_inset Formula $(N_{1}^{*},N_{2}^{*},s^{*})$
 \end_inset
@@ -774,10 +769,11 @@ and note that the second part goes to infinity as
 
 \end_inset
 
- We consider four cases.
+ We consider four cases, of which only three can occur.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsection*
+Case 1: 
 \begin_inset Formula $N_{1}^{*}>0,N_{2}^{*}>0$
 \end_inset
 
@@ -847,51 +843,16 @@ s^{*}=\frac{s^{*}+\left(\frac{b}{a}\right)^{1/\sigma}}{1+\left(\left(\frac{b}{a}
 
 which simplifies to
 \begin_inset Formula 
-\[
-s^{*}=\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\sigma)/(2\sigma-1)}.
-\]
+\begin{equation}
+s^{*}=\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\sigma)/(2\sigma-1)}.\label{eq:s1}
+\end{equation}
 
 \end_inset
 
-Again note that for 
-\begin_inset Formula $\sigma<1$
-\end_inset
 
-, 
-\begin_inset Formula $s^{*}$
-\end_inset
-
- increases in 
-\begin_inset Formula $h$
-\end_inset
-
-.
- Furthermore 
-\begin_inset Formula $s^{*}$
-\end_inset
-
- is convex in 
-\begin_inset Formula $h$
-\end_inset
-
- if 
-\begin_inset Formula $\sigma<2/3$
-\end_inset
-
-, and concave otherwise.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Note Note
-status collapsed
-
-\begin_layout Plain Layout
-Pleasingly CORRECT for positive values of N, checked computationally in
- julia.
-\end_layout
-
-\end_inset
-
 Plugging the above into (
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -918,7 +879,29 @@ N_{2}^{*} & =\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{(1-\s
 
 \end_inset
 
-Also:
+Note that that 
+\begin_inset Formula $N_{1}^{*}<N_{2}^{*}$
+\end_inset
+
+.
+ For these both to be positive requires low values of 
+\begin_inset Formula $h$
+\end_inset
+
+ if 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+ and high values of 
+\begin_inset Formula $h$
+\end_inset
+
+ if 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+.
+ Also:
 \begin_inset Formula 
 \[
 w(s^{*},h)\equiv s^{*}h=\left(\frac{b}{a}\right)^{1/(2\sigma-1)}h^{\sigma/(2\sigma-1)}.
@@ -985,15 +968,7 @@ which is obv wrong....
 
 \end_inset
 
- Also observe that 
-\begin_inset Formula $N_{1}^{*}<N_{2}^{*}$
-\end_inset
-
- if 
-\begin_inset Formula $N_{2}^{*}>0$
-\end_inset
-
-.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -1017,12 +992,89 @@ While
 
 \end_inset
 
-which is negative for 
+Examining this and expression (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:s1"
+
+\end_inset
+
+) gives:
+\end_layout
+
+\begin_layout Lemma
+\begin_inset CommandInset label
+LatexCommand label
+name "case-1-lemma"
+
+\end_inset
+
+For 
 \begin_inset Formula $\sigma<1$
 \end_inset
 
+, case 1 holds for 
+\begin_inset Formula $h$
+\end_inset
+
+ low enough, and in case 1, 
+\begin_inset Formula $N_{1}^{*}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ decrease in 
+\begin_inset Formula $h$
+\end_inset
+
+, while 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ increases in 
+\begin_inset Formula $h$
+\end_inset
+
 .
- Also, differentiating again shows that 
+ 
+\end_layout
+
+\begin_layout Lemma
+For 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+, case 1 holds for 
+\begin_inset Formula $h$
+\end_inset
+
+ high enough, and in case 1 
+\begin_inset Formula $N_{1}^{*}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ increase in 
+\begin_inset Formula $h$
+\end_inset
+
+, while 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ decreases in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Lemma
 \begin_inset Formula $N_{t}^{*}$
 \end_inset
 
@@ -1035,9 +1087,48 @@ which is negative for
 \end_inset
 
 , and concave otherwise.
+ 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ is convex in 
+\begin_inset Formula $h$
+\end_inset
+
+ if 
+\begin_inset Formula $\sigma<2/3$
+\end_inset
+
+, and concave otherwise.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Checking effect of 
+\begin_inset Formula $a$
+\end_inset
+
+:
+\begin_inset Formula 
+\[
+\frac{d^{2}N_{t}^{*}}{dadh}=b^{1/(2\sigma-1)-1}\frac{1-\sigma}{(2\sigma-1)^{2}}h^{(1-\sigma)/(2\sigma-1)-1}a^{1/(1-2\sigma)-1}>0.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Case 2: 
 \begin_inset Formula $N_{1}^{*}=0,N_{2}^{*}>0$
 \end_inset
 
@@ -1116,6 +1207,10 @@ N_{2}^{*}=\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}(s^{*}h)^{(1-\si
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
 Plugging this into 
 \begin_inset Formula $s^{*}$
 \end_inset
@@ -1125,6 +1220,28 @@ Plugging this into
 \begin{align*}
 s^{*} & =\frac{1}{1+\left(\frac{bh}{a}\right)^{(\sigma-1)/\sigma^{2}}(s^{*}){}^{-(1-\sigma)^{2}/\sigma^{2}}}
 \end{align*}
+
+\end_inset
+
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Note that since 
+\begin_inset Formula $s^{*}<1$
+\end_inset
+
+, 
+\begin_inset Formula 
+\[
+s^{*}=\frac{1}{1+\left(\frac{bh}{a}\right)^{(\sigma-1)/\sigma^{2}}(s^{*}){}^{-(1-\sigma)^{2}/\sigma^{2}}}<\frac{1}{1+\left(\frac{bh}{a}\right)^{(\sigma-1)/\sigma^{2}}}.
+\]
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
@@ -1154,6 +1271,203 @@ s^{(1-2\sigma)/\sigma^{2}}(1-s) & =X
 \begin{equation}
 (1-s^{*})(s^{*})^{(1-2\sigma)/\sigma^{2}}=\left(\frac{a}{bh}\right)^{(1-\sigma)/\sigma^{2}}.\label{eq:estar2}
 \end{equation}
+
+\end_inset
+
+
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Write this as
+\begin_inset Formula 
+\[
+((s^{*})^{(1-2\sigma)/\sigma^{2}}-(s^{*})^{(1-\sigma)^{2}/\sigma^{2}})=\left(\frac{a}{bh}\right)^{(1-\sigma)/\sigma^{2}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+or as
+\begin_inset Formula 
+\[
+(1-s^{*})^{\sigma^{2}/(1-\sigma)}(s^{*})^{(1-2\sigma)/(1-\sigma)}=\frac{a}{bh}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+or as
+\begin_inset Formula 
+\[
+(1-s^{*})^{-\sigma^{2}/(1-\sigma)}(s^{*})^{(2\sigma-1)/(1-\sigma)}=\frac{b}{a}h
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Use the IFT:
+\begin_inset Formula 
+\[
+\frac{ds^{*}}{dh}=\frac{b/a}{dLHS/ds^{*}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Formula 
+\begin{align*}
+\frac{dLHS}{ds^{*}} & =\frac{(\sigma^{2})}{1-\sigma}(1-s^{*})^{-\sigma^{2}/(1-\sigma)-1}(s^{*})^{(2\sigma-1)/(1-\sigma)}+(1-s^{*})^{-\sigma^{2}/(1-\sigma)}\frac{2\sigma-1}{1-\sigma}(s^{*})^{(2\sigma-1)/(1-\sigma)-1}\\
+ & =(1-s^{*})^{-\sigma^{2}/(1-\sigma)-1}(s^{*})^{(2\sigma-1)/(1-\sigma)-1}[\frac{(\sigma^{2})}{1-\sigma}s^{*}+\frac{2\sigma-1}{1-\sigma}(1-s^{*})]
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Now 
+\begin_inset Formula 
+\[
+\frac{d^{2}s^{*}}{dh^{2}}\propto-(b/a)\frac{d^{2}LHS}{ds^{*}}\textrm{ i.e. "}-fg'\textrm{"}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+And the latter is 
+\begin_inset Formula 
+\begin{align*}
+\frac{d^{2}LHS}{ds^{*}}=(1-s^{*})^{-\sigma^{2}/(1-\sigma)-1}(s^{*})^{(2\sigma-1)/(1-\sigma)-1}[1-\sigma] & +\\{}
+[\frac{(\sigma^{2})}{1-\sigma}s^{*}+\frac{2\sigma-1}{1-\sigma}(1-s^{*})] & \times\\
+\left[(1-s^{*})^{-\sigma^{2}/(1-\sigma)-1}(\frac{2\sigma-1}{1-\sigma}-1)(s^{*})^{(2\sigma-1)/(1-\sigma)-2}+(-\frac{\sigma^{2}}{1-\sigma}-1)(1-s^{*})^{-\sigma^{2}/(1-\sigma)-2}(s^{*})^{(2\sigma-1)/(1-\sigma)-1}\right]
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+which equals
+\begin_inset Formula 
+\begin{align*}
+(1-s^{*})^{-\sigma^{2}/(1-\sigma)-1}(s^{*})^{(2\sigma-1)/(1-\sigma)-1}[1-\sigma] & +\\{}
+[\frac{(\sigma^{2})}{1-\sigma}s^{*}+\frac{2\sigma-1}{1-\sigma}(1-s^{*})] & \times\\
+(1-s^{*})^{-\sigma^{2}/(1-\sigma)-2}(s^{*})^{(2\sigma-1)/(1-\sigma)-2}\left[(\frac{2\sigma-1}{1-\sigma}-1)(1-s^{*})+(-\frac{\sigma^{2}}{1-\sigma}-1)(s^{*})\right]
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+which, dividing through, and tweaking the last term in [], is signed by
+\begin_inset Formula 
+\begin{align*}
+(1-s^{*})(s^{*})[1-\sigma] & +\\{}
+[\frac{(\sigma^{2})}{1-\sigma}s^{*}+\frac{2\sigma-1}{1-\sigma}(1-s^{*})] & \times\\
+\left[(\frac{3\sigma-2}{1-\sigma})(1-s^{*})-(\frac{\sigma^{2}+1-\sigma}{1-\sigma})s^{*}\right]
+\end{align*}
+
+\end_inset
+
+which equals
+\begin_inset Formula 
+\begin{align*}
+(1-s^{*})(s^{*})[1-\sigma] & +\\
+\frac{1}{(1-\sigma)^{2}}[\sigma^{2}s^{*}+(2\sigma-1)(1-s^{*})] & \times\\
+\left[(3\sigma-2)(1-s^{*})-(\sigma^{2}+1-\sigma)s^{*}\right]
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Note: you need to know something about 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ to prove this is negative.
+ For example, take 
+\begin_inset Formula $s^{*}=0$
+\end_inset
+
+, it reduces to a positive number times 
+\begin_inset Formula $3\sigma-2$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Plain Layout
+Term in square brackets attempt:
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+and the term in square brackets is
+\begin_inset Formula 
+\begin{align*}
+ & (3\sigma-2)+(2-3\sigma)s^{*}-(\sigma^{2}+1-\sigma)(s^{*})\\
+= & (3\sigma-2)+(1-2\sigma-\sigma^{2})s^{*}
+\end{align*}
+
+\end_inset
+
+solving this for 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ might be revealing
+\begin_inset Formula 
+\begin{align*}
+(3\sigma-2)+(1-2\sigma-\sigma^{2})s^{*} & >0\\
+\Leftrightarrow s^{*} & <\frac{2-3\sigma}{1-2\sigma-\sigma^{2}}\\
+\Leftrightarrow s^{*} & <\frac{3\sigma-2}{\sigma^{2}+2\sigma-1}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Multiplying through, this equals
+\begin_inset Formula 
+\begin{align*}
+(1-s^{*})(s^{*})[1-\sigma] & +\\
+\frac{1}{(1-\sigma)^{2}}[\sigma^{2}(3\sigma-2)s^{*}(1-s^{*})+\sigma^{2}(\sigma^{2}+1-\sigma)(s^{*})^{2}+(2\sigma-1)(3\sigma-2)(1-s^{*})^{2}-(2\sigma-1)(\sigma^{2}+1-\sigma)s^{*}(1-s^{*})]\\
+\end{align*}
+
+\end_inset
+
+
+\end_layout
 
 \end_inset
 
@@ -1431,7 +1745,7 @@ reference "eq:estar2"
 \begin_inset Formula $s^{*}$
 \end_inset
 
-is decreasing in 
+ is decreasing in 
 \begin_inset Formula $h$
 \end_inset
 
@@ -1475,50 +1789,197 @@ reference "eq:estar2"
 and use the Implicit Function Theorem to write 
 \begin_inset Formula 
 \begin{align*}
-\frac{ds^{*}}{dh} & =\frac{1}{X}\left(\frac{b}{a}\right)^{(\sigma-1)/\sigma^{2}}\frac{\sigma-1}{\sigma^{2}}h^{(\sigma-1)/\sigma^{2}-1}\\
- & \equiv Wh^{(\sigma-1)/\sigma^{2}-1}
+\frac{ds^{*}}{dh} & =\frac{1}{X}\left(\frac{b}{a}\right)^{(\sigma-1)/\sigma^{2}}\frac{\sigma-1}{\sigma^{2}}h^{(\sigma-1)/\sigma^{2}-1}
 \end{align*}
 
 \end_inset
 
-where 
-\begin_inset Formula $X$
+which is positive for 
+\begin_inset Formula $\sigma<1$
 \end_inset
 
- is given by (
+.
+ 
+\begin_inset Formula $X<0$
+\end_inset
+
+ is given in (
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:destar-lhs"
 
 \end_inset
 
-), is negative, and is constant in 
-\begin_inset Formula $h$
+):
+\begin_inset Formula 
+\begin{align*}
+X= & (s^{*})^{(1-2\sigma)/\sigma^{2}-1}\frac{1}{\sigma^{2}}[1-2\sigma-(1-\sigma)^{2}(s^{*})]
+\end{align*}
+
 \end_inset
 
-, and 
-\begin_inset Formula $W$
-\end_inset
 
- is defined in the obvious way and is positive for 
-\begin_inset Formula $\sigma<1$
-\end_inset
+\end_layout
 
-.
- Differentiating again gives
+\begin_layout Plain Layout
 \begin_inset Formula 
 \[
-\frac{d^{2}s^{*}}{dh^{2}}=W\left(\frac{\sigma-1}{\sigma^{2}}-1\right)h^{(\sigma-1)/\sigma^{2}-2}
+\frac{1}{X}=(s^{*})^{1-(1-2\sigma)/\sigma^{2}}\sigma^{2}\frac{1}{1-2\sigma-(1-\sigma)^{2}(s^{*})}
 \]
 
 \end_inset
 
-which is negative for 
+
+\end_layout
+
+\begin_layout Plain Layout
+and insert this into the above to get
+\begin_inset Formula 
+\[
+\frac{ds^{*}}{dh}=(s^{*})^{1-(1-2\sigma)/\sigma^{2}}\frac{1-\sigma}{-1+2\sigma+(1-\sigma)^{2}s^{*}}\left(\frac{b}{a}\right)^{(\sigma-1)/\sigma^{2}}h^{(\sigma-1)/\sigma^{2}-1}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Trying to diff in terms of logs:
+\begin_inset Formula 
+\[
+\log\frac{ds^{*}}{dh}=(1-(1-2\sigma)/\sigma^{2})\log s^{*}-\log[-1+2\sigma+(1-\sigma)^{2}s^{*}]+\log(1-\sigma)+\log\left(\frac{b}{a}\right)^{(\sigma-1)/\sigma^{2}}+((\sigma-1)/\sigma^{2}-1)\log h
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\frac{d}{dh}\log\frac{ds^{*}}{dh} & =\frac{d^{2}s^{*}}{dh^{2}}/\frac{ds^{*}}{dh}\\
+ & =(1-(1-2\sigma)/\sigma^{2})\frac{ds^{*}}{dh}/s^{*}-\frac{(1-\sigma)^{2}\frac{ds^{*}}{dh}}{-1+2\sigma+(1-\sigma)^{2}s^{*}}+((\sigma-1)/\sigma^{2}-1)\frac{1}{h}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+For 
 \begin_inset Formula $\sigma<1$
 \end_inset
 
+, since 
+\begin_inset Formula $ds^{*}/dh>0$
+\end_inset
+
+, this will have the same sign as 
+\begin_inset Formula $\frac{d^{2}s^{*}}{dh^{2}}$
+\end_inset
+
 .
- 
+\end_layout
+
+\begin_layout Plain Layout
+more garbage below...
+\end_layout
+
+\begin_layout Plain Layout
+It will be convenient to prove that 
+\begin_inset Formula $d(1/s^{*})/dh$
+\end_inset
+
+ is decreasing in 
+\begin_inset Formula $h$
+\end_inset
+
+, equivalently that 
+\begin_inset Formula $ds^{*}/dh$
+\end_inset
+
+ is increasing or 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ is convex.
+ Writing this as
+\begin_inset Formula 
+\[
+\left(\frac{a}{b}\right)^{(\sigma-1)/\sigma^{2}}\frac{\sigma^{2}}{\sigma-1}Xh^{1-(\sigma-1)/\sigma^{2}}
+\]
+
+\end_inset
+
+we differentiate 
+\begin_inset Formula $Xh^{1-(\sigma-1)/\sigma^{2}}$
+\end_inset
+
+ ignoring the (negative) constant terms.
+ We want to show the below is positive:
+\begin_inset Formula 
+\begin{align*}
+\frac{d}{dh}Xh^{1-(\sigma-1)/\sigma^{2}} & =X(1-\frac{\sigma-1}{\sigma^{2}})h^{-(\sigma-1)/\sigma^{2}}+h^{1-(\sigma-1)/\sigma^{2}}\frac{dX}{dh}\\
+ & =h^{-(\sigma-1)/\sigma^{2}}[X(1-\frac{\sigma-1}{\sigma^{2}})+h\frac{dX}{dh}]
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+again it will suffice to show the term in square brackets is positive
+\begin_inset Formula 
+\begin{align*}
+X(1-\frac{\sigma-1}{\sigma^{2}})+h\frac{dX}{dh} & >0\\
+h\frac{dX}{dh} & >X(\frac{-\sigma^{2}+\sigma-1}{\sigma^{2}})
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Now
+\begin_inset Formula 
+\begin{align*}
+\frac{dX}{dh} & =\frac{ds^{*}}{dh}\left(\text{\frac{\sigma-1}{\sigma^{2}}}-1\right)(s^{*})^{(1-2\sigma)/\sigma^{2}-2}\frac{1}{\sigma^{2}}[1-2\sigma-(1-\sigma)^{2}(s^{*})]\\
+ & +(s^{*})^{(1-2\sigma)/\sigma^{2}-1}\frac{1}{\sigma^{2}}[-(1-\sigma)^{2}\frac{ds^{*}}{dh}]\\
+ & =\frac{ds^{*}}{dh}(s^{*})^{(1-2\sigma)/\sigma^{2}-2}\frac{1}{\sigma^{2}}\left[\left(\text{\frac{\sigma-1}{\sigma^{2}}}-1\right)[1-2\sigma-(1-\sigma)^{2}(s^{*})]-(s^{*})(1-\sigma)^{2}\right]\\
+ & =\frac{1}{X}\left(\frac{b}{a}\right)^{(\sigma-1)/\sigma^{2}}\frac{\sigma-1}{\sigma^{2}}h^{(\sigma-1)/\sigma^{2}-1}(s^{*})^{(1-2\sigma)/\sigma^{2}-2}\frac{1}{\sigma^{2}}\left[\left(\text{\frac{\sigma-1}{\sigma^{2}}}-1\right)[1-2\sigma-(1-\sigma)^{2}(s^{*})]-(s^{*})(1-\sigma)^{2}\right]
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+(proof that term in square brackets is positive
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+which in turn is signed by
+\begin_inset Formula 
+\begin{align*}
+\left(\text{\frac{\sigma-1}{\sigma^{2}}}-1\right)[1-2\sigma-(1-\sigma)^{2}(s^{*})]-(s^{*})(1-\sigma)^{2} & >0\\
+\text{\frac{1-\sigma}{\sigma^{2}}}[(1-\sigma)^{2}(s^{*})+2\sigma-1]-[1-2\sigma-2(1-\sigma)^{2}(s^{*})] & >0\\
+(s^{*})(1-\sigma)^{2}\left(\text{\frac{2\sigma^{2}+1-\sigma}{\sigma^{2}}}\right)+\text{\frac{\sigma^{2}+1-\sigma}{\sigma^{2}}}[2\sigma-1] & >0\\
+(s^{*})(1-\sigma)^{2}\left(\text{\frac{2\sigma^{2}+1-\sigma}{\sigma^{2}}}\right) & >\text{\frac{\sigma^{2}+1-\sigma}{\sigma^{2}}}(1-2\sigma)\\
+s^{*} & >\frac{(\sigma^{2}+1-\sigma)(1-2\sigma)}{(1-\sigma)^{2}(2\sigma^{2}+1-\sigma)}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+) hence
 \end_layout
 
 \end_inset
@@ -1564,76 +2025,14 @@ which is negative for
  in this case.
  
 \begin_inset Note Note
-status collapsed
+status open
 
 \begin_layout Plain Layout
-Trying to prove that
-\begin_inset Formula $N_{2}^{*}$
+could check effect of 
+\begin_inset Formula $a$
 \end_inset
 
- is convex in 
-\begin_inset Formula $h$
-\end_inset
-
-.
- Don't do this:
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Note Note
-status collapsed
-
-\begin_layout Plain Layout
-Differentiating once more gives
-\begin_inset Formula 
-\begin{align*}
-\frac{d^{2}N_{2}^{*}}{dh^{2}} & =-Y\frac{1-\sigma}{\sigma}\left[\frac{1-2\sigma}{\sigma}(s^{*}h)^{(1-3\sigma)/\sigma}(s^{*}+h\frac{ds^{*}}{dh})^{2}+(s^{*}h)^{(1-2\sigma)/\sigma}(2\frac{ds^{*}}{dh}+h\frac{d^{2}s^{*}}{dh^{2}})\right]\\
- & =-Y\frac{1-\sigma}{\sigma}(s^{*}h)^{(1-\sigma)/\sigma-2}\left[(\frac{1}{\sigma}-2)(s^{*}+h\frac{ds^{*}}{dh})^{2}+(s^{*}h)(2\frac{ds^{*}}{dh}+h\frac{d^{2}s^{*}}{dh^{2}})\right]\\
- & =-Y\frac{1-\sigma}{\sigma}(s^{*}h)^{(1-\sigma)/\sigma-2}\left[(\frac{1}{\sigma}-2)(s^{*}+Wh^{(\sigma-1)/\sigma^{2}})^{2}+(s^{*}h)(2Wh^{(\sigma-1)/\sigma^{2}}+W\left(\frac{\sigma-1}{\sigma^{2}}-1\right)h^{(\sigma-1)/\sigma^{2}-1})\right]\\
- & =-Y\frac{1-\sigma}{\sigma}(s^{*}h)^{(1-\sigma)/\sigma-2}\left[(\frac{1}{\sigma}-2)(s^{*}+Wh^{(\sigma-1)/\sigma^{2}})^{2}+(s^{*}h)h^{(\sigma-1)/\sigma^{2}-1}W(2h+\frac{\sigma-1}{\sigma^{2}}-1)\right]
-\end{align*}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-For 
-\begin_inset Formula $\frac{d^{2}N_{2}^{*}}{dh^{2}}>0$
-\end_inset
-
-, the term in square brackets must be negative.
- This is
-\begin_inset Formula 
-\begin{align*}
- & (\frac{1}{\sigma}-2)(s^{*}+Wh^{(\sigma-1)/\sigma^{2}})^{2}+(s^{*}h)h^{(\sigma-1)/\sigma^{2}-1}W(2h+\frac{\sigma-1}{\sigma^{2}}-1)\\
-< & (\frac{1}{\sigma}-2)(Wh^{(\sigma-1)/\sigma^{2}})^{2}+(s^{*}h)h^{(\sigma-1)/\sigma^{2}-1}W(2h+\frac{\sigma-1}{\sigma^{2}}-1)\\
-= & (\frac{1}{\sigma}-2)W^{2}h^{2(\sigma-1)/\sigma^{2}}+(s^{*}h)h^{(\sigma-1)/\sigma^{2}-1}W(2h+\frac{\sigma-1}{\sigma^{2}}-1)\\
-= & Wh^{(\sigma-1)/\sigma^{2}}\left[(\frac{1}{\sigma}-2)Wh^{(\sigma-1)/\sigma^{2}}+s^{*}(2h+\frac{\sigma-1}{\sigma^{2}}-1)\right]
-\end{align*}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-where, if 
-\begin_inset Formula $2h+\frac{\sigma-1}{\sigma^{2}}-1<0$
-\end_inset
-
-, then we are done.
- If not then we continue the chain of inequalities 
-\begin_inset Formula 
-\begin{align*}
-< & Wh^{(\sigma-1)/\sigma^{2}}\left[(\frac{1}{\sigma}-2)Wh^{(\sigma-1)/\sigma^{2}}+(2h+\frac{\sigma-1}{\sigma^{2}}-1)\right]\textrm{, sincs }s^{*}<1\\
-= & Wh^{(\sigma-1)/\sigma^{2}}\left[(\frac{1}{\sigma}-2)Wh^{(\sigma-1)/\sigma^{2}}+(2h+\frac{1}{\sigma}-\frac{1}{\sigma^{2}}-1)\right]
-\end{align*}
-
-\end_inset
-
-
+...
 \end_layout
 
 \end_inset
@@ -1641,8 +2040,7 @@ where, if
 
 \end_layout
 
-\end_inset
-
+\begin_layout Standard
 Differentiating again:
 \end_layout
 
@@ -1694,7 +2092,7 @@ reference "eq:estar2"
 
 .
  The term in square brackets then reduces to 
-\begin_inset Formula $2(s^{*})^{2}>0$
+\begin_inset Formula $(s^{*})^{2}>0$
 \end_inset
 
 .
@@ -1716,9 +2114,104 @@ reference "eq:estar2"
 \end_inset
 
 .
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Trying some more
+\begin_inset Formula 
+\begin{align*}
+ & [\frac{2\sigma-1}{\sigma}(s^{*}+h\frac{ds^{*}}{dh})^{2}-(s^{*}h)(2\frac{ds^{*}}{dh}+h\frac{d^{2}s^{*}}{dh^{2}})]\\
+= & [\frac{2\sigma-1}{\sigma}(s^{*}+h\frac{ds^{*}}{dh})^{2}-2(s^{*}h)\frac{ds^{*}}{dh}-(s^{*}h)h\frac{d^{2}s^{*}}{dh^{2}})]\\
+= & [\frac{2\sigma-1}{\sigma}(s^{*2}+2s^{*}h\frac{ds^{*}}{dh}+h^{2}\left(\frac{ds^{*}}{dh}\right)^{2})-2(s^{*}h)\frac{ds^{*}}{dh}-(s^{*}h)h\frac{d^{2}s^{*}}{dh^{2}})]\\
+= & [\frac{2\sigma-1}{\sigma}(s^{*2}+h^{2}\left(\frac{ds^{*}}{dh}\right)^{2})-(s^{*}h)h\frac{d^{2}s^{*}}{dh^{2}})]
+\end{align*}
+
+\end_inset
+
+Now if 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ is concave, every term here is non-negative.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Plain Layout
+Could I differentiate log ds/dh to get d2s/dh2 in terms of ds/dh?
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+Summarizing:
+\end_layout
+
+\begin_layout Lemma
+\begin_inset CommandInset label
+LatexCommand label
+name "case-2-lemma"
+
+\end_inset
+
+Case 2 holds for intermediate values of 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ In case 2: for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ is increasing in 
+\begin_inset Formula $h$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ is decreasing in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ For 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+, 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+is decreasing in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ For 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ close enough to 1, 
+\begin_inset Formula $N_{2}^{*}$
+\end_inset
+
+ is convex in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection*
+Case 3: 
 \begin_inset Formula $N_{1}^{*}=0,N_{2}^{*}=0$
 \end_inset
 
@@ -1902,9 +2395,54 @@ and note that again, as
 \end_inset
 
  low enough.
+ Summarizing
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Lemma
+\begin_inset CommandInset label
+LatexCommand label
+name "case-3-lemma"
+
+\end_inset
+
+For 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, case 3 holds for 
+\begin_inset Formula $h$
+\end_inset
+
+ high enough, and in case 3, 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ increases in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ For 
+\begin_inset Formula $\sigma>1$
+\end_inset
+
+, case 3 holds for 
+\begin_inset Formula $h$
+\end_inset
+
+ low enough and 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ decreases in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection*
+Case 4: 
 \begin_inset Formula $N_{1}^{*}>0,N_{2}^{*}=0$
 \end_inset
 
@@ -2013,7 +2551,7 @@ Comparative statics
 \end_layout
 
 \begin_layout Standard
-We next examine how the fertility-human capital relationship 
+We can now examine how the fertility-human capital relationship 
 \begin_inset Formula 
 \[
 \frac{dN^{*}}{dh},\textrm{ where }N^{*}\equiv N_{1}^{*}+N_{2}^{*},
@@ -2041,10 +2579,106 @@ reasonable
 
  predictions in other areas, e.g.
  that education levels increase with human capital.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:theory"
+
+\end_inset
+
+ shows how 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+ changes with 
+\begin_inset Formula $h$
+\end_inset
+
+ for 
+\begin_inset Formula $a=0.4,b=0.25,\sigma=0.7$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
-From the cases above, as 
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename N-plot.png
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:theory"
+
+\end_inset
+
+Fertility vs.
+ human capital in the two-period model with 
+\begin_inset Formula $a=0.4,b=0.25,\sigma=0.7$
+\end_inset
+
+.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From Lemmas 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "case-1-lemma"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "case-2-lemma"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "case-3-lemma"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+, as 
 \begin_inset Formula $h$
 \end_inset
 
@@ -2107,15 +2741,7 @@ From the cases above, as
 \end_inset
 
 , all that remains is to check that the derivative is increasing around
- the 
-\begin_inset Quotes eld
-\end_inset
-
-joins
-\begin_inset Quotes erd
-\end_inset
-
- where these 3 regions meet.
+ the points where these 3 regions meet.
  That is trivially satisfied where 
 \begin_inset Formula $N_{2}^{*}$
 \end_inset
@@ -2237,7 +2863,7 @@ reference "eq:estar2"
 \end_inset
 
 , 
-\begin_inset Formula $\sigma^{*}\rightarrow0.5$
+\begin_inset Formula $s^{*}\rightarrow0.5$
 \end_inset
 
  and 
@@ -2247,7 +2873,7 @@ reference "eq:estar2"
 , and therefore the above approaches
 \begin_inset Formula 
 \[
-2\frac{1}{(0.5)^{2}}=8
+2\frac{1}{(0.5)^{2}}=8.
 \]
 
 \end_inset
@@ -2256,38 +2882,153 @@ reference "eq:estar2"
 \end_layout
 
 \begin_layout Standard
-so that indeed (
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:dNonleft"
-
+Thus, as 
+\begin_inset Formula $\sigma\nearrow1$
 \end_inset
 
-) is larger in magnitude than (
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:dNonright"
-
-\end_inset
-
-).
- Thus, 
+, 
 \begin_inset Formula $N^{*}$
 \end_inset
 
- is globally concave in 
+ is guaranteed to be globally concave in 
 \begin_inset Formula $h$
-\end_inset
-
- as 
-\begin_inset Formula $\sigma\nearrow1$
 \end_inset
 
 .
 \end_layout
 
 \begin_layout Standard
-Differentiating 
+We can now prove the facts stated in the main text.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Fact 1
+\series default
+: for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, total fertility 
+\begin_inset Formula $N^{*}\equiv N_{1}^{*}+N_{2}^{*}$
+\end_inset
+
+ is decreasing in human capital 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Furthermore, for 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ close enough to 1, fertility is convex in human capital, i.e.
+ 
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Fact 2 part 1
+\series default
+: the fertility-human capital relationship is closer to 0 at high levels
+ of 
+\begin_inset Formula $h$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+For 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+, education levels 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ increase in 
+\begin_inset Formula $h$
+\end_inset
+
+, and so therefore do equilibrium wages 
+\begin_inset Formula $w(s^{*},h)$
+\end_inset
+
+.
+ This, plus fact 1, gives:
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Fact 2 part 2
+\series default
+: for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+ and close to 1, the fertility-human capital relationship is weaker among
+ higher earners.
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Fact 4
+\series default
+: for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+ and close to 1, the fertility-human capital relationship is weaker at high
+ levels of education.
+\end_layout
+
+\begin_layout Standard
+Next, we compare people who start fertility early (
+\begin_inset Formula $N_{1}^{*}>0$
+\end_inset
+
+) versus those who start fertility late (
+\begin_inset Formula $N_{1}^{*}=0$
+\end_inset
+
+).
+ Again, for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+ the former group have lower 
+\begin_inset Formula $h$
+\end_inset
+
+ than the latter group.
+ Thus we have:
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Fact 5
+\series default
+: for 
+\begin_inset Formula $\sigma<1$
+\end_inset
+
+ and close to 1, the fertility-human capital relationship is weaker among
+ those who start fertility late.
+\end_layout
+
+\begin_layout Standard
+Lastly, we prove fact 3.
+ Differentiating 
 \begin_inset Formula $dN_{t}^{*}/dh$
 \end_inset
 
@@ -2385,82 +3126,7 @@ which again is negative for
 \end_inset
 
 .
- Therefore, for 
-\begin_inset Formula $\sigma<1$
-\end_inset
-
-, the fertility-human capital relationship is more negative when the burden
- of childcare 
-\begin_inset Formula $b$
-\end_inset
-
- is larger.
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-Fact 1
-\series default
-: for 
-\begin_inset Formula $\sigma<1$
-\end_inset
-
-, total fertility 
-\begin_inset Formula $N^{*}\equiv N_{1}^{*}+N_{2}^{*}$
-\end_inset
-
- is decreasing in human capital 
-\begin_inset Formula $h$
-\end_inset
-
-.
- Furthermore, for 
-\begin_inset Formula $\sigma$
-\end_inset
-
- close enough to 1, fertility is convex in human capital, i.e.
- the fertility-human capital relationship is weaker, i.e.
- closer to 0, at high levels of 
-\begin_inset Formula $h$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-Since wages are increasing in human capital, the following is obvious from
- fact 1:
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-Fact 2
-\series default
-: for 
-\begin_inset Formula $\sigma<1$
-\end_inset
-
- and close to 1, the fertility-human capital relationship is weaker among
- higher earners.
-\end_layout
-
-\begin_layout Standard
-For 
-\begin_inset Formula $\sigma<1$
-\end_inset
-
-, education levels 
-\begin_inset Formula $s^{*}$
-\end_inset
-
- increase in 
-\begin_inset Formula $h$
-\end_inset
-
-.
- This plus fact 1 gives:
+ Therefore:
 \end_layout
 
 \begin_layout Standard
@@ -2472,95 +3138,65 @@ Fact 3
 \begin_inset Formula $\sigma<1$
 \end_inset
 
- and close to 1, the fertility-human capital relationship is weaker at high
- levels of education.
-\end_layout
-
-\begin_layout Standard
-Next, we compare people who start fertility early (
-\begin_inset Formula $N_{1}^{*}>0$
-\end_inset
-
-) versus those who start fertility late (
-\begin_inset Formula $N_{1}^{*}=0$
-\end_inset
-
-).
- Again, since the former group have lower 
-\begin_inset Formula $h$
-\end_inset
-
- than the latter group, we have:
-\end_layout
-
-\begin_layout Standard
-
-\series bold
-Fact 4
-\series default
-: for 
-\begin_inset Formula $\sigma<1$
-\end_inset
-
- and close to 1, the fertility-human capital relationship is weaker among
- those who start fertility late.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-Consider an alternative perspective: genetics correlate with 
-\begin_inset Formula $a$
-\end_inset
-
-, not with 
-\begin_inset Formula $h$
-\end_inset
-
- and wages.
- (We'll have some evidence relevant to this from the fertility PGS.) If so,
- how could this explain our results? I.e.
- obviously 
-\begin_inset Formula $dN^{*}/da>0$
-\end_inset
-
-; furthermore 
-\begin_inset Formula $ds^{*}/da<0$
-\end_inset
-
-.
- So in period 2, 
-\begin_inset Formula $Y_{2}$
-\end_inset
-
- decreases in 
-\begin_inset Formula $a$
-\end_inset
-
-; not totally clear in period 1, but probably overall effect will be negative.
- So you'd see a negative correlation between earnings and genetics.
- But would this negative correlation be smaller at higher earnings or education?
- Or for lower 
+, the fertility-human capital relationship is more negative when the burden
+ of childcare 
 \begin_inset Formula $b$
 \end_inset
 
-?
-\end_layout
-
-\end_inset
-
-
+ is larger.
 \end_layout
 
 \begin_layout Subsection*
 Concavity
 \end_layout
 
-\begin_layout Standard
-To check whether the two-period problem is globally concave, we examine
- the Hessian matrix of utility in each period.
+\begin_layout Lemma
+\begin_inset CommandInset label
+LatexCommand label
+name "lemma-concavity"
+
+\end_inset
+
+For 
+\begin_inset Formula $\sigma>0.5$
+\end_inset
+
+, 
+\begin_inset Formula $U$
+\end_inset
+
+ in equation (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:U"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) is concave in 
+\begin_inset Formula $N_{1},N_{2}$
+\end_inset
+
+ and 
+\begin_inset Formula $s$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Proof
+We examine the Hessian matrix of utility in each period.
+ Note that period 1 utility is constant in 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ and period 2 utility is constant in 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+.
  For period 1 the Hessian with respect to 
 \begin_inset Formula $N_{1}$
 \end_inset
@@ -2603,7 +3239,7 @@ Thus, first period utility is weakly concave.
 , the Hessian is:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Proof
 \begin_inset Formula 
 \[
 \left[\begin{array}{cc}

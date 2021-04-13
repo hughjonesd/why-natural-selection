@@ -1,11 +1,8 @@
 
-# let's learn julia
-
-# ==== using Ipopt and JuMP ====
 
 module Fertility
 
-export U, ipopt_solve, theory_solve, solve_e, plot_solutions
+export U, ipopt_solve, theory_solve, solve_s, plot_solutions
 
 using JuMP
 using Ipopt
@@ -16,22 +13,22 @@ model = Model(Ipopt.Optimizer)
 set_optimizer_attribute(model, "print_level", 0)
 @variable(model, 0 <= N₁)
 @variable(model, 0 <= N₂)
-@variable(model, 0 <= e)
+@variable(model, 0 <= s)
 @NLparameter(model, h == 1)
 @NLparameter(model, a == 0.1)
 @NLparameter(model, b == 0.1)
 @NLparameter(model, σ == 0.8)
 
 @NLobjective(model, Max, 
-    (1 - e - b * N₁)^(1 - σ)/(1 - σ) +
-    ((e * h) * (1 - b * N₂))^(1 - σ)/(1 - σ) + 
+    (1 - s - b * N₁)^(1 - σ)/(1 - σ) +
+    ((s * h) * (1 - b * N₂))^(1 - σ)/(1 - σ) + 
     a * (N₁ + N₂)
 )
 
 
-function U(N₁::Real, N₂::Real, e::Real, h::Real, a::Real, b::Real, σ::Real)
-    (1 - e - b * N₁)^(1 - σ)/(1 - σ) +
-    ((e * h) * (1 - b * N₂))^(1 - σ)/(1 - σ) + 
+function U(N₁::Real, N₂::Real, s::Real, h::Real, a::Real, b::Real, σ::Real)
+    (1 - s - b * N₁)^(1 - σ)/(1 - σ) +
+    ((s * h) * (1 - b * N₂))^(1 - σ)/(1 - σ) + 
     a * (N₁ + N₂)
 end
 
@@ -45,22 +42,22 @@ function ipopt_solve(H::Real, A::Real, B::Real, S::Real)
 
     optimize!(model::JuMP.Model)
 
-    [value(N₁), value(N₂), value(e)]
+    [value(N₁), value(N₂), value(s)]
 end
 
-"solve for e when N₁ == 0"
-function solve_e(h, a, b, σ)
+"solve for s when N₁ == 0"
+function solve_s(h, a, b, σ)
     
     rhs = (a / (b*h)) ^ ((1 - σ)/σ^2)
     f(e) = (1 - e) * e ^ ((1 - 2σ)/σ^2) - rhs
 
-    es = find_zeros(f, 0.001, 1)
-    if length(es) != 1
-        @warn "Found $(length(es)) values for e"
+    ss = find_zeros(f, 0.001, 1)
+    if length(ss) != 1
+        @warn "Found $(length(ss)) values for e"
         @warn "h $h; a $a; b $b; σ $σ"
     end
 
-    es[1]
+    ss[1]
 end
 
 function theory_solve(h::Real, a::Real, b::Real, σ::Real)
@@ -70,20 +67,20 @@ function theory_solve(h::Real, a::Real, b::Real, σ::Real)
 
     N₁ = max(0, N₁)
 
-    e = if N₁ == 0
-        solve_e(h, a, b, σ)
+    s = if N₁ == 0
+        solve_s(h, a, b, σ)
     else
         (b/a) ^ (1/(2σ-1)) * h ^ ((1 - σ)/(2σ - 1))
     end
 
-    N₂ = 1/b * (1 - (b/a) ^ (1/σ) * (e * h) ^ ((1 - σ)/σ))
+    N₂ = 1/b * (1 - (b/a) ^ (1/σ) * (s * h) ^ ((1 - σ)/σ))
     N₂ = max(0, N₂)
 
     if N₂ == 0
-        e = 1/(1 + h ^ ((σ-1)/σ))
+        s = 1/(1 + h ^ ((σ-1)/σ))
     end
 
-    [N₁, N₂, e]
+    [N₁, N₂, s]
 end
 
 function plot_solutions(hmin, hmax, a, b, σ; theory = true, ipopt = true)
@@ -120,6 +117,25 @@ function plot_solutions(hmin, hmax, a, b, σ; theory = true, ipopt = true)
     end
 
     display(p)
+end
+
+function dN2dh(h, a, b ,σ)
+
+    s = solve_s(h, a, b, σ)
+
+    N1, N2, _ = theory_solve(h, a, b, σ) 
+    N1 == 0 || (@warn "N1 not 0")
+    N2 > 0  || (@warn "N2 not positive")
+
+    W = (b/a) ^ ((σ-1)/(σ^2)) * (σ-1)/(σ^2) 
+    X = (1-2σ)/σ^2 * s ^ ((1-2σ)/σ^2 - 1) - (1 - σ)^2/σ^2 * s ^ ((1-2σ)/σ^2)
+    W /= X
+
+    dsdh = W * h ^ ((σ-1)/(σ^2) - 1)
+
+    dN2dh = - 1/b * (b/a)^(1/σ) * (1 - σ)/σ *  (s * h)^((1 - 2σ)/σ) * (s + h * dsdh)
+
+    dN2dh
 end
 
 end
