@@ -1,8 +1,5 @@
 
 
-\externaldocument{why-natural-selection}
-
-\section*{Appendix}
 
 \section*{Solution for the one-period model}
 
@@ -83,7 +80,7 @@ N_{1}^{*} & =\frac{1}{b}\left(1-s^{*}-\left(\frac{b}{a}\right)^{1/\sigma}\right)
 N_{2}^{*} & =\frac{1}{b}\left(1-\left(\frac{b}{a}\right)^{1/\sigma}(s^{*}h)^{(1-\sigma)/\sigma}\right);\label{eq:N21}\\
 s^{*} & =\frac{1-bN_{1}^{*}}{1+\left((1-bN_{2}^{*})h\right)^{1-1/\sigma}}.
 \end{align}
-Plugging the expressions for $N_{1}^{*}$ and $N_{2}^{*}$ into $s^{*}$gives
+Plugging the expressions for $N_{1}^{*}$ and $N_{2}^{*}$ into $s^{*}$ gives
 \[
 s^{*}=\frac{s^{*}+\left(\frac{b}{a}\right)^{1/\sigma}}{1+\left(\left(\frac{b}{a}\right)^{1/\sigma}s^{*(1-\sigma)/\sigma}h{}^{1/\sigma}\right)^{1-1/\sigma}}
 \]
@@ -296,13 +293,16 @@ shows how $N^{*}$ changes with $h$ for $a=0.4,b=0.25,\sigma=0.7$.
 with $a=0.4,b=0.25,\sigma=0.7$.}
 \end{figure}
 
+\begin{lem}
+For $\sigma < 1$ in a neighbourhood of 1, $N^*$ is globally convex in $h$.
+\end{lem}
+\begin{proof}
 From Lemmas \ref{case-1-lemma}, \ref{case-2-lemma} and \ref{case-3-lemma},
 as $h$ increases we move from $N_{1}^{*},N_{2}^{*}>0$ to $N_{1}^{*}=0,N_{2}^{*}>0$
 to $N_{1}^{*}=N_{2}^{*}=0$. Furthermore, for $\sigma>2/3$, $N_{1}^{*}$
 and $N_{2}^{*}$ are convex in $h$ when they are both positive, and
 for $\sigma$ close enough to 1, $N_{2}^{*}$ is convex in $h$ when
-$N_{1}^{*}=0$. To show global concavity of $N^{*}$ in $h$ as $\sigma\nearrow1$,
-all that remains is to check that the derivative is increasing around
+$N_{1}^{*}=0$. All that remains is to check that the derivative is increasing around
 the points where these 3 regions meet. That is trivially satisfied
 where $N_{2}^{*}$ becomes 0, since thereafter $\frac{dN^{*}}{dh}$
 is zero. The derivative as $N_{1}^{*}$ approaches zero is twice the
@@ -328,11 +328,9 @@ the above approaches
 \[
 2\frac{1}{(0.5)^{2}}=8.
 \]
+\end{proof}
 
-Thus, as $\sigma\nearrow1$, $N^{*}$ is guaranteed to be globally
-convex in $h$.
-
-We can now prove the facts stated in the main text.
+We can now gather the facts stated in the main text.
 
 \textbf{Fact 1}: for $\sigma<1$, total fertility $N^{*}\equiv N_{1}^{*}+N_{2}^{*}$
 is decreasing in human capital $h$. 
