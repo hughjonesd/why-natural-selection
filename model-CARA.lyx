@@ -517,7 +517,7 @@ reference "eq:scond"
 \end_inset
 
  if that's a valid number for it.
- Similarly 
+ (If not it stays at 0.) Similarly 
 \begin_inset Formula $N_{2}$
 \end_inset
 
@@ -574,7 +574,7 @@ status open
 
 \begin_layout Plain Layout
 indeed in compute-CARA.jl you get a stark switch of regimes if this condition
- is violated.
+ is violated, from babies/no education to no babies/education.
 \end_layout
 
 \end_inset
@@ -583,6 +583,10 @@ indeed in compute-CARA.jl you get a stark switch of regimes if this condition
 \end_layout
 
 \begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
 We'll insert 
 \begin_inset Formula $N_{1}$
 \end_inset
@@ -613,7 +617,7 @@ s & =\frac{\log(\frac{1}{\gamma s}\log(\frac{\gamma shb}{a}))-\log(sh)}{\gamma-1
 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 \begin_inset Formula 
 \[
 \frac{d}{ds}\frac{1}{\gamma s}\log(\frac{\gamma shb}{a})=\frac{d}{ds}\log((\frac{\gamma shb}{a})^{1/\gamma s})\textrm{ signed by}\frac{d}{ds}(\frac{\gamma shb}{a})^{1/\gamma s}
@@ -632,8 +636,17 @@ which is
 
 \end_layout
 
-\begin_layout Standard
-x
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+With 
+\begin_inset Formula $N_{1}=0$
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard

@@ -263,10 +263,8 @@ scale_y_reordered <- function(..., sep = "___") {
 * Add CIs - done.
 * Clarify collider bias/endogeneity - done.
 * Formalize theory - done.
-  - Comment on results where effects are actually reversed. Could this
-  happen if \sigma were higher in period 2? Or if it increased with income?
-  Could maybe do a computational example.
-  - One possibility is CARA utility. Solving it computationally
+  - Comment on results where effects are actually reversed. This works
+    nicely if you throw in a money cost. Done computational example.
 * Clarify causality?
   - Helps to deal with the "collider bias" argument of reviewer
   - Might also be a better test of mediation via human capital
@@ -282,6 +280,7 @@ scale_y_reordered <- function(..., sep = "___") {
   end of formal section.
 * Why don't women see stronger effects? But note, they do: not significant
   after correction for multiple testing, but a 25% difference. 
+  - I think we leave this for reviewers.
 
 # Open questions/TODO
 
@@ -555,10 +554,11 @@ increased by a factor of `r mean_rel$Geographical` (geographical weighting),
 `r mean_rel[["Age/Qual/AFLB"]]` (age/qualification/AFLB). Estimates might be
 further affected by weighting on other demographic variables.
 
-We also check for purifying and diversifying selection by 
-estimating \@ref(eq:regression) with a quadratic term. See Appendix Figure \@ref(fig:plot-purifying). In particular, we find diversifying selection for
-educational attainment polygenic scores: at higher values of these scores, 
-the effect on fertility is closer to zero.
+We also check for purifying and diversifying selection by estimating
+\@ref(eq:regression) with a quadratic term. In particular, we find diversifying
+selection for educational attainment polygenic scores: at lower values of these
+scores, the negative effect on fertility is larger (Appendix Figure
+\@ref(fig:plot-purifying)).
 
 
 ```{r plot-res-wt, fig.cap = "Selection effects: weighted and unweighted regressions.  Each point represents a single bivariate regression of number of children on a polygenic score."}
@@ -566,37 +566,41 @@ the effect on fertility is closer to zero.
 n_regs <- as.double(length(score_names))
 
 res_wt_combined %>% 
-  mutate(
-    Weights  = fct_relevel(Weights, "Geographical", "Age/Qualification",
-                "Age/Qual/AFLB", "None"),
-    term     = pretty_names(term),
-    term     = fct_reorder(term, estimate, order_abs(1))
-  ) %>% 
-  rename(p = p.value) %>% 
-  ggplot(aes(
-    x = estimate, 
-    y = term, 
-    shape = Weights, 
-    fill = Weights, 
-    colour = p < 0.05/{{n_regs}}
-  )) +
-  geom_point(size = 1.5, stroke = 0.5) +
-  my_vline +
-  pval_scale() +
-  scale_fill_manual(values = c(
-    "None"              = "grey15", 
-    "Geographical"      = "dodgerblue4",
-    "Age/Qualification" = "steelblue2",
-    "Age/Qual/AFLB"      = "darkseagreen4"
-  )) +
-  scale_shape_manual(values = c(
-    "None" = "square filled", 
-    "Geographical" = "circle filled",
-    "Age/Qualification" = "circle filled", 
-    "Age/Qual/AFLB" = "circle filled"
-  )) + 
-  labs(x = "Effect size", y = "") +
-  my_theme()
+      mutate(
+        Weights  = fct_relevel(Weights, "Geographical", "Age/Qualification",
+                    "Age/Qual/AFLB", "None"),
+        term     = pretty_names(term),
+        term     = fct_reorder(term, estimate, order_abs(1))
+      ) %>% 
+      rename(p = p.value) %>% 
+      # can't use standard_ggplot because we have non-standard geom_point()
+      ggplot(aes(
+        x      = estimate, 
+        y      = term, 
+        yend   = term,
+        shape  = Weights, 
+        fill   = Weights, 
+        colour = p < 0.05/{{n_regs}}
+      )) +
+      my_vline +
+      geom_point(size = 1.5, stroke = 0.5) +
+      confint_geom_segment() +
+      pval_scale() +
+      scale_fill_manual(values = c(
+        "None"              = "grey15", 
+        "Geographical"      = "dodgerblue4",
+        "Age/Qualification" = "steelblue2",
+        "Age/Qual/AFLB"      = "darkseagreen4"
+      )) +
+      scale_shape_manual(values = c(
+        "None" = "square filled", 
+        "Geographical" = "circle filled",
+        "Age/Qualification" = "circle filled", 
+        "Age/Qual/AFLB" = "circle filled"
+      )) + 
+      labs(x = "Effect size", y = "") +
+      scale_linetype_manual(name = "", values = c("95% c.i." = 1)) +
+      my_theme()
 
 
 ```
@@ -1399,7 +1403,7 @@ natural selection's effects are outweighed by environmental improvements, such
 as those underlying the Flynn effect [@flynn1987massive]. The evidence
 here may add some nuance to this debate. Patterns of natural selection have been
 relatively consistent across the past two generations, but they are not the
-outcome of a universal, society-wide phenomenon. Instead they result from  
+outcome of a universal, society-wide phenomenon. Instead they result from 
 opposing forces, operating in different parts of society and pulling in
 different directions.
 
