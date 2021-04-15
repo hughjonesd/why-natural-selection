@@ -17,11 +17,15 @@ set_optimizer_attribute(model, "print_level", 0)
 @NLparameter(model, h == 1)
 @NLparameter(model, a == 0.1)
 @NLparameter(model, b == 0.1)
+@NLparameter(model, m == 0.1)
 @NLparameter(model, σ == 0.8)
 
+@NLconstraint(model, 1 - s - b * N₁ - m * N₁ >= 0)
+@NLconstraint(model, (s * h) * (1 - b * N₂) - m * N₂ >= 0)
+
 @NLobjective(model, Max, 
-    (1 - s - b * N₁)^(1 - σ)/(1 - σ) +
-    ((s * h) * (1 - b * N₂))^(1 - σ)/(1 - σ) + 
+    (1 - s - b * N₁ - m * N₁)^(1 - σ)/(1 - σ) +
+    ((s * h) * (1 - b * N₂) - m * N₂)^(1 - σ)/(1 - σ) + 
     a * (N₁ + N₂)
 )
 

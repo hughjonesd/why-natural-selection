@@ -1,0 +1,696 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "times" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+U(N_{1},N_{2})=u(Y_{1})+u(Y_{2})+a(N_{1}+N_{2})\label{eq:U}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $u$
+\end_inset
+
+ is now CARA 
+\begin_inset Formula $u(y)=-e^{-\gamma y}$
+\end_inset
+
+, with 
+\begin_inset Formula $u'(y)=\gamma e^{-\gamma y}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Period 1 and period 2 income are:
+\begin_inset Formula 
+\begin{align}
+Y_{1} & =1-s-bN_{1}\label{eq:Y1}\\
+Y_{2} & =w(s,h)(1-bN_{2})\label{eq:Y2}
+\end{align}
+
+\end_inset
+
+with 
+\begin_inset Formula $w(s,h)=sh$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Write the Lagrangian of utility 
+\begin_inset Formula $U$
+\end_inset
+
+ (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:U"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) as 
+\begin_inset Formula 
+\[
+\mathcal{L}(N_{1},N_{2},s)=u(Y_{1})+u(Y_{2})+a(N_{1}+N_{2})+\lambda_{1}N_{1}+\lambda_{2}(\frac{1}{b}-s-N_{1})+\lambda_{3}N_{2}+\lambda_{4}(\frac{1}{b}-N_{2})+\mu_{1}s+\mu_{2}(1-s)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+with conditions
+\begin_inset Formula 
+\begin{align*}
+\frac{d\mathcal{L}}{dN_{1}} & =-\gamma be^{-\gamma Y_{1}}+a+\lambda_{1}-\lambda_{2}=0\textrm{ with }\lambda_{1}N_{1}=0,\lambda_{2}(\frac{1}{b}-s-N_{1})=0\\
+\frac{d\mathcal{L}}{dN_{2}} & =-\gamma shbe^{-\gamma Y_{2}}+a+\lambda_{3}-\lambda_{4}=0\textrm{ with }\lambda_{3}N_{2}=0,\lambda_{4}(\frac{1}{b}-N_{2})=0\\
+\frac{d\mathcal{L}}{ds} & =-\gamma e^{-\gamma Y_{1}}+\gamma h(1-bN_{2})e^{-\gamma Y_{2}}+\mu_{1}-\mu_{2}=0\textrm{ with }\mu_{1}s=0,\mu_{2}(1-s)=0\\
+N_{1},N_{2},s,\mathbf{\lambda},\mathbf{\mu} & \ge0\\
+ & s\le1,N_{1}\le\frac{1-s}{b},N_{2}\le\frac{1}{b}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+\series bold
+Solving for 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+:
+\series default
+
+\begin_inset Formula 
+\begin{align}
+-\gamma be^{-\gamma Y_{1}}+a & \lesseqqgtr0\textrm{ as }N_{1}=0,N_{1}\in(0,\frac{1-s}{b}),N_{1}=\frac{1-s}{b}\nonumber \\
+\frac{a}{\gamma b} & \lesseqqgtr e^{-\gamma Y_{1}}\nonumber \\
+\log(\frac{a}{\gamma b}) & \lesseqqgtr-\gamma Y_{1}=-\gamma(1-s-bN_{1})\nonumber \\
+\frac{1}{\gamma}\log(\frac{a}{\gamma b}) & \lesseqqgtr bN_{1}+s-1\nonumber \\
+\frac{1}{b\gamma}\log(\frac{a}{\gamma b})+\frac{1-s}{b} & \lesseqqgtr N_{1}\textrm{ as }N_{1}=0,N_{1}\in(0,\frac{1-s}{b}),N_{1}=\frac{1-s}{b}.\label{eq:N1cond}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that if 
+\begin_inset Formula $a>\gamma b$
+\end_inset
+
+ then we must have 
+\begin_inset Formula $N_{1}=\frac{1-s}{b}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Equally if 
+\begin_inset Formula $\frac{1}{b\gamma}\log(\frac{a}{\gamma b})+\frac{1}{b}<0\Leftrightarrow\log(\frac{a}{\gamma b})<-\gamma$
+\end_inset
+
+ then we must have 
+\begin_inset Formula $N_{1}=0$
+\end_inset
+
+ for any 
+\begin_inset Formula $s$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+
+\series bold
+Solving for 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+:
+\series default
+
+\begin_inset Formula 
+\begin{align}
+-\gamma shbe^{-\gamma Y_{2}}+a & \lesseqqgtr0\textrm{ as }N_{2}=0,N_{2}\in(0,\frac{1}{b}),N_{2}=\frac{1}{b}\nonumber \\
+\frac{a}{\gamma shb} & \lesseqqgtr e^{-\gamma Y_{2}}\nonumber \\
+\log(\frac{a}{\gamma shb}) & \lesseqqgtr-\gamma Y_{2}=-\gamma(sh(1-bN_{2}))\nonumber \\
+\frac{1}{\gamma sh}\log(\frac{a}{\gamma shb}) & \lesseqqgtr bN_{2}-1\nonumber \\
+\frac{1}{b}+\frac{1}{b\gamma sh}\log(\frac{a}{\gamma shb}) & \lesseqqgtr N_{2}\textrm{ as }N_{2}=0,N_{2}\in(0,\frac{1}{b}),N_{2}=\frac{1}{b}.\label{eq:N2cond}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $a>\gamma shb$
+\end_inset
+
+, in particular always if 
+\begin_inset Formula $a>\gamma hb$
+\end_inset
+
+, then we have 
+\begin_inset Formula $N_{2}=\frac{1}{b}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If 
+\begin_inset Formula $\frac{1}{b}+\frac{1}{b\gamma sh}\log(\frac{a}{\gamma shb})<0\Leftrightarrow\log(\frac{a}{\gamma shb})<-\gamma sh$
+\end_inset
+
+ and in particular always if 
+\begin_inset Formula $\log(\frac{a}{\gamma shb})<-\gamma h$
+\end_inset
+
+ 
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+but note 
+\begin_inset Formula $s$
+\end_inset
+
+ is still in there
+\end_layout
+
+\end_inset
+
+ then 
+\begin_inset Formula $N_{2}=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+
+\series bold
+Solving for 
+\begin_inset Formula $s$
+\end_inset
+
+:
+\series default
+
+\begin_inset Formula 
+\begin{align}
+-\gamma e^{-\gamma Y_{1}}+\gamma h(1-bN_{2})e^{-\gamma Y_{2}} & \lesseqqgtr0\textrm{ as }s=0,s\in(0,1),s=1\nonumber \\
+h(1-bN_{2})e^{-\gamma Y_{2}} & \lesseqqgtr e^{-\gamma Y_{1}}\nonumber \\
+\log(h(1-bN_{2}))-\gamma Y_{2} & \lesseqqgtr-\gamma Y_{1}\nonumber \\
+\frac{1}{\gamma}\log(h(1-bN_{2})) & \lesseqqgtr Y_{2}-Y_{1}=sh(1-bN_{2})-(1-s-bN_{1})\nonumber \\
+\frac{1}{\gamma}\log(h(1-bN_{2})) & \lesseqqgtr s(h(1-bN_{2})+1)-(1-bN_{1})\nonumber \\
+\frac{\frac{1}{\gamma}\log(h(1-bN_{2}))+(1-bN_{1})}{1+h(1-bN_{2})} & \lesseqqgtr s\textrm{ as }s=0,s\in(0,1),s=1.\label{eq:scond}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that the above, specifically line 2, implies 
+\begin_inset Formula $s=0$
+\end_inset
+
+ whenever 
+\begin_inset Formula $N_{2}=1/b$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+
+\series bold
+Low 
+\begin_inset Formula $h$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Let's start from low 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ Then 
+\begin_inset Formula $a>\gamma hb$
+\end_inset
+
+ and so we have 
+\begin_inset Formula $N_{2}=\frac{1}{b}$
+\end_inset
+
+.
+ Note that the second line of the above chain becomes 
+\begin_inset Formula $0<e^{0}$
+\end_inset
+
+ which is always true, so 
+\begin_inset Formula $s=0$
+\end_inset
+
+.
+ 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ then, like 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+, solely depends on 
+\begin_inset Formula $a,\gamma$
+\end_inset
+
+ and 
+\begin_inset Formula $b$
+\end_inset
+
+.
+ So at these low values, 
+\begin_inset Formula $N^{*}$
+\end_inset
+
+ is constant in 
+\begin_inset Formula $h$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+What's the maximum for this? (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:scond"
+plural "false"
+caps "false"
+noprefix "false"
+
+\end_inset
+
+) is satisfied for 
+\begin_inset Formula $s=0$
+\end_inset
+
+ so long as 
+\begin_inset Formula $N_{2}=1/b$
+\end_inset
+
+.
+ The condition from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:N2cond"
+
+\end_inset
+
+) line 1 for 
+\begin_inset Formula $N_{2}=1/b$
+\end_inset
+
+ is also satisfied so long as 
+\begin_inset Formula $s=0$
+\end_inset
+
+.
+ (If you're out of the labour market having kids, no point in getting educated,
+ and if you didn't get educated, you may as well have kids.
+ The condition for 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:N1cond"
+
+\end_inset
+
+) does not depend on 
+\begin_inset Formula $h$
+\end_inset
+
+ except via 
+\begin_inset Formula $s$
+\end_inset
+
+, so if 
+\begin_inset Formula $s=0$
+\end_inset
+
+ it's satisfied for any 
+\begin_inset Formula $h$
+\end_inset
+
+.
+ But NB we haven't yet shown global concavity, so this might be only a local
+ optimum.
+\end_layout
+
+\begin_layout Subsection
+
+\series bold
+High 
+\begin_inset Formula $h$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now let's make 
+\begin_inset Formula $h$
+\end_inset
+
+ high.
+ If it is high enough, then from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:N2cond"
+
+\end_inset
+
+) we can't have 
+\begin_inset Formula $N_{2}=\frac{1}{b}$
+\end_inset
+
+.
+ That then implies that the term (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:scond"
+
+\end_inset
+
+) is proportionate to 
+\begin_inset Formula $\log(h)/h$
+\end_inset
+
+ which approaches zero asymptotically.
+ I.e.
+ 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ is slowly declining.
+ It also implies 
+\begin_inset Formula $ds^{*}/dh\rightarrow0$
+\end_inset
+
+, I think.
+ Since 
+\begin_inset Formula $s^{*}$
+\end_inset
+
+ is slowly declining 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ is slowly increasing, towards 
+\begin_inset Formula $\frac{1}{b\gamma}\log(\frac{a}{\gamma b})+\frac{1}{b}$
+\end_inset
+
+ if that's a valid number for it.
+ Similarly 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ increases towards 
+\begin_inset Formula $1/b$
+\end_inset
+
+ since 
+\begin_inset Formula $\frac{1}{b\gamma sh}\log(\frac{a}{\gamma shb})<0$
+\end_inset
+
+ and approaches 0 as 
+\begin_inset Formula $h$
+\end_inset
+
+ gets large.
+ 
+\end_layout
+
+\begin_layout Subsection
+Interior equilibrium
+\end_layout
+
+\begin_layout Standard
+Let's seek an interior equilibrium.
+ Then
+\begin_inset Formula 
+\begin{align*}
+s & =\frac{\frac{1}{\gamma}\log(h(1-bN_{2}))+(1-bN_{1})}{1+h(1-bN_{2})}\in(0,1);\\
+N_{2} & =\frac{1}{b}+\frac{1}{b\gamma sh}\log(\frac{a}{\gamma shb})\in(0,\frac{1}{b});\\
+N_{1} & =\frac{1}{b\gamma}\log(\frac{a}{\gamma b})+\frac{1-s}{b}\in(0,\frac{1-s}{b})
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This clearly requires 
+\begin_inset Formula $a<\gamma b$
+\end_inset
+
+ and 
+\begin_inset Formula $a<\gamma shb$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+indeed in compute-CARA.jl you get a stark switch of regimes if this condition
+ is violated.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We'll insert 
+\begin_inset Formula $N_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $N_{2}$
+\end_inset
+
+ into 
+\begin_inset Formula $s$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{align*}
+s & =\frac{\frac{1}{\gamma}\log(-\frac{1}{\gamma s}\log(\frac{a}{\gamma shb}))-\frac{1}{\gamma}\log(\frac{a}{\gamma b})+s}{1-\frac{1}{\gamma s}\log(\frac{a}{\gamma shb})}\\
+ & =\frac{\log(-\frac{1}{\gamma s}\log(\frac{a}{\gamma shb}))-\log(\frac{a}{\gamma b})+s}{\gamma-\frac{1}{s}\log(\frac{a}{\gamma shb})}\\
+s(1-\frac{1}{\gamma-\frac{1}{s}\log(\frac{a}{\gamma shb})}) & =\frac{\log(-\frac{1}{\gamma s}\log(\frac{a}{\gamma shb}))-\log(\frac{a}{\gamma b})}{\gamma-\frac{1}{s}\log(\frac{a}{\gamma shb})}\\
+s(\gamma-\frac{1}{s}\log(\frac{a}{\gamma shb})-1) & =\log(-\frac{1}{\gamma s}\log(\frac{a}{\gamma shb}))-\log(\frac{a}{\gamma b})\\
+s(\gamma-1)-\log(\frac{a}{\gamma shb}) & =\log(-\frac{1}{\gamma s}\log(\frac{a}{\gamma shb}))-\log(\frac{a}{\gamma b})\\
+s(\gamma-1) & =\log(-\frac{1}{\gamma s}\log(\frac{a}{\gamma shb}))-\log(\frac{a}{\gamma b})+\log(\frac{a}{\gamma shb})\\
+s(\gamma-1) & =\log(-\frac{1}{\gamma s}\log(\frac{a}{\gamma shb}))-\log(sh)\\
+s & =\frac{\log(\frac{1}{\gamma s}\log(\frac{\gamma shb}{a}))-\log(sh)}{\gamma-1}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\frac{d}{ds}\frac{1}{\gamma s}\log(\frac{\gamma shb}{a})=\frac{d}{ds}\log((\frac{\gamma shb}{a})^{1/\gamma s})\textrm{ signed by}\frac{d}{ds}(\frac{\gamma shb}{a})^{1/\gamma s}
+\]
+
+\end_inset
+
+which is
+\begin_inset Formula 
+\[
+\log\frac{\gamma shb}{a}(\frac{-\gamma}{(\gamma s)^{2}})\frac{\gamma hb}{a}(\frac{\gamma shb}{a})^{1/\gamma s}<0\textrm{ since }\gamma shb>a.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+x
+\end_layout
+
+\begin_layout Standard
+x
+\end_layout
+
+\begin_layout Standard
+x
+\end_layout
+
+\begin_layout Standard
+In between these values, what if 
+\begin_inset Formula $a>\gamma b$
+\end_inset
+
+? Then 
+\begin_inset Formula $N_{1}=(1-s)/b$
+\end_inset
+
+ and (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:scond"
+
+\end_inset
+
+) becomes
+\begin_inset Formula 
+\begin{align*}
+\frac{\frac{1}{\gamma}\log(h(1-bN_{2}))+s}{1+h(1-bN_{2})} & \lesseqqgtr s\textrm{ as }s=0,s\in(0,1),s=1.\\
+\frac{1}{\gamma}\log(h(1-bN_{2})) & \lesseqqgtr s(h(1-bN_{2}))\\
+\frac{1}{\gamma h(1-bN_{2})}\log(h(1-bN_{2})) & \lesseqqgtr s\textrm{ as }s=0,s\in(0,1),s=1.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Also from (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:N2cond"
+
+\end_inset
+
+):
+\begin_inset Formula 
+\[
+\frac{1}{b}+\frac{1}{b\gamma sh}\log(\frac{a}{\gamma shb})\lesseqqgtr N_{2}\textrm{ as }N_{2}=0,N_{1}\in(0,\frac{1}{b}),N_{2}=\frac{1}{b}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

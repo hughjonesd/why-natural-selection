@@ -281,7 +281,7 @@ We can now examine how the fertility-human capital relationship
 
 changes with respect to other parameters. We focus on the case $\sigma<1$,
 since it gives the closest match to our observations, and since it
-also generates ``reasonable'' predictions in other areas, e.g. that
+also generates "reasonable" predictions in other areas, e.g. that
 education levels increase with human capital. Figure \ref{fig:theory}
 shows how $N^{*}$ changes with $h$ for $a=0.4,b=0.25,\sigma=0.7$.
 
@@ -375,6 +375,31 @@ which again is negative for $\sigma<1$. Therefore:
 \textbf{Fact 3}: for $\sigma<1$, the fertility-human capital relationship
 is more negative when the burden of childcare $b$ is larger.
 
+
+\subsection*{Including a money cost}
+
+The model can be extended by adding a money cost $m$ per child. Utility is
+then
+
+\[
+U = u(1 - s - bN_1 - mN_1) + u(w(s,h)(1 - bN_2) - mN_2) + a(N_1 + N_2)
+\]
+
+Figure \ref{fig:N-plot-with-m} shows a computed example with 
+$a = 0.4, b = 0.175, \sigma = 0.7, m = 0.075$. Fertility first declines steeply with
+human capital, then rises. In addition, for parents with low AFLB ($N_1 > 0$), the
+fertility-human capital relationship is negative, while for parents with 
+higher AFLB ($N_1 = 0$) it is positive.
+
+\begin{figure}
+\begin{centering}
+\includegraphics[width=9cm, height=6cm]{N-plot-with-m}
+\par\end{centering}
+\caption{\label{fig:N-plot-with-m}Fertility vs. human capital in the two-period model
+with money costs of children. $a=0.4,b=0.175,\sigma=0.7, m = 0.075$.}
+\end{figure}
+
+
 \subsection*{Concavity}
 \begin{lem}
 \label{lemma-concavity}For $\sigma>0.5$, $U$ in equation (\ref{eq:U})
@@ -422,4 +447,5 @@ then the Hessian is negative definite and thus utility is concave;
 this combined with weak concavity of period 1, and linearity of $a(N_{1}+N_{2})$,
 shows that (\ref{eq:U}) is concave.
 \end{proof}
+
 

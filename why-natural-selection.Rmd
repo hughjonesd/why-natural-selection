@@ -1043,8 +1043,9 @@ the time burden of children $b$ is high, e.g. for single parents (Figure
 starting fertility later (Figure \@ref(fig:plot-age-flb)).
 
 Our results are actually stronger than this, in that correlations with
-fertility are reversed at higher AFLB. This could occur if relative risk 
-aversion increased at higher income levels.
+fertility are reversed at higher AFLB. This could be accommodated in the model 
+if children have a money cost as well as a time cost, since money costs are less
+burdensome at higher wages, i.e. in period 2 for those with high human capital. Appendix Figure \@ref(fig:N-plot-with-m) shows an example.
 
 ```{r literature, eval = FALSE}
 "Other models of the literature
