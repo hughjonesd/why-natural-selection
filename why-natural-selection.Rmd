@@ -995,7 +995,7 @@ Here $a$ captures the strength of preference for children. $u(\cdot)$
 is concave and increasing. We treat $N$ as continuous, in line with
 the literature: this can be thought of as the expected number of children
 among similar people. The marginal benefit of an extra child is
-$\frac{dU}{dN}=-bWu'(Y)+a$. The effect of an increase in human capital on this
+$\frac{dU}{dN} = -bWu'(Y)+a$. The effect of an increase in human capital on this
 marginal benefit is
 
 \[
@@ -1006,19 +1006,6 @@ The *substitution effect* is negative and reflects that when wages increase,
 time devoted to childcare costs more in foregone income. The positive *income
 effect* depends on the curvature of the utility function, and reflects that when
 income is higher, the marginal loss of income from children is less painful.
-Letting $u(\cdot)$ take the constant relative risk aversion (CRRA) form
-$u(y)=\frac{y^{1 - \sigma} - 1}{1 - \sigma}$, where $\sigma>0$ captures risk aversion
-in income, we solve for optimal fertility $N^{*}$, and examine the
-*fertility-human capital relationship*, $\frac{dN^{*}}{dh}$. For moderate levels
-of risk aversion ($0.5<\sigma<1$):
-
-\begin{enumerate}
-\item The fertility-human capital relationship is negative: $\frac{dN^{*}}{dh} < 0$.
-\item The relationship is weaker (closer to zero) at higher wages and/or
-levels of human capital.
-\item The relationship is more negative when the time burden of children,
-$b$, is larger.
-\end{enumerate}
 
 To examine education and fertility timing, we extend the model to
 two periods. For convenience we ignore time discounting, and assume
@@ -1028,40 +1015,49 @@ that credit markets are imperfect so that agents cannot borrow. Write
 U(N_{1},N_{2}) = u(Y_{1}) + u(Y_{2}) + aN_{1} + aN_{2})\label{eq:U}
 \end{equation}
 
-Instead of identifying human capital $h$ with wages, we now allow
+Instead of identifying human capital with wages, we now allow
 individuals to choose a level of education $s \in [0,1]$, which has
-a time cost in period 1. Education increases period 2 wages, and is
-complementary to human capital $h > 0$. For period 2 wages we assume
-the simple functional form $w(s,h) = sh$. We normalize period 1 wages
-to 1. Maintaining the assumption of CRRA utility, we examine total
-fertility $N^{*} = N_{1}^{*} + N_{2}^{*}$. For $0.5 < \sigma < 1$,
-facts 1-3 continue to hold (fact 2 in a neighborhood of $\sigma = 1$).
-In addition, for $\sigma$ in a neighborhood of 1:
+a time cost in period 1. Education is
+complementary to human capital $h > 0$, and increases period 2 wages, which take 
+the  simple functional form $w(s,h) = sh$. We normalize period 1 wages
+to 1. Letting $u(\cdot)$ take the constant relative risk aversion (CRRA) form
+$u(y)=\frac{y^{1 - \sigma} - 1}{1 - \sigma}$, where $\sigma>0$ captures risk aversion
+in income, we examine total fertility $N^{*} = N_{1}^{*} + N_{2}^{*}$ and the 
+*fertility-human capital relationship*, $\frac{dN^{*}}{dh}$. For $\sigma < 1$,
+and in a neighbourhood of $\sigma = 1$:
 
-\begin{enumerate}
-\item [4.]\setcounter{enumi}{4}The fertility-human capital relationship
-is weaker at higher levels of education $s$.
-\item The relationship is weaker among those who start fertility in period
-2 ($N_{1}^{*} = 0$) than among those who start fertility in period
-1 ($N_{1}^{*} > 0$).
-\end{enumerate}
 
-Facts 1-5 match our empirical results. In this model, polygenic scores which
-correlate with human capital would have a negative correlation with fertility at
-low income and education levels, and a weaker or zero correlation at higher
-levels (Figures \@ref(fig:plot-income-educ-level)a and \@ref(fig:plot-income-educ-level)b). Among scores which are highly
-correlated with human capital, the correlation might also be weaker at higher
-levels of the score itself, giving rise to diversifying selection, as we observe
-for scores for educational attainment (Appendix
-Figure \@ref(fig:plot-purifying)). The correlation would be more negative when
-the time burden of children $b$ is high, e.g. for single parents (Figure
+1. The fertility-human capital relationship is negative: $\frac{dN^{*}}{dh} < 0$.
+2. The relationship is weaker (closer to zero) at higher wages and/or
+  levels of human capital.
+3. The relationship is more negative when the time burden of children,
+  $b$, is larger.
+4. The relationship is weaker at higher levels of education $s$.
+5. The relationship is weaker among those who start fertility in period
+  2 ($N_{1}^{*} = 0$) than among those who start fertility in period
+  1 ($N_{1}^{*} > 0$).
+
+
+Facts 1-5 parallel our empirical results.[^one-period-results] In this model,
+polygenic scores that correlate with human capital would have a negative
+correlation with fertility at low income and education levels, and a weaker or
+zero correlation at higher levels (Figures \@ref(fig:plot-income-educ-level)a
+and \@ref(fig:plot-income-educ-level)b). Among scores which are highly
+correlated with human capital, the fertility correlation might also be weaker at
+higher levels of the score itself, giving rise to diversifying selection, as we
+observe for scores for educational attainment (Appendix Figure
+\@ref(fig:plot-purifying)). The correlation would be more negative when the time
+burden of children $b$ is high, e.g. for single parents (Figure
 \@ref(fig:plot-n-partners)). Lastly, the correlation would be weaker among those
-starting fertility later (Figure \@ref(fig:plot-age-flb)).
+starting fertility later (Figure \@ref(fig:plot-age-flb)).[^money-costs]
 
-Our results are actually stronger than this, in that correlations with
-fertility are reversed at higher AFLB. This could be accommodated in the model 
-if children have a money cost as well as a time cost, since money costs are less
-burdensome at higher wages, i.e. in period 2 for those with high human capital. Appendix Figure \@ref(fig:N-plot-with-m) shows an example.
+[^one-period-results]: Facts 1-3 also hold in the one-period model.
+
+[^money-costs]: Our results are actually stronger than this, in that
+correlations with fertility are reversed at higher AFLB. This prediction can be
+accommodated in the model if children have a money cost as well as a time cost. 
+Appendix Figure \@ref(fig:N-plot-with-m) shows an example.
+
 
 ```{r literature, eval = FALSE}
 "Other models of the literature
@@ -1155,7 +1151,7 @@ mothers [@baudin2015fertility], in line with our fact 3 and as predicted by
 @becker1981treatise.
 
 
-```{r plot-cors-earnings-educ, fig.cap="Selection effects by correlations with earnings and educational attainment. Each point represents one polygenic score.", fig.height = 4}
+```{r plot-cors-earnings-educ, fig.cap="Selection effects by correlations with earnings and educational attainment. Each point represents one polygenic score."}
 
 drake::loadd(res_all)
 drake::loadd(res_age_flb)
@@ -1215,8 +1211,7 @@ dfr %>%
 ## Testing the theory
 
 We test this explanation in two ways. First, the economic theory predicts that
-genetic variants will be selected for (or against) in proportion to their effect
-on earnings. Figure \@ref(fig:plot-cors-earnings-educ) plots selection effects
+genetic variants will be selected for (or against) in proportion to their correlation with human capital. Figure \@ref(fig:plot-cors-earnings-educ) plots selection effects
 on each polygenic score against that score's correlation with two measures of
 human capital: earnings in a respondent's first job, and educational attainment.
 The relationships are strongly negative. Thus, human capital appears to be relevant
@@ -1272,31 +1267,30 @@ stopifnot(n_less_sig == 0)
 An alternative theory is that polygenic scores correlate with the motivation to
 have children (parameter $a$ in the model; cf. @jones2008fertility). However, this
 theory would not explain why our results are weaker at higher incomes and
-education levels.[^note] 
+education levels.[^note] Another alternative is that traits under selection are
+linked to externalizing behaviour and risk-seeking. This might be partially
+captured by our risk-aversion parameter $\sigma$, which affects fertility by
+changing the marginal utility of income, but a more direct channel is risky
+sexual behaviour [@Mills2020.05.06.081273]. The data here provide some support
+for this: scores which might plausibly be linked to externalizing behaviour,
+like ADHD and (younger) age at smoking initiation, are selected for. However,
+this theory is less good at explaining variation in selection across the full
+range of scores, including physical measures such as waist-hip ratio and BMI. We
+test this theory directly by re-estimating equation \@ref(eq:regression)
+controlling for a measure of risk attitude (UK Biobank field 2040).  The median
+ratio of effect sizes between regressions with and without controls is 
+`r median(ratio)`; all scores which are significant at $p < 0.05/33$ in
+uncontrolled regressions remain so when controlling for risk attitude. This
+non-result could simply reflect the imprecision of the risk aversion measure,
+which is a single yes/no question. However, the risk aversion measure *does*
+predict the overall number of children, highly significantly ($p < 2 \times
+10^{-16}$, `r n_risk_sig`/33 regressions). Given that, and the statistical power
+we get from our sample size, we believe that the non-result is real: while risk
+aversion does predict fertility in the sample, it is not an important channel
+for natural selection.
 
-[^note]: Indeed, in the one-period model above, while $\frac{dN^{*}}{da} > 0$,
-this relationship becomes stronger, not weaker, at higher wages.
-
-Another alternative is that traits under selection are linked to externalizing
-behaviour and risk-seeking. This might be partially captured by our risk-aversion 
-parameter $\sigma$, which affects fertility by changing the marginal utility of 
-income, but a more direct channel is risky sexual behaviour
-[@Mills2020.05.06.081273]. The data here provide some support for this: scores
-which might plausibly be linked to externalizing behaviour, like ADHD and
-(younger) age at smoking initiation, are selected for. However, this theory is
-less good at explaining variation in selection across the full range of scores,
-including physical measures such as waist-hip ratio and BMI. We test this theory
-directly by re-estimating equation \@ref(eq:regression) controlling for a
-measure of risk attitude (UK Biobank field 2040).  The median ratio of effect
-sizes between regressions with and without controls is `r median(ratio)`; all
-scores which are significant at $p < 0.05/33$ in uncontrolled regressions
-remain so when controlling for risk attitude. This non-result could simply
-reflect the imprecision of the risk aversion measure, which is a single yes/no
-question. However, the risk aversion measure *does* predict the overall number
-of children, highly significantly ($p < 2 \times 10^{-16}$, `r n_risk_sig`/33
-regressions). Given that, and the statistical power we get from our sample size, 
-we believe that the non-result is real: while risk aversion does predict fertility 
-in the sample, it is not an important channel for natural selection.
+[^note]: Indeed in the one-period model, while $\frac{dN^{*}}{da} > 0$,
+this effect becomes stronger, not weaker, at higher wages.
 
 
 # Discussion
