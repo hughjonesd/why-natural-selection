@@ -170,6 +170,19 @@ plan <- drake_plan(
             )
   },
   
+  res_sibs_quadratic = {
+    famhist %<>% inner_join(parent_weights, by = "f.eid")
+    map_dfr(score_names, 
+            ~run_regs_fml(
+              "n_sibs ~ {score_name} + I({score_name}^2)", 
+              score_name = .x,
+              famhist    = famhist,
+              weights    = quote(weights)
+            ),
+            .id = "score_name"
+    )
+  },
+  
   res_pcs = {
     pc_names <- grep("PC", names(pcs), value = TRUE)
     res_sibs_pcs <- run_regs_pcs( 
@@ -534,16 +547,16 @@ plan <- drake_plan(
             .id = "score_name")
   },
   
-    res_risk_control = {
-      # f.2040.0.0 is risk attitude (via questionnaire)
-      map_dfr(score_names, 
-                ~ run_regs_fml(
-                  fml = "n_children ~ {score_name} + f.2040.0.0",
-                  score_name = .x,
-                  famhist    = famhist,
-                  subset     = quote(kids_ss)
-                ), 
-              .id = "score_name")
+  res_risk_control = {
+    # f.2040.0.0 is risk attitude (via questionnaire)
+    map_dfr(score_names, 
+              ~ run_regs_fml(
+                fml = "n_children ~ {score_name} + f.2040.0.0",
+                score_name = .x,
+                famhist    = famhist,
+                subset     = quote(kids_ss)
+              ), 
+            .id = "score_name")
   },
   
   res_ineq = {
