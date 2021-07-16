@@ -301,3 +301,15 @@ add_deprivation_data <- function (famhist, dep_data_dir) {
   
   famhist
 }
+
+
+add_fertility_prs <- function (famhist, fertility_data_dir) {
+  fertility_prs <- readr::read_table2(
+                     file.path(fertility_data_dir, 
+                               "UKB.AMC.NEB_POOLED.HM3.EUR.SBLUP.10k.csv")
+  )
+  famhist %<>% left_join(fertility_prs, by = c("f.eid" = "FID")) %>% 
+               rename(fertility_prs = SCORE) %>%
+               mutate(fertility_prs = c(scale(fertility_prs)))
+  famhist
+}

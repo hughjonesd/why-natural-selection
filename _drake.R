@@ -25,6 +25,7 @@ DC5202SC_file      <- file.path(data_dir, "DC5202SC.csv")
 msoa_shapefile     <- file.path(data_dir, "infuse_msoa_lyr_2011_clipped", 
                         "infuse_msoa_lyr_2011_clipped.shp")
 dep_data_dir       <- file.path(data_dir, "deprivation-data")
+fertility_data_dir <- file.path(data_dir, "fertility_PRS")
 
 weighting_scheme_syms <- rlang::syms(c("flb_weights", "age_qual_weights", 
                         "msoa_weights"))
@@ -66,6 +67,9 @@ plan <- drake_plan(
                      names(famhist)[names(famhist) %in% score_names] %<>%
                        paste0("_raw")
                      names(famhist) <- gsub("_resid$", "", names(famhist))
+                     
+                     famhist <- add_fertility_prs(famhist, fertility_data_dir)
+                     
                      famhist
                    },
                     format = "fst_tbl"
@@ -539,7 +543,7 @@ plan <- drake_plan(
     famhist <- add_ashe_income(famhist, ashe_income)
     map_dfr(score_names, 
               ~ run_regs_fml(
-                fml = "n_children ~ {score_name} + age_fte_cat + first_job_pay",
+                fml = "n_children ~ {score_name} + age_fte_cat + factor(income_cat)",
                 score_name = .x,
                 famhist    = famhist,
                 subset     = quote(kids_ss)
@@ -582,6 +586,8 @@ plan <- drake_plan(
                                 names_pattern = "(.*)_(.+?)$"
                               ) 
   },
+  
+  # res_fe_fertility = run_reg_fe_fertility(famhist, score_names),
   
   # res_margins = {
   #    res_extensive <- map_dfr(score_names, 

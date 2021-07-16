@@ -216,3 +216,23 @@ run_income_dist <- function (famhist) {
   #   - use within-family regressions, then work out the intercept separately
   # - predicted from regression, weighting multiplied by n_children
 }
+
+run_reg_fe_fertility <- function (famhist, score_names) {
+  fmls <- paste("n_children ~", score_names, "| sib_group + YOB + sex")
+  fmls <- purrr::map(fmls, as.formula)
+  mods <- purrr::map(fmls, fixest::feols, data = famhist, 
+                       subset = famhist$kids_ss & ! is.na(famhist$first_job_pay), 
+                       note = FALSE)
+  tidied_raw <- purrr::map_dfr(mods, tidy, conf.int = TRUE)
+
+  fmls <- paste("n_children ~", score_names, "+ age_fte_cat + first_job_pay | sib_group + YOB + sex")
+  fmls <- purrr::map(fmls, as.formula)
+  mods <- purrr::map(fmls, fixest::feols, data = famhist, subset = famhist$kids_ss, 
+                       note = FALSE)
+  tidied_mediators <- purrr::map_dfr(mods, tidy, conf.int = TRUE)
+  tidied_mediators %<>% dplyr::filter(! grepl("age_fte_cat|first_job_pay", term))
+  
+  
+  tidied_all <- bind_rows(Raw = tidied_raw, Controlled = tidied_mediators, 
+                            .id = "reg.type")
+}
