@@ -1230,19 +1230,6 @@ categories, the income effect dominates. (See also the Supplementary Animations
 for the uncorrected effects per AFLB group, which show the correlation reversing
 after age 22.)
 
-
-```{r calc-res-earn-educ}
-
-drake::loadd(res_ee_control)
-drake::loadd(res_all)
-
-res_ee_control %<>% filter(term == score_name)
-n_05 <- sum(res_ee_control$p.value < 0.05)
-n_05_33 <- sum(res_ee_control$p.value < 0.05/33)
-
-```
-
-
 Second, we re-estimate equation \@ref(eq:regression) for each polygenic score,
 controlling for earnings in first job and education levels. Effect sizes are
 generally reduced (Appendix Figure \@ref(fig:plot-res-earn-educ)), with
@@ -1250,23 +1237,38 @@ large reductions for polygenic scores for educational attainment. This
 suggests that earnings and education indeed mediate the effect of 
 polygenic scores on fertility.
 
-* We estimate the causal effect of each PGS on fertility using within-sibling
-  regressions.
-  - These are causal due to lottery of meiosis
-  - Also do the fertility PGS
+```{r calc-fe-fertility}
+drake::loadd(res_fe_fertility)
+drake::loadd(res_all)
+
+res_all %<>% filter(dep.var == "N children", reg.type == "controlled")
+res_fe_fertility %<>% filter(Regression == "Raw")
+res_all %<>% left_join(res_fe_fertility, by = "term")
+
+cor_pool_within <- cor.test(res_all$estimate.x, res_all$estimate.y)
+```
+
+One interpretation of these results is that natural selection on polygenic
+scores is driven by their correlation with human capital, which affects
+fertility as our model describes. This does not necessarily imply that polygenic
+scores are causal of either human capital or fertility. Instead they may simply
+correlate with different family environments, for example via "genetic nurture"
+effects [@kong2018nature] or population stratification. To test whether
+polygenic scores cause fertility, we estimate equation \@ref(eq:regression)
+among full siblings, controlling for sibling group fixed effects (Appendix
+Figure \@ref(fig:plot-res-fe-fertility)). Results are never significant after
+Bonferroni correction. The correlation between pooled and within-sibling effect
+sizes is `r cor_pool_within$estimate` (p = `r cor_pool_within$p.value`), and within-sibling effects are about 1/3 smaller. Thus, there is only weak evidence for causal
+links from polygenic scores to fertility, with at least some of the effect
+coming from gene-environment correlation. If we re-estimate the within-sibling
+regressions adding a control for education, effect sizes barely change. This
+suggests that our measures of education only mediate between-sibling-group
+differences in fertility; among siblings, other causal channels are more
+important.
+
+
+
   
-  
-* We also estimate the effect of PSEA and fertility PGS on education and
-  earnings, again within-siblings
-  - confirm PSEA affects both; does fertility? What if we put both in together?
-* Lastly we again estimate effect of PSEAs on fertility, 
-  controlling for education and earnings in first job. 
-  - We cannot exclude some reverse causality from EA3 -> fertility -> education/income
-  - Our theory indeed assumes that people simultaneously choose N and s, while taking into
-    account their effect on Y. We don't make claims about exogenous (chance) variation
-    in Y or in N. But note that exog variation in N1 (i.e. no choice, treat
-    it as fixed to different values) would affect s. OTOH, if EA3 affects $a$ and
-    thereby changes things, you don't get predictions 2 or 4.
   
 * Results:
   - in bivariate within-sib regs, extraversion, EA2/3, ADHD and some others are
@@ -1281,6 +1283,16 @@ polygenic scores on fertility.
     on fertility is multiplied by 10!! within-sib. Much of this is because
     of year of birth confound i.e. declining fertility and also retired people
     have smaller income
+  - within-sib and pooled coefs for PGS are highly correlated; within coefs
+    are about 67% of the size.
+    
+* Interpretation:
+  - some families are better educated and have fewer children
+  - they also have selected-against PG scores like what we see
+  - scores aren't necessarily causal for children, they may be
+    associated
+  - the between-family effect goes through education, but not the 
+    within-family effect (cf. the paper on causality)
     
 
 ```{r calc-risk-attitude}
@@ -2113,6 +2125,20 @@ standard_ggplot(res_compare, fill_col = Regression, n_regs = 33)
   
 ```
 
+
+
+\FloatBarrier
+\clearpage
+## Within-siblings regressions
+
+
+```{r plot-res-fe-fertility, fig.cap = "Selection effects controlling for sibling-group fixed effects. \"Controlled\" regressions add a control for education (left education before 16, 16-18, or after 18)."}
+
+drake::loadd(res_fe_fertility)
+
+standard_ggplot(res_fe_fertility, fill_col = Regression, n_regs = 33, fill_direction = -1)
+  
+```
 
 \FloatBarrier
 \clearpage

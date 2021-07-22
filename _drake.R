@@ -587,7 +587,7 @@ plan <- drake_plan(
                               ) 
   },
   
-  # res_fe_fertility = run_reg_fe_fertility(famhist, score_names),
+  res_fe_fertility = run_reg_fe_fertility(famhist, score_names),
   
   # res_margins = {
   #    res_extensive <- map_dfr(score_names, 
