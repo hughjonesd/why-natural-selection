@@ -260,24 +260,26 @@ scale_y_reordered <- function(..., sep = "___") {
 
 # TODO response to PNAS
 
+* Only use education, not first job pay, in "controlled" regressions; check
+  description is correct - done.
 * Add CIs - done.
 * Clarify collider bias/endogeneity - done.
 * Formalize theory - done.
   - Comment on results where effects are actually reversed. This works
-    nicely if you throw in a money cost. Done computational example.
-* Clarify causality?
+    nicely if you throw in a money cost - done computational example.
+* Clarify causality? - done...
   - Helps to deal with the "collider bias" argument of reviewer
   - Might also be a better test of mediation via human capital
   - One other possibility. If we use only people with first profession
     teacher, that (as it happens) shuts down the EA3-income correlation.
     It also shuts down the EA3-fertility relationship, suggesting that
     income is indeed the mediator.
-* Control for PGS for fertility
 * Clarify "what we learn about genetic links to fertility by using economic theory to interpret relationships between polygenic scores and fertility."
   - Point is that we can explain how natural selection is occurring.
 * "Discuss empirical predictions for AFLB grounded in dynamic theory"
   - hmm, tricky, maybe we can include it in discussion of economic results at
   end of formal section.
+  - think our theory with 2 periods probably covers this
 * Why don't women see stronger effects? But note, they do: not significant
   after correction for multiple testing, but a 25% difference. 
   - I think we leave this for reviewers.
@@ -1231,11 +1233,10 @@ for the uncorrected effects per AFLB group, which show the correlation reversing
 after age 22.)
 
 Second, we re-estimate equation \@ref(eq:regression) for each polygenic score,
-controlling for earnings in first job and education levels. Effect sizes are
-generally reduced (Appendix Figure \@ref(fig:plot-res-earn-educ)), with
+controlling for education levels. Effect sizes are
+generally reduced (Appendix Figure \@ref(fig:plot-res-educ)), with
 large reductions for polygenic scores for educational attainment. This 
-suggests that earnings and education indeed mediate the effect of 
-polygenic scores on fertility.
+suggests that education indeed mediates the effect of polygenic scores on fertility.
 
 ```{r calc-fe-fertility}
 drake::loadd(res_fe_fertility)
@@ -1245,7 +1246,9 @@ res_all %<>% filter(dep.var == "N children", reg.type == "controlled")
 res_fe_fertility %<>% filter(Regression == "Raw")
 res_all %<>% left_join(res_fe_fertility, by = "term")
 
-cor_pool_within <- cor.test(res_all$estimate.x, res_all$estimate.y)
+lm_pool_w <- tidy(lm(estimate.y ~ estimate.x, res_all))
+coef_pool_w <- lm_pool_w[[2, "estimate"]]
+se_pool_w <- lm_pool_w[[2, "std.error"]]
 ```
 
 One interpretation of these results is that natural selection on polygenic
@@ -1255,45 +1258,19 @@ scores are causal of either human capital or fertility. Instead they may simply
 correlate with different family environments, for example via "genetic nurture"
 effects [@kong2018nature] or population stratification. To test whether
 polygenic scores cause fertility, we estimate equation \@ref(eq:regression)
-among full siblings, controlling for sibling group fixed effects (Appendix
-Figure \@ref(fig:plot-res-fe-fertility)). Results are never significant after
-Bonferroni correction. The correlation between pooled and within-sibling effect
-sizes is `r cor_pool_within$estimate` (p = `r cor_pool_within$p.value`), and within-sibling effects are about 1/3 smaller. Thus, there is only weak evidence for causal
-links from polygenic scores to fertility, with at least some of the effect
-coming from gene-environment correlation. If we re-estimate the within-sibling
-regressions adding a control for education, effect sizes barely change. This
-suggests that our measures of education only mediate between-sibling-group
-differences in fertility; among siblings, other causal channels are more
+among full siblings, controlling for a full set of sibling group dummies
+(Appendix Figure \@ref(fig:plot-res-fe-fertility)). All within-sibling effects
+are insignificant after Bonferroni correction. Effect sizes are positively
+correlated with effect sizes from the pooled model, and about 1/3 smaller
+(regressing within-sibling on pooled effect sizes, b = `r coef_pool_w`, se = 
+`r se_pool_w` ). Thus, there is only weak evidence that polygenic scores are
+causally linked to fertility, and selection effects are at least partially
+driven by gene-environment correlation. Also, if we add a control for education 
+to the within-sibling regressions, effect sizes barely change. This
+suggests that our measure of education only mediates differences in fertility
+between sibling groups; among siblings, other causal channels are more
 important.
 
-
-
-  
-  
-* Results:
-  - in bivariate within-sib regs, extraversion, EA2/3, ADHD and some others are
-    weakly significant (only at .05!)
-  - adding education as a control barely changes effect sizes
-  - adding income as a control increases effect sizes (of EA at least)
-  - by contrast, in pooled regs, adding education shrinks effect sizes, and
-    adding income does nothing.
-  - relevant: effect of EA2 on education is halved within-sib, and effect of
-    education on fertility is halved within-sib
-  - whereas, effect of EA2 on income is halved within-sib, but effect of income
-    on fertility is multiplied by 10!! within-sib. Much of this is because
-    of year of birth confound i.e. declining fertility and also retired people
-    have smaller income
-  - within-sib and pooled coefs for PGS are highly correlated; within coefs
-    are about 67% of the size.
-    
-* Interpretation:
-  - some families are better educated and have fewer children
-  - they also have selected-against PG scores like what we see
-  - scores aren't necessarily causal for children, they may be
-    associated
-  - the between-family effect goes through education, but not the 
-    within-family effect (cf. the paper on causality)
-    
 
 ```{r calc-risk-attitude}
 
@@ -1337,7 +1314,7 @@ uncontrolled regressions remain so when controlling for risk attitude. This
 non-result could simply reflect the imprecision of the risk aversion measure,
 which is a single yes/no question. However, the risk aversion measure *does*
 predict the overall number of children, highly significantly ($p < 2 \times
-10^{-16}$, `r n_risk_sig`/33 regressions). Given that, and the statistical power
+10^{-16}$ in `r n_risk_sig`/33 regressions). Given that, and the statistical power
 we get from our sample size, we believe that the non-result is real: while risk
 aversion does predict fertility in the sample, it is not an important channel
 for natural selection.
@@ -2103,7 +2080,7 @@ res_age_birth_parents_dv %>%
 ## Controlling for earnings and education
 
 
-```{r plot-res-earn-educ, fig.cap = "Selection effects controlling for earnings in first job (estimated by mean earnings from ASHE 2007 for the SOC2000 job code) and education (left education before 16, 16-18, or after 18). Raw effects are shown for comparison."}
+```{r plot-res-educ, fig.cap = "Selection effects controlling for education (left education before 16, 16-18, or after 18). Raw effects are shown for comparison."}
 
 drake::loadd(res_ee_control)
 drake::loadd(res_all)
@@ -2132,7 +2109,7 @@ standard_ggplot(res_compare, fill_col = Regression, n_regs = 33)
 ## Within-siblings regressions
 
 
-```{r plot-res-fe-fertility, fig.cap = "Selection effects controlling for sibling-group fixed effects. \"Controlled\" regressions add a control for education (left education before 16, 16-18, or after 18)."}
+```{r plot-res-fe-fertility, fig.cap = "Selection effects controlling for sibling-group fixed effects, with and without a control for education (left education before 16, 16-18, or after 18)."}
 
 drake::loadd(res_fe_fertility)
 
