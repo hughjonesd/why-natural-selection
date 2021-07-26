@@ -1259,17 +1259,16 @@ correlate with different family environments, for example via "genetic nurture"
 effects [@kong2018nature] or population stratification. To test whether
 polygenic scores cause fertility, we estimate equation \@ref(eq:regression)
 among full siblings, controlling for a full set of sibling group dummies
-(Appendix Figure \@ref(fig:plot-res-fe-fertility)). All within-sibling effects
-are insignificant after Bonferroni correction. Effect sizes are positively
-correlated with effect sizes from the pooled model, and about 1/3 smaller
-(regressing within-sibling on pooled effect sizes, b = `r coef_pool_w`, se = 
-`r se_pool_w` ). Thus, there is only weak evidence that polygenic scores are
-causally linked to fertility, and selection effects are at least partially
-driven by gene-environment correlation. Also, if we add a control for education 
-to the within-sibling regressions, effect sizes barely change. This
-suggests that our measure of education only mediates differences in fertility
-between sibling groups; among siblings, other causal channels are more
-important.
+(Appendix Figure \@ref(fig:plot-res-fe-fertility)). On the one hand, all 
+within-sibling effects are insignificant after Bonferroni correction. On the
+other hand, effect sizes are positively correlated with effect sizes from the
+pooled model, and about 1/3 smaller (regressing within-sibling on pooled effect
+sizes, b = `r coef_pool_w`, se = `r se_pool_w` ). We view this as providing weak
+evidence that polygenic scores are causally linked to fertility, with at least
+some role for correlated environments. Also, if we add a control for education
+to the within-sibling regressions, effect sizes barely change. This suggests
+that our measure of education only mediates differences in fertility between
+sibling groups; among siblings, other causal channels are more important.
 
 
 ```{r calc-risk-attitude}

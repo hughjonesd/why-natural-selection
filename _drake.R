@@ -504,15 +504,17 @@ plan <- drake_plan(
           ) 
     # keep variables in this order (it matters to .id):
     pars <- expand_grid(subset = subsets, score_name = score_names) 
+    fh_tmp <- famhist %>% filter(kids_ss)
     res_income <- pmap_dfr(pars,
             ~ run_regs_fml(
               "n_children ~ {score_name}", 
               score_name = .y, 
               subset     = .x,
-              famhist    = famhist %>% filter(kids_ss)
+              famhist    = fh_tmp
             ),
             .id = "row_number"
           ) 
+    rm(fh_tmp)
     pars$row_number <- as.character(seq_len(nrow(pars)))
     res_income %>% left_join(pars, by = "row_number") %>% 
           filter(term != "(Intercept)") %>% 
