@@ -540,10 +540,9 @@ plan <- drake_plan(
   },
   
   res_ee_control = {
-    famhist <- add_ashe_income(famhist, ashe_income)
     map_dfr(score_names, 
               ~ run_regs_fml(
-                fml = "n_children ~ {score_name} + age_fte_cat + factor(income_cat)",
+                fml = "n_children ~ {score_name} + age_fte_cat",
                 score_name = .x,
                 famhist    = famhist,
                 subset     = quote(kids_ss)
@@ -587,7 +586,7 @@ plan <- drake_plan(
                               ) 
   },
   
-  # res_fe_fertility = run_reg_fe_fertility(famhist, score_names),
+  res_fe_fertility = run_reg_fe_fertility(famhist, score_names),
   
   # res_margins = {
   #    res_extensive <- map_dfr(score_names, 
