@@ -5,6 +5,7 @@ suppressPackageStartupMessages({
   library(purrr)
   library(tidyr)
   library(readr)
+  library(dplyr)
   loadNamespace("future")
 })
 
