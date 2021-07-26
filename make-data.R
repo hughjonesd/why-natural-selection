@@ -304,7 +304,7 @@ add_deprivation_data <- function (famhist, dep_data_dir) {
 
 
 add_fertility_prs <- function (famhist, fertility_data_dir) {
-  fertility_prs <- readr::read_table2(
+  fertility_prs <- readr::read_table(
                      file.path(fertility_data_dir, 
                                "UKB.AMC.NEB_POOLED.HM3.EUR.SBLUP.10k.csv")
   )

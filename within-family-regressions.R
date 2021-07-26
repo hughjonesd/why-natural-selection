@@ -5,7 +5,7 @@ library(readr)
 loadd(famhist)
 loadd(score_names)
 
-grf <- readr::read_table2("~/UKBB data 2019/relatedness_file.txt")
+grf <- readr::read_table("~/UKBB data 2019/relatedness_file.txt")
 grf <- grf %>% filter(Kinship > 0.45)
 sibs <- left_join(grf, famhist, by = c("ID1" = "f.eid"))
 sibs <- left_join(sibs, famhist, by = c("ID2" = "f.eid"))
