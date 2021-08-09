@@ -1046,8 +1046,9 @@ Appendix Figure \@ref(fig:N-plot-with-m) shows an example.
             
 2.  The fertility-human capital                       Figure \@ref(fig:plot-income-educ-level)a. 
     relationship is weaker (closer to zero)           Selection effects are also weaker at higher
-    at higher wages and/or levels of                  polygenic scores for EA (Appendix Figure
-    human capital.                                    \@ref(fig:plot-purifying)).
+    at higher wages and/or levels of                  polygenic scores for 
+    human capital.                                    educational attainment (Appendix Figure
+                                                      \@ref(fig:plot-purifying)).
             
 3.  The relationship is more negative when            Stronger effects for single parents
     the time burden of children, $b$, is              (Figure \@ref(fig:plot-n-partners)).
@@ -1251,24 +1252,26 @@ coef_pool_w <- lm_pool_w[[2, "estimate"]]
 se_pool_w <- lm_pool_w[[2, "std.error"]]
 ```
 
-One interpretation of these results is that natural selection on polygenic
-scores is driven by their correlation with human capital, which affects
-fertility as our model describes. This does not necessarily imply that polygenic
-scores are causal of either human capital or fertility. Instead they may simply
-correlate with different family environments, for example via "genetic nurture"
-effects [@kong2018nature] or population stratification. To test whether
-polygenic scores cause fertility, we estimate equation \@ref(eq:regression)
-among full siblings, controlling for a full set of sibling group dummies
-(Appendix Figure \@ref(fig:plot-res-fe-fertility)). On the one hand, all 
-within-sibling effects are insignificant after Bonferroni correction. On the
-other hand, effect sizes are positively correlated with effect sizes from the
-pooled model, and about 1/3 smaller (regressing within-sibling on pooled effect
-sizes, b = `r coef_pool_w`, se = `r se_pool_w` ). We view this as providing weak
-evidence that polygenic scores are causally linked to fertility, with at least
-some role for correlated environments. Also, if we add a control for education
-to the within-sibling regressions, effect sizes barely change. This suggests
-that our measure of education only mediates differences in fertility between
-sibling groups; among siblings, other causal channels are more important.
+These results support our theory that natural selection on polygenic scores is
+driven by their correlation with human capital. This need not imply
+that a given polygenic score is causal of either fertility or human capital. Instead
+scores may simply correlate with causally relevant environments, for example via
+"genetic nurture" effects [@kong2018nature] or population stratification. To
+test whether polygenic scores cause fertility, we estimate equation
+\@ref(eq:regression) among full siblings, controlling for a full set of sibling
+group dummies (Appendix Figure \@ref(fig:plot-res-fe-fertility)). With a reduced
+sample size, all within-sibling effects are insignificant after Bonferroni
+correction. However, effect sizes are positively correlated with effect sizes
+from the pooled model, and about 1/3 smaller (regressing within-sibling on
+pooled effect sizes, $b$ = `r coef_pool_w`). This attenuation is broadly in line
+with the ~50% decrease in heritability in within-sibling GWASs on age at first
+birth and educational attainment [@Howe2021.03.05.433935]. We see these results
+as providing weak evidence that polygenic scores cause fertility, with effects
+being at least partly driven by gene-environment correlations. We also reran
+within-siblings regressions adding a control for education. Most effect sizes
+barely change, suggesting that our measure of education does not in general
+mediate differences in fertility among siblings. However, for educational
+attainment polygenic scores (EA2 and EA3), effect sizes are reduced by about 20%.
 
 
 ```{r calc-risk-attitude}
@@ -1302,7 +1305,7 @@ captured by our risk-aversion parameter $\sigma$, which affects fertility by
 changing the marginal utility of income, but a more direct channel is risky
 sexual behaviour [@mills2021identification]. The data here provide some support
 for this: scores which might plausibly be linked to externalizing behaviour,
-like ADHD and (younger) age at smoking initiation, are selected for. However,
+like ADHD and younger age at smoking initiation, are selected for. However,
 this theory is less good at explaining variation in selection across the full
 range of scores, including physical measures such as waist-hip ratio and BMI. We
 test this theory directly by re-estimating equation \@ref(eq:regression)
@@ -1313,7 +1316,7 @@ uncontrolled regressions remain so when controlling for risk attitude. This
 non-result could simply reflect the imprecision of the risk aversion measure,
 which is a single yes/no question. However, the risk aversion measure *does*
 predict the overall number of children, highly significantly ($p < 2 \times
-10^{-16}$ in `r n_risk_sig`/33 regressions). Given that, and the statistical power
+10^{-16}$ in `r n_risk_sig` out of 33 regressions). Given that, and the statistical power
 we get from our sample size, we believe that the non-result is real: while risk
 aversion does predict fertility in the sample, it is not an important channel
 for natural selection.
@@ -1360,7 +1363,7 @@ of natural selection to those studied here. In addition, genetic effects on
 educational attainment have been shown to be inflated in population-based
 samples as compared to within-family designs, likely because of indirect genetic 
 effects, gene-environment correlations, and/or assortative mating 
-[@lee2018gene; @selzam2019comparing; @kong2018nature]. 
+[@lee2018gene; @selzam2019comparing; @kong2018nature; @Howe2021.03.05.433935]. 
 In short, it is probably too early to tell whether modern natural selection has a
 substantively important effect on the genetic make-up of the population.
 Nevertheless, we note that selection effects on our measured polygenic scores
@@ -1401,7 +1404,7 @@ scores, with a median increase of `r median_pct_change`% in the difference
 between highest and lowest income groups (Appendix Table
 \@ref(tab:tbl-inequality-effects)). If inequalities in polygenic scores are
 important for understanding class mobility and structure [@belsky2018genetic;
-@Rimfeld_2018], then these increases are substantial effects. Since many
+@Rimfeld_2018], then these increases are substantially important. Since many
 polygenic scores are predictive of disease risk, they could also potentially
 increase health inequalities. In general, the evolutionary history of
 anatomically modern humans is related to disease risk [@benton2021influence];
