@@ -330,24 +330,24 @@ the above approaches
 \]
 \end{proof}
 
-We can now gather the facts stated in the main text.
+We can now gather the theoretical predictions stated in Table \ref{tab:theory}.
 
-\textbf{Fact 1}: for $\sigma<1$, total fertility $N^{*}\equiv N_{1}^{*}+N_{2}^{*}$
+\textbf{Prediction 1}: for $\sigma<1$, total fertility $N^{*}\equiv N_{1}^{*}+N_{2}^{*}$
 is decreasing in human capital $h$. 
 
 Furthermore, for $\sigma$ close enough to 1, fertility is convex
 in human capital, i.e. 
 
-\textbf{Fact 2 part 1}: the fertility-human capital relationship is
+\textbf{Prediction 2 part 1}: the fertility-human capital relationship is
 closer to 0 at high levels of $h$.
 
 For $\sigma<1$, education levels $s^{*}$ increase in $h$, and so
 therefore do equilibrium wages $w(s^{*},h)$. This, plus fact 1, gives:
 
-\textbf{Fact 2 part 2}: for $\sigma<1$ and close to 1, the fertility-human
+\textbf{Prediction 2 part 2}: for $\sigma<1$ and close to 1, the fertility-human
 capital relationship is weaker among higher earners.
 
-\textbf{Fact 4}: for $\sigma<1$ and close to 1, the fertility-human
+\textbf{Prediction 4}: for $\sigma<1$ and close to 1, the fertility-human
 capital relationship is weaker at high levels of education.
 
 Next, we compare people who start fertility early ($N_{1}^{*}>0$)
@@ -355,10 +355,10 @@ versus those who start fertility late ($N_{1}^{*}=0$). Again, for
 $\sigma<1$ the former group have lower $h$ than the latter group.
 Thus we have:
 
-\textbf{Fact 5}: for $\sigma<1$ and close to 1, the fertility-human
+\textbf{Prediction 5}: for $\sigma<1$ and close to 1, the fertility-human
 capital relationship is weaker among those who start fertility late.
 
-Lastly, we prove fact 3. Differentiating $dN_{t}^{*}/dh$ in (\ref{eq:dNdh1})
+Lastly, we prove prediction 3. Differentiating $dN_{t}^{*}/dh$ in (\ref{eq:dNdh1})
 with respect to $b$, for when $N_{1}^{*}>0$ gives:
 \begin{align*}
 \frac{d^{2}N_{t}^{*}}{dhdb} & =\frac{2\sigma-2}{2\sigma-1}b^{(3-4\sigma)/(2\sigma-1)}\left(\frac{1}{a}\right)^{1/(2\sigma-1)}\frac{1-\sigma}{2\sigma-1}h^{(\sigma-1)^{2}/(\sigma(2\sigma-1))}
@@ -372,7 +372,7 @@ $dN_{2}^{*}/dh$ in (\ref{eq:dNdh2}) gives:
 \]
 which again is negative for $\sigma<1$. Therefore:
 
-\textbf{Fact 3}: for $\sigma<1$, the fertility-human capital relationship
+\textbf{Prediction 3}: for $\sigma<1$, the fertility-human capital relationship
 is more negative when the burden of childcare $b$ is larger.
 
 
