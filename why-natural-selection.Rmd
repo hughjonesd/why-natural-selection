@@ -1,6 +1,5 @@
 ---
 title: "Human capital mediates natural selection in contemporary humans"
-author: "David Hugh-Jones \\thanks{Corresponding author. School of Economics, University of East Anglia, Norwich, UK. Email: D.Hugh-Jones@uea.ac.uk}, Abdel Abdellaoui \\thanks{Department of Psychiatry, Amsterdam UMC, University of Amsterdam, Amsterdam, The Netherlands.}"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 abstract: "\\noindent Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection through the association between 33 polygenic scores and fertility, across two generations, using data from UK Biobank (N = 409,629 British subjects with European ancestry). Consistently over time, polygenic scores associated with lower (higher) earnings, education and health are selected for (against). Selection effects are concentrated among lower SES groups, younger parents, people with more lifetime sexual partners, and people not living with a partner. The direction of natural selection is reversed among older parents (22+), or after controlling for age at first live birth. These patterns are in line with economic theories of fertility, in which earnings-increasing human capital may either increase or decrease fertility via income and substitution effects in the labour market. Studying natural selection can help us understand the genetic architecture of health outcomes: we find evidence in modern day Great Britain for multiple natural selection pressures that vary between subgroups in the direction and strength of their effects, that are strongly related to the socio-economic system, and that may contribute to health inequalities across income groups."
 bibliography: "negative-selection.bib"
@@ -1478,7 +1477,7 @@ We use participant data from UK Biobank [@bycroft2018uk], which has received
 ethical approval from the National Health Service North West Centre for Research
 Ethics Committee (reference: 11/NW/0382). We limit the sample to white British
 participants of European descent, as defined by genetic estimated ancestry and
-self-identified ethnic group [@abdellaoui2019genetic], giving a sample size of
+self-identified ethnic group, giving a sample size of
 `r comma_num(nrow(famhist))`. For regressions on number of children we use
 participants over 45, since most fertility is completed by this age. This gives
 a sample size of `r comma_num(nrow(famhist %>% filter(kids_ss)))`.
@@ -1487,8 +1486,6 @@ Polygenic scores were computed by summing the alleles across ~1.3 million
 genetic variants weighted by their effect sizes as estimated in 33 genome-wide 
 association studies (GWASs) that excluded UK Biobank. To control for population 
 stratification, we corrected the polygenic scores for 100 principal components (PCs). 
-To compute polygenic scores and PCs, the same procedures were followed as 
-described in @abdellaoui2019genetic.
 
 Earnings in first job are estimated from mean earnings in the 2007 Annual Survey
 of Hours and Earnings, using the SOC 2000 job code (Biobank field 22617).
@@ -1501,13 +1498,6 @@ the R "survey" package [@lumley2020survey]. Geographical weighting was done with
 iterative post-stratification using the `rake()` function, on Census Middle Layer
 Super Output Areas, sex and presence/absence of a partner.
 
-
-# Acknowledgements
-
-AA is supported by the Foundation Volksbond Rotterdam and by ZonMw grant 
-849200011 from The Netherlands Organisation for Health Research and Development. 
-This study was conducted using UK Biobank resources under application numbers 
-40310 and 19127.
 
 \FloatBarrier
 \clearpage
