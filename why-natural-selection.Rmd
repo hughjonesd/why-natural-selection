@@ -22,6 +22,8 @@ header-includes:
   - \theoremstyle{plain}
   - \newtheorem{lem}{\protect\lemmaname}
   - \providecommand{\lemmaname}{Lemma}
+  - \usepackage{lineno}
+  - \linenumbers
 editor_options: 
   markdown: 
     wrap: 72
