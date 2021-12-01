@@ -366,16 +366,28 @@ populations, using genome-wide analysis
 particular, genetic variants associated with higher educational attainment are
 being selected against, although effect sizes appear small.
 
-As yet we know little about the social mechanisms behind these effects. This
-study uses data from UK Biobank [@bycroft2018uk] to learn more. We test for
+As yet we know little about the social mechanisms behind these effects. A
+potential explanation for them comes from the economic theory of fertility first
+presented by [@becker1960economic]. In this theory, higher potential earnings
+have two opposite effects on fertility: a fertility-increasing *income effect*
+(higher income makes children more affordable), and a fertility-lowering
+*substitution effect* (time spent on childrearing has a higher cost in foregone
+earnings). Thus, an individual's *human capital* -- skills and personality
+traits which are valuable in labour markets -- can increase or decrease his or
+her fertility. This can lead to selection on inherited
+variants which are linked to human capital. Furthermore, the economic theory predicts
+systematic variation in the relative strength of the income and substitution
+effects across different social groups.
+
+This
+study uses data from UK Biobank [@bycroft2018uk] to learn more about contemporary
+natural selection. We test for
 natural selection on 33 different polygenic scores by estimating their
 correlation with fertility. We extend the analysis over two generations, using
 data on respondents' number of siblings as well as their number of children.
 This is interesting because consistent natural selection over multiple
-generations could lead to substantive effects in the long run. Most importantly,
-we examine reproductive rates in different subgroups of the population, in order
-to uncover patterns that can help illuminate the mechanisms behind modern
-natural selection.
+generations could lead to substantive effects in the long run. We then examine
+reproductive rates in different subgroups of the population. 
 
 We find selection effects on many polygenic scores. Effects are largely consistent
 across generations. The strength of natural selection on a polygenic score is
@@ -389,17 +401,10 @@ weaker and often statistically insignificant. In some subgroups, the
 direction of selection is even reversed: polygenic scores predicting
 higher education and earnings are associated with *higher* fertility.
 
-These patterns are in line with economic theories of fertility
-[@becker1960economic]. In these, higher potential earnings have two opposite
-effects on fertility: a fertility-increasing *income effect* (higher income
-makes children more affordable), and a fertility-lowering *substitution effect*
-(time spent on childrearing has a higher cost in foregone earnings). Our results
-suggest that the substitution effect dominates for single parents and younger
-parents, while among couples and older parents (22+) effects are more evenly
-balanced. Thus, contemporary natural selection on polygenic scores can be
-explained by their correlation with earnings-increasing human capital. Below, we 
-show that a simple model of human capital, education and fertility choices 
-can give rise to our key empirical results.
+We then show that a parsimonious model of human capital, education and
+fertility choices can give rise to these empirical results. Thus, contemporary
+natural selection on polygenic scores can be explained by their correlation with
+earnings-increasing human capital.
  
 
 # Results
@@ -629,20 +634,19 @@ res_wt_combined %>%
 ```
 
 
-To understand the reasons for the ascertainment bias in our sample, and to learn 
-about the mechanisms underlying natural selection, we split the sample, starting with
-basic demographic variables including education, income and sex. These are all
-potential sources of ascertainment bias, as mentioned above. We then re-estimate
-\@ref(eq:regression) within each subgroup.
+To motivate our economic model, we split the sample by demographic
+and social variables, and re-estimate \@ref(eq:regression) within each subgroup.
+We examine socio-demographic variables including income, education and sex, and
+family structure variables including age at first live birth, presence of a partner, and
+lifetime number of sexual partners.
+We emphasize that these categories are not necessarily exogenous to the polygenic
+scores. For example, both in the data and in our theoretical model, age at first
+live birth is a choice variable, which is endogenous to human-capital-related 
+polygenic scores. Nevertheless, differences in equation
+\@ref(eq:regression) across subgroups constrain the set of possible explanations
+for natural selection. As we show below, the economic theory predicts 
+the patterns in the data, while alternative explanations do not.
 
-We emphasize that this exercise does
-*not* apportion the total correlation with fertility into subgroups. 
-That is because the polygenic score may also affect the probability of being in 
-each subgroup. For example, the EA3 polygenic score for educational attainment not only affects
-fertility among university graduates, and among non-graduates; it also changes
-a person's chance of attending university. Nevertheless, differences in equation
-\@ref(eq:regression) across subgroups can inform us about how natural
-selection works, by constraining the set of possible mechanisms.
 
 
 ```{r plot-income-educ-level, fig.cap = "Selection effects by education and income.", fig.subcap = c("Age left full-time education", "Household income"), fig.ncol = 1}
@@ -1597,8 +1601,9 @@ rel_sizes %>%
 \clearpage
 ## Balancing and diversifying selection
 
-
-We rerun equation \@ref(eq:regression), adding a quadratic term in $PGS_i$,
+Balancing selection reduces variance in the trait under selection, 
+while diversifying selection increases variance. To check for these,
+we rerun equation \@ref(eq:regression), adding a quadratic term in $PGS_i$,
 and using our age/qualification weights. Scores for hip circumference and drinks
 per week show significant balancing selection ($p < 0.05/33$, negative
 coefficient). Scores for educational attainment (EA2 and EA3) show significant
