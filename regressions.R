@@ -12,6 +12,7 @@ suppressPackageStartupMessages({
   loadNamespace("sampleSelection")
   loadNamespace("Formula")
   loadNamespace("fixest")
+  loadNamespace("psych")
 })
 
 calc_pgs_over_time <- function (famhist, score_names) {
@@ -235,4 +236,32 @@ run_reg_fe_fertility <- function (famhist, score_names) {
   
   tidied_all <- bind_rows(Raw = tidied_raw, Controlled = tidied_mediators, 
                             .id = "Regression")
+}
+
+run_cor_income <- function (famhist, score_names, age_qual_weights) {
+  famhist <- famhist %>% 
+               left_join(age_qual_weights, by = "f.eid") %>% 
+               filter(
+                 ! is.na(n_children), 
+                 ! is.na(income_cat), 
+                 ! is.na(weights)
+               ) %>%
+               mutate(
+                 child_weights = weights * n_children
+               )
+    
+  cors_counterfactual <- purrr::map(score_names, ~{
+    psych::cor.wt(famhist[c("income_cat", .x)], w = famhist$weights)
+  })
+  cors_actual <- purrr::map(score_names, ~{
+    psych::cor.wt(famhist[c("income_cat", .x)], w = famhist$child_weights)
+  })
+  
+  cors_counterfactual <- purrr::map_dbl(cors_counterfactual, ~ .x$r[2,1])
+  cors_actual <- purrr::map_dbl(cors_actual, ~ .x$r[2,1])
+  
+  res <- tibble(score = score_names, actual = cors_actual, cf = cors_counterfactual)
+  res <- res %>% mutate(ratio = actual/cf)
+  
+  res
 }

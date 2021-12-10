@@ -1397,21 +1397,8 @@ bias.
 ```{r calc-inequality}
 drake::loadd(res_ineq)
 
-ineq_comp <-  left_join(
-                res_ineq %>% filter(income_cat == 1),
-                res_ineq %>% filter(income_cat == 5),
-                by = "score"
-              )
-
-ineq_comp %<>% mutate(
-                 diff_children = wtd.y - wtd.x,
-                 diff_hypoth   = unw.y - unw.x,
-                 pct_change    = 100 * (diff_children - diff_hypoth)/diff_hypoth
-               )
-
-median_pct_change <- median(ineq_comp$pct_change)
-n_increases <- sum(ineq_comp$pct_change > 0)
-
+n_increases <- sum(res_ineq$ratio > 1)
+median_pct_change <- (median(res_ineq$ratio) - 1) * 100
 ```
 
 Because selection effects are concentrated in lower-income groups, they may also
@@ -1423,17 +1410,17 @@ number of children. The grey bars show the hypothetical means if all households
 had equal numbers of children. Natural selection against genes associated with
 educational attainment, which lowers the mean, is stronger at the bottom of the
 income distribution, and this increases the differences between groups. Overall,
-natural selection increases inequality for `r n_increases` out of 33 polygenic
-scores, with a median increase of `r median_pct_change`% in the difference
-between highest and lowest income groups (Appendix Table
-\@ref(tab:tbl-inequality-effects)). If inequalities in polygenic scores are
+natural selection increases the correlation of polygenic scores with income 
+for `r n_increases` out of 33 polygenic
+scores, with a median increase in the correlation of `r median_pct_change`% 
+(Appendix Table \@ref(tab:tbl-inequality-effects)). If inequalities in polygenic scores are
 important for understanding class mobility and structure [@belsky2018genetic;
-@Rimfeld_2018], then these increases are substantially important. Since many
-polygenic scores are predictive of disease risk, they could also potentially
-increase health inequalities. In general, the evolutionary history of
-anatomically modern humans is related to disease risk [@benton2021influence];
-understanding the role of contemporary natural selection may aid in mapping the
-genetic architecture of current health disparities.
+@Rimfeld_2018; @harden2021genetic], then these increases are substantially
+important. Since many polygenic scores are predictive of disease risk, they
+could also potentially increase health inequalities. In general, the
+evolutionary history of anatomically modern humans is related to disease risk
+[@benton2021influence]; understanding the role of contemporary natural selection
+may aid in mapping the genetic architecture of current health disparities.
 
 
 ```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean polygenic score for educational attainment (EA3) of children by household income group. Blue is actual. Grey is hypothetical in the absence of selection effects. Respondents weighted by Age/Qualification.", fig.width = 4}
@@ -2187,31 +2174,33 @@ statistics.
 \FloatBarrier
 ## Effects on inequality
 
-Table \@ref(tab:tbl-inequality-effects) estimates differences in children's mean
-polygenic scores between the highest and lowest income groups. Column "With
-selection" uses respondents' scores weighted by Age/Qualification times number
+Table \@ref(tab:tbl-inequality-effects) shows correlations between children's
+polygenic scores and household income (UKB data field 738). Column "With
+selection" uses respondents' scores weighted by Age/Qualification, times number
 of children. Column "Without selection" uses scores weighted by
-Age/Qualification only, i.e. if all couples had the same number of children.
+Age/Qualification only, i.e. if all respondents had the same number of children,
+equivalently the correlation among respondents.
 
 
 ```{r tbl-inequality-effects}
 
-ineq_comp %>% 
+
+res_ineq %>% 
       select(
-        PGS                 = score, 
-        `Without selection` = diff_hypoth,
-        `With selection`    = diff_children, 
-        `% change`          = pct_change
+        PGS                      = score, 
+        `Cor. without selection` =cf,
+        `Cor. with selection`    = actual, 
+        `Ratio`                  = ratio
       ) %>% 
       mutate(
         PGS = pretty_names(PGS)
       ) %>% 
-      arrange(desc(`% change`)) %>% 
+      arrange(desc(`Ratio`)) %>% 
       as_hux() %>% 
       set_align(everywhere, -1, "right") %>% 
       set_number_format(everywhere, 2:3, 3) %>% 
-      set_number_format(everywhere, 4, 1) %>% 
-      set_caption("Differences in polygenic scores between highest and lowest income group.") %>% 
+      set_number_format(everywhere, 4, 2) %>% 
+      set_caption("Correlations of polygenic scores with income group.") %>% 
       theme_compact() %>% 
       set_width(0.75) %>% 
       set_col_width(c(.4, .2, .2, .2)) %>% 
