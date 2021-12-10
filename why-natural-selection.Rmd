@@ -1399,6 +1399,9 @@ drake::loadd(res_ineq)
 
 n_increases <- sum(res_ineq$ratio > 1)
 median_pct_change <- (median(res_ineq$ratio) - 1) * 100
+
+cor_ea3 <- res_ineq[res_ineq$score == "EA3_excl_23andMe_UK", ]
+cor_ea3$increase_pct <- (cor_ea3$ratio - 1) * 100
 ```
 
 Because selection effects are concentrated in lower-income groups, they may also
@@ -1409,18 +1412,18 @@ blue bars show the actual means, i.e. parents' mean polygenic score weighted by
 number of children. The grey bars show the hypothetical means if all households
 had equal numbers of children. Natural selection against genes associated with
 educational attainment, which lowers the mean, is stronger at the bottom of the
-income distribution, and this increases the differences between groups. Overall,
-natural selection increases the correlation of polygenic scores with income 
-for `r n_increases` out of 33 polygenic
-scores, with a median increase in the correlation of `r median_pct_change`% 
-(Appendix Table \@ref(tab:tbl-inequality-effects)). If inequalities in polygenic scores are
+income distribution, and this increases the differences between groups.
+Overall, natural selection increases the correlation of polygenic scores with
+income for `r n_increases` out of 33 polygenic scores, with a median
+proportionate increase of `r median_pct_change`% (Appendix Table
+\@ref(tab:tbl-inequality-effects)). If inequalities in polygenic scores are
 important for understanding class mobility and structure [@belsky2018genetic;
-@Rimfeld_2018; @harden2021genetic], then these increases are substantially
-important. Since many polygenic scores are predictive of disease risk, they
-could also potentially increase health inequalities. In general, the
-evolutionary history of anatomically modern humans is related to disease risk
-[@benton2021influence]; understanding the role of contemporary natural selection
-may aid in mapping the genetic architecture of current health disparities.
+@Rimfeld_2018; @harden2021genetic], then these increases are substantive. Since
+many polygenic scores are predictive of disease risk, they could also
+potentially increase health inequalities. In general, the evolutionary history
+of anatomically modern humans is related to disease risk [@benton2021influence];
+understanding the role of contemporary natural selection may aid in mapping the
+genetic architecture of current health disparities.
 
 
 ```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean polygenic score for educational attainment (EA3) of children by household income group. Blue is actual. Grey is hypothetical in the absence of selection effects. Respondents weighted by Age/Qualification.", fig.width = 4}
@@ -2178,8 +2181,9 @@ Table \@ref(tab:tbl-inequality-effects) shows correlations between children's
 polygenic scores and household income (UKB data field 738). Column "With
 selection" uses respondents' scores weighted by Age/Qualification, times number
 of children. Column "Without selection" uses scores weighted by
-Age/Qualification only, i.e. if all respondents had the same number of children,
-equivalently the correlation among respondents.
+Age/Qualification only, i.e. the counterfactual correlation if all respondents
+had the same number of children (equivalently, the correlation in the
+respondents' own generation).
 
 
 ```{r tbl-inequality-effects}
@@ -2188,14 +2192,14 @@ equivalently the correlation among respondents.
 res_ineq %>% 
       select(
         PGS                      = score, 
-        `Cor. without selection` =cf,
         `Cor. with selection`    = actual, 
+        `Cor. without selection` = cf,
         `Ratio`                  = ratio
       ) %>% 
       mutate(
         PGS = pretty_names(PGS)
       ) %>% 
-      arrange(desc(`Ratio`)) %>% 
+      arrange(desc(`Cor. with selection`)) %>% 
       as_hux() %>% 
       set_align(everywhere, -1, "right") %>% 
       set_number_format(everywhere, 2:3, 3) %>% 
