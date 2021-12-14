@@ -242,6 +242,7 @@ run_cor_income <- function (famhist, score_names, age_qual_weights) {
   famhist <- famhist %>% 
                left_join(age_qual_weights, by = "f.eid") %>% 
                filter(
+                 kids_ss,
                  ! is.na(n_children), 
                  ! is.na(income_cat), 
                  ! is.na(weights)
@@ -264,4 +265,98 @@ run_cor_income <- function (famhist, score_names, age_qual_weights) {
   res <- res %>% mutate(ratio = actual/cf)
   
   res
+}
+
+run_ineq_ea3_calcs <- function (famhist, age_qual_weights, h2) {
+  
+  famhist <- famhist %>% filter(kids_ss)
+  famhist <- left_join(famhist, age_qual_weights, by = "f.eid")
+  famhist$child_weights <- famhist$n_children * famhist$weights
+  
+  res <- list()
+  
+  reg_edu_ea3 <- lm(age_fulltime_edu ~ EA3_excl_23andMe_UK, 
+                    data = famhist, weights = weights)
+  
+  res$r2_edu_ea3 <- summary(reg_edu_ea3)$r.squared
+  res$lambda <- res$r2_edu_ea3/h2
+  
+  reg_income_ea3 <- lm(income_cat ~ EA3_excl_23andMe_UK, 
+                       data = famhist, weights = weights)
+  reg_income_ea3_wt <- lm(income_cat ~ EA3_excl_23andMe_UK, 
+                         data = famhist, weights = child_weights)
+  
+  res$r2_income_ea3 <- summary(reg_income_ea3)$r.squared
+  res$r2_income_ea3_wt <- summary(reg_income_ea3_wt)$r.squared
+  
+  res$r2_income_true_psea <- res$r2_income_ea3 / res$lambda
+  res$r2_income_true_psea_wt <- res$r2_income_ea3_wt / res$lambda
+  
+  reg_income_ea3_fe <- fixest::feols(income_cat ~ EA3_excl_23andMe_UK | sib_group, 
+                                     data = famhist, weights = famhist$weights)
+  reg_income_ea3_fe_wt <- fixest::feols(income_cat ~ EA3_excl_23andMe_UK | sib_group, 
+                                     data = famhist, weights = famhist$child_weights)
+  res$r2_income_ea3_fe <- fixest::r2(reg_income_ea3_fe, type = "wr2")
+  res$r2_income_ea3_fe_wt <- fixest::r2(reg_income_ea3_fe_wt, type = "wr2")
+  
+  return(res)
+}
+
+run_mediation_analysis_rosla <- function (famhist, score_names, res_all) {
+  
+  # take people either side of ROSLA 1973 (born 1957 Aug/Sept)
+  # regress n_children ~ post_rosla
+  # this, divided by change in edu_years pre/post, estimates exogenous effect of edu_years
+  
+  # change this for placebo tests. Effect size is at 10th percentile among 1948-1967,
+  # so reasonably OK. But SEs are big....
+  # SEs measure sampling variation; placebo tests check whether there's a confound
+  # such as month of birth in *any* year. So they are separate issues...!
+  rosla_year <- 1957
+  famhist$birth_year_m <- famhist$birth_year * 12 + famhist$birth_mon
+  famhist$dbym <- famhist$birth_year_m - (rosla_year * 12 + 9)
+  famhist$rosla <- famhist$dbym >= 0
+  
+  rosla_subset <- famhist[famhist$YOB == rosla_year & famhist$birth_mon %in% 8:9, ]
+  reg_nc_rosla <- lm(n_children ~ rosla, rosla_subset)
+  reg_edu_rosla <- lm(age_fulltime_edu ~ rosla, rosla_subset)
+  effect_nc_edu <- coef(reg_nc_rosla)[2]/coef(reg_edu_rosla)[2]
+  
+
+  # regress edu_years on score_name (within this subsample? bias-variance tradeoff!)
+  # no controls, we just want correlation
+  # score_name * beta_score_edu * beta_edu_kids is mediated effect on n_children
+  fmls <- lapply(glue::glue("age_fulltime_edu ~ {score_names}"), as.formula)
+  fmls <- setNames(fmls, score_names)
+  beta_edu_ps <- purrr::map(fmls, lm, data = famhist)%>%
+                       purrr::map_dbl(~ coef(.x)[2])
+  effect_mediated_nc_ps <- effect_nc_edu * beta_edu_ps
+  
+  # regress n_children on score_name: this gives raw "total effect"
+  # deduct mediated effect to give direct effect
+  # calculate mediated_effect/total_effect to give % mediated
+  res_chn <- res_all %>% 
+               dplyr::filter(
+                 dep.var == "N children", 
+                 reg.type == "controlled"
+               )
+  effect_nc_ps <- setNames(res_chn$estimate, res_chn$term)
+  
+  prop_mediated <- effect_mediated_nc_ps[score_names] / effect_nc_ps[score_names]
+  
+  res <- data.frame(score_name = score_names, prop_mediated = prop_mediated)
+  res <- arrange(res, desc(prop_mediated))
+  
+  # overall:
+  # SEs are very large
+  # but results are sensible in that almost all significant PGS
+  # have prop_mediated > 0
+  # though some have it > 1, i think this means "fertility effect changes sign
+  # when we control for education" which is indeed possible
+  # results are inline with res_ee_control (the "naive" approach)
+  # but about 2.5x bigger
+  # - the results are the same "mechanically", in the sense that both use the
+  #   unmediated effect sizes in the numerator; and the effect size of education
+  #   is about the same in most of the regressions
+  # Not sure this adds much; we could put it in the appendix.
 }

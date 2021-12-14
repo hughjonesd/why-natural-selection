@@ -567,6 +567,8 @@ plan <- drake_plan(
   
   res_ineq = run_cor_income(famhist, score_names, age_qual_weights),
   
+  res_ineq_ea3 = run_ineq_ea3_calcs(famhist, age_qual_weights, h2 = 0.4),
+  
   res_fe_fertility = run_reg_fe_fertility(famhist, score_names),
   
   report =  {
