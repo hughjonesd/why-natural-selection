@@ -1251,11 +1251,8 @@ categories, the income effect dominates. (See also the Supplementary Animations
 for the uncorrected effects per AFLB group, which show the correlation reversing
 after age 22.)
 
-Second, we re-estimate equation \@ref(eq:regression) for each polygenic score,
-controlling for education levels. Effect sizes are
-generally reduced (Appendix Figure \@ref(fig:plot-res-educ)), with
-large reductions for polygenic scores for educational attainment. This 
-suggests that education indeed mediates the effect of polygenic scores on fertility.
+Second we test whether educational attainment mediates the correlation between
+polygenic scores and fertility. 
 
 ```{r calc-fe-fertility}
 drake::loadd(res_fe_fertility)
@@ -2107,32 +2104,73 @@ res_age_birth_parents_dv %>%
 
 \FloatBarrier
 \clearpage
-## Controlling for earnings and education
+## Mediation analysis
 
+We run a standard mediation analysis in the framework of @baron1986moderator. We estimate 
+\begin{align}
+N_i & = \alpha + \beta PGS_i + \gamma EA_i + X_i\mu + \varepsilon_i \\
+EA_i & = \delta + \zeta PGS_i + X_i\mu + \eta_i
+\end{align}
+where $N_i$ is fertility, $PGS_i$ is each polygenic score, $EA_i$ is educational
+attainment (age of leaving fulltime education), and $X_i$ is a vector of
+controls. The total effect of $PGS$ on number of children is $\beta + \gamma
+\zeta$. The "indirect effect" mediated by $EA$ is $\gamma \zeta$. The standard
+error of the indirect effect can be calculated as
 
-```{r plot-res-educ, fig.cap = "Selection effects controlling for education (left education before 16, 16-18, or after 18). Raw effects are shown for comparison."}
+\[
+\sqrt{\hat\gamma^2 \hat\sigma_\zeta^2 + \hat\zeta^2\hat\sigma_\gamma^2}
+\]
 
-drake::loadd(res_ee_control)
-drake::loadd(res_all)
+where $\hat\sigma_\zeta$ is the standard error of $\hat\zeta$, etc.
 
-res_ee_control %<>% filter(term == score_name)
+We are not concerned about endogeneity of polygenic scores, since our theory
+requires only that these correlate with human capital. However, endogeneity of
+educational attainment is a concern. For example, educational attainment might
+correlate with unobserved characteristics that affect one's fertility, e.g. via
+success in marriage markets. To partially address this, we include
+controls for age, sex, fluid IQ and height in $X$.
 
+```{r tbl-res-mediation}
 
-res_all %<>% 
-  filter(term == score_name, reg.type == "controlled", dep.var == "N children") %>% 
-  select(-dep.var, -reg.type)
+drake::loadd(res_mediation)
 
-res_compare <- bind_rows(
-                 Raw = res_all, 
-                 Controlled = res_ee_control, 
-                 .id = "Regression"
-               )
+res_mediation %<>% mutate(
+                     prop = estimate_ind/estimate_total,
+                     # 0.025 not 0.05 because two-sided
+                     sig  = abs(statistic_ind) > qnorm(1 - 0.025/33),
+                     star = ifelse(sig, "*", "")
+                   )
 
-standard_ggplot(res_compare, fill_col = Regression, n_regs = 33)
-  
+n_positive <- sum(res_mediation$prop > 0)
+n_pos_sig <- sum(res_mediation$sig & res_mediation$prop > 0)
+median_prop <- median(res_mediation$prop)
+
+res_mediation %>%
+      arrange(desc(estimate_total)) %>%
+      transmute(
+        PGS = pretty_names(term),
+        `Total effect` = estimate_total,
+        `Indirect effect` = estimate_ind,
+        `95% c.i.` = glue::glue(
+                     "[{estimate_ind - 1.96 * se_ind}, {estimate_ind + 1.96 * se_ind}]"
+                     ),
+        `Indirect/total` = prop,
+        ` ` = star
+      ) %>%
+      as_hux() %>%
+      set_align(everywhere, -1, "right") %>% 
+      set_number_format(-1, 2:4, 4) %>% 
+      set_number_format(-1, 5, fmt_percent()) %>%
+      set_caption("Mediation analysis") %>% 
+      theme_compact() %>% 
+      set_width(0.9) %>%
+      set_col_width(c(.3, .125, .125, .3, .1, .05)) %>% 
+      set_bottom_border(final(), everywhere) %>%
+      add_footnote("* indirect effect p < 0.05/33", font_size = 8)
 ```
 
-
+Table \@ref(tab:tbl-res-mediation) shows results. `r n_pos_sig` scores are 
+significantly greater than 0 at $p = 0.05/33$. 
 
 \FloatBarrier
 \clearpage
@@ -2265,7 +2303,10 @@ is independent of both $p$ and $\varepsilon$. Under these conditions,
 the ratio between the estimated $R^{2}$ in a regression of $p$ on
 $EA$, and the true $R^{2}$ of $p^{*}$ on $EA$, satisfies: 
 \begin{equation}
-\frac{\textrm{plim}\hat{R}^{2}}{R^{2}}=\frac{\sigma_{p}^{2}-\sigma_{\eta}^{2}}{\sigma_{p}^{2}}=\frac{\sigma_{p^{*}}^{2}}{\sigma_{p}^{2}}\equiv\lambda,\label{eq:r2-ratio}
+\frac{\textrm{plim}\hat{R}^{2}}{R^{2}} 
+= \frac{\sigma_{p}^{2} - \sigma_{\eta}^{2}}{\sigma_{p}^{2}}
+= \frac{\sigma_{p^{*}}^{2}}{\sigma_{p}^{2}}
+\equiv \lambda, \label{eq:r2-ratio}
 \end{equation}
 as we show below. The right hand side is the "reliability ratio".
 We regress educational attainment on EA3 in our sample, weighting

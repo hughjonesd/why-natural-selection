@@ -542,16 +542,7 @@ plan <- drake_plan(
     res %>% filter(grepl(":factor\\(age_fte_cat\\)", term))
   },
   
-  res_ee_control = {
-    map_dfr(score_names, 
-              ~ run_regs_fml(
-                fml = "n_children ~ {score_name} + age_fte_cat",
-                score_name = .x,
-                famhist    = famhist,
-                subset     = quote(kids_ss)
-              ), 
-            .id = "score_name")
-  },
+  res_mediation = run_mediation(famhist, score_names),
   
   res_risk_control = {
     # f.2040.0.0 is risk attitude (via questionnaire)

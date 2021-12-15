@@ -301,3 +301,64 @@ run_ineq_ea3_calcs <- function (famhist, age_qual_weights, h2) {
   
   return(res)
 }
+
+
+run_mediation <- function (famhist, score_names) {
+  famhist <- famhist %>%
+               filter(
+                 kids_ss,
+                 ! is.na(n_children),
+                 ! is.na(age_fte_cat),
+                 ! is.na(sex),
+                 ! is.na(age_at_recruitment)
+               )
+  
+  run_one_mediation <- function (score_name) {
+    
+    controls <- "age_at_recruitment + sex + fluid_iq + height"
+    f_mediator <- as.formula(glue::glue("age_fulltime_edu ~ {score_name} +
+                                           {controls}"))
+    mod_mediator <- lm(f_mediator, data = famhist)
+    f_y <- as.formula(glue::glue("n_children ~ {score_name} +
+                                    age_fulltime_edu +
+                                    {controls}"))
+    mod_y <- lm(f_y, data = famhist)
+    
+    # standard Baron/Kenny 1986;
+    # dep_var ~ treatment + mediator + covariates
+    # mediator ~ treatment + covariates
+    # indirect effect = b_mediator * b_med_treat
+    b_mediator <- coef(mod_y)["age_fulltime_edu"]
+    b_med_treat <- coef(mod_mediator)[score_name]
+    indirect_effect <- b_mediator * b_med_treat
+                         
+    # total effect = b_treatment + b_mediator * b_med_treat (from 1)
+    b_treat <- coef(mod_y)[score_name]
+    total_effect <- b_treat + indirect_effect
+    
+    se_b_mediator <- coef(summary(mod_y))["age_fulltime_edu", "Std. Error"]
+    se_b_med_treat <- coef(summary(mod_mediator))[score_name, "Std. Error"]
+    
+    # s.e. of indirect effect = sqrt of:
+    # b_mediator^2 * var(b_treatment) + b_treatment^2 * var(b_mediator)
+    # = b_mediator^2 * se(b_treatment)^2 + b_treatment^2 * se(b_mediator)^2
+    var_ind_eff <- b_mediator^2 * se_b_med_treat^2 + 
+                   b_med_treat^2 * se_b_mediator^2 + 
+                   se_b_med_treat^2 * se_b_mediator^2
+    se_ind_eff <- sqrt(var_ind_eff)
+    
+    tibble(
+      term           = score_name, 
+      estimate_total = total_effect,
+      estimate_ind   = indirect_effect, 
+      se_ind         = se_ind_eff,
+      statistic_ind  = indirect_effect/se_ind_eff,
+      p.value_ind    = 2 * pnorm(abs(statistic_ind), mean = 0, 
+                                   lower.tail = FALSE)
+    )
+  }
+  
+  res <- purrr::map_dfr(score_names, run_one_mediation)
+  
+  res
+}
