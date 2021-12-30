@@ -377,9 +377,8 @@ populations, using genome-wide analysis
 particular, genetic variants associated with higher educational attainment are
 being selected against, although effect sizes appear small.
 
-As yet we know little about the social mechanisms behind these effects. A
-potential explanation for them comes from the economic theory of fertility first
-presented by [@becker1960economic]. In this theory, higher potential earnings
+As yet we know little about the social mechanisms behind natural selection. A
+potential explanation comes from the economic theory of fertility [@becker1960economic]. In this theory, higher potential earnings
 have two opposite effects on fertility: a fertility-increasing *income effect*
 (higher income makes children more affordable), and a fertility-lowering
 *substitution effect* (time spent on childrearing has a higher cost in foregone
@@ -403,18 +402,16 @@ and people with more lifetime sexual partners. Outside these groups, effects are
 weaker and often statistically insignificant. In some subgroups, the
 direction of selection is even reversed.
  
-We then show that a parsimonious model of human capital, education and fertility
+We then show that a simple model of human capital, education and fertility
 choices can give rise to these empirical results. To test the theory, we show
 that polygenic scores' correlation with fertility is associated with their
-correlation with education and earnings. Furthermore, controlling for education
-and earnings reduces the correlation with fertility, suggesting that human
-capital mediates natural selection. Thus, contemporary natural selection on
-polygenic scores can be explained by their correlation with earnings-increasing
-human capital.
+correlation with education and earnings. Furthermore, a mediation analysis shows
+that part of the correlation with fertility is indeed *via* education. Thus, contemporary natural selection on polygenic scores can be explained by their correlation with earnings-increasing human capital.
 
 Lastly, we discuss the effects of natural selection. While measured effects on
-mean genetic scores are small, natural selection may substantially increase the correlation
-between genetic scores and income, i.e. the "genetic lottery" [@harden2021genetic].
+mean genetic scores are small, natural selection may substantially increase the
+correlation between genetic scores and income, i.e. the "genetic lottery"
+[@harden2021genetic].
 
 
 # Results
