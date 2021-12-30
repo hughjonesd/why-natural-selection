@@ -354,6 +354,16 @@ plan <- drake_plan(
               .id = "score_name"
             )
     res %<>% filter(grepl(":", term))
+    quintiles <- famhist_townsend_71 %>%
+                   filter(! is.na(n_sibs), ! is.na(whr_combined)) %>%
+                   group_by(Quin71) %>%
+                   count()
+    res %<>% 
+      mutate(
+        quintile = sub("Quin71(\\d):.*", "\\1", term)
+      ) %>%
+      left_join(quintiles, by = c("quintile" = "Quin71"))
+    
     res
   },
   
@@ -557,6 +567,15 @@ plan <- drake_plan(
   },
   
   res_ineq = run_cor_income(famhist, score_names, age_qual_weights),
+  
+  res_cor_income = {
+    famhist <- add_ashe_income(famhist, ashe_income)
+    cor(famhist[score_names], famhist$first_job_pay, use = "pairwise")
+  },
+  
+  res_cor_educ = {
+    cor(famhist[score_names], famhist$age_fulltime_edu, use = "pairwise")
+  },
   
   res_ineq_ea3 = run_ineq_ea3_calcs(famhist, age_qual_weights, h2 = 0.4),
   
