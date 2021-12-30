@@ -2134,10 +2134,10 @@ where $\hat\sigma_\zeta$ is the standard error of $\hat\zeta$, etc.
 
 We are not concerned about endogeneity of polygenic scores, since our theory
 requires only that these correlate with human capital. However, endogeneity of
-educational attainment is a concern. For example, educational attainment might
-correlate with unobserved characteristics that affect one's fertility, e.g. via
-success in marriage markets. To partially address this, we include
-controls for age, sex, fluid IQ and height in $X$.
+educational attainment is a concern, i.e., educational attainment might
+correlate with unobserved characteristics that affect one's fertility (and which
+are not related to human capital). To partially address this, we include
+controls for age, sex, fluid IQ, height and risk attitude in $X$.
 
 ```{r tbl-res-mediation}
 

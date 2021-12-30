@@ -310,12 +310,15 @@ run_mediation <- function (famhist, score_names) {
                  ! is.na(n_children),
                  ! is.na(age_fte_cat),
                  ! is.na(sex),
-                 ! is.na(age_at_recruitment)
+                 ! is.na(age_at_recruitment),
+                 ! is.na(height),
+                 ! is.na(fluid_iq),
+                 ! is.na(f.2040.0.0) # risk attitude
                )
   
   run_one_mediation <- function (score_name) {
     
-    controls <- "age_at_recruitment + sex + fluid_iq + height"
+    controls <- "age_at_recruitment + sex + fluid_iq + height + f.2040.0.0"
     f_mediator <- as.formula(glue::glue("age_fulltime_edu ~ {score_name} +
                                            {controls}"))
     mod_mediator <- lm(f_mediator, data = famhist)
