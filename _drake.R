@@ -17,6 +17,8 @@ source("regressions.R")
 source("weight-data.R")
 
 
+# file locations for data ====
+
 nomis_file         <- file.path(data_dir, "nomis-2011-statistics.csv")
 ghs_file           <- file.path(data_dir, "UKDA-5804-stata8", "stata8", 
                         "Ghs06client.dta")
@@ -27,6 +29,9 @@ msoa_shapefile     <- file.path(data_dir, "infuse_msoa_lyr_2011_clipped",
                         "infuse_msoa_lyr_2011_clipped.shp")
 dep_data_dir       <- file.path(data_dir, "deprivation-data")
 fertility_data_dir <- file.path(data_dir, "fertility_PRS")
+
+
+# plan ====
 
 weighting_scheme_syms <- rlang::syms(c("flb_weights", "age_qual_weights", 
                         "msoa_weights"))
@@ -85,11 +90,7 @@ plan <- drake_plan(
                           add_deprivation_data(famhist, dep_data_dir),
                           format = "fst_tbl"
                         ),
-  
-  # mlogit now uses dfidx to create a "long" dataset, but mnlogit 
-  # (used below) doesn't update. Skipping for now.
-  # fhl_mlogit   =  make_famhist_long_mlogit(famhist, score_names),
-  
+
   resid_scores = target({
                      resid_scores <- compute_resid_scores(famhist_no_resid, 
                                                             pcs, score_names)

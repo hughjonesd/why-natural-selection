@@ -1242,6 +1242,12 @@ from zero ($p < 0.05/33$).
 drake::loadd(res_fe_fertility)
 drake::loadd(res_all)
 
+educ_reduction <- with(res_fe_fertility, 
+       estimate[Regression == "Controlled" & term == "EA3_excl_23andMe_UK"] / 
+       estimate[Regression == "Raw" & term == "EA3_excl_23andMe_UK"]
+     )
+educ_reduction <- 1 - educ_reduction
+
 res_all %<>% filter(dep.var == "N children", reg.type == "controlled")
 res_fe_fertility %<>% filter(Regression == "Raw")
 res_all %<>% left_join(res_fe_fertility, by = "term")
@@ -1249,28 +1255,25 @@ res_all %<>% left_join(res_fe_fertility, by = "term")
 lm_pool_w <- tidy(lm(estimate.y ~ estimate.x, res_all))
 coef_pool_w <- lm_pool_w[[2, "estimate"]]
 se_pool_w <- lm_pool_w[[2, "std.error"]]
+
 ```
 
 These results support our theory that natural selection on polygenic scores is
-driven by their correlation with human capital. This need not imply
-that a given polygenic score is causal of either fertility or human capital. Instead
-scores may simply correlate with causally relevant environments, for example via
-"genetic nurture" effects [@kong2018nature] or population stratification. To 
-investigate the presence of these indirect genetic effects, we estimate equation
-\@ref(eq:regression) among full siblings, controlling for a full set of sibling
-group dummies (Appendix Figure \@ref(fig:plot-res-fe-fertility)). With a reduced
-sample size, all within-sibling effects are insignificant after Bonferroni
-correction. However, effect sizes are positively correlated with effect sizes
-from the pooled model, and about 1/3 smaller (regressing within-sibling on
-pooled effect sizes, $b$ = `r coef_pool_w`). This attenuation is broadly in line
-with the ~50% decrease in heritability in within-sibling GWASs on age at first
-birth and educational attainment [@Howe2021.03.05.433935]. We see these results
-as providing tentative evidence that polygenic scores cause fertility, with effects
-being at least partly driven by gene-environment correlations. We also reran
+driven by their correlation with human capital. We also test for causality by
+running within-siblings regressions (Appendix Figure
+\@ref(fig:plot-res-fe-fertility)). With a reduced sample size, all
+within-sibling effects are insignificant after Bonferroni correction. However,
+effect sizes are positively correlated with effect sizes from the pooled model,
+and about 50% smaller (regressing within-sibling on pooled effect sizes, $b$ =
+`r format(coef_pool_w, digits = 3)`). This attenuation is in line with the ~50%
+decrease in heritability in within-sibling GWASs on age at first birth and
+educational attainment [@Howe2021.03.05.433935]. We see these results as
+providing tentative evidence that polygenic scores cause fertility, with effects
+being partly driven by gene-environment correlations. We also reran
 within-siblings regressions adding a control for education. Most effect sizes
 barely change, suggesting that our measure of education does not in general
 mediate differences in fertility among siblings. However, for educational
-attainment polygenic scores, effect sizes are reduced by about 20%.
+attainment polygenic scores, effect sizes are reduced by `r percent(educ_reduction)`.
 
 
 ```{r calc-risk-attitude}
@@ -2184,13 +2187,28 @@ at $p = 0.05/33$.
 ## Within-siblings regressions
 
 
-```{r plot-res-fe-fertility, fig.cap = "Selection effects controlling for sibling-group fixed effects, with and without a control for education (left education before 16, 16-18, or after 18)."}
+```{r plot-res-fe-fertility, fig.cap = "Selection effects controlling for sibling-group fixed effects, with and without a control for education (left education before 16, 16-18, or after 18). Each set of results is from a single regression of 'n children' on 29 polygenic scores. Standard errors clustered by sibling group."}
 
 drake::loadd(res_fe_fertility)
+n_regs <- nrow(res_fe_fertility)/2 # Raw and Controlled treated separately
 
-standard_ggplot(res_fe_fertility, fill_col = Regression, n_regs = 33, fill_direction = -1)
-  
+standard_ggplot(res_fe_fertility, fill_col = Regression, n_regs = n_regs,
+                  fill_direction = -1)
+
+n_groups <- attr(res_fe_fertility, "n_groups")
+n <- attr(res_fe_fertility, "n")
+
 ```
+
+
+We run a single regression on 29 polygenic scores within `r n_groups` sibling
+groups (N = `r n`). Thus, we control both for environmental confounds (since
+scores are randomly allocated within sib-groups by meiosis), and for genetic
+confounds captured by our polygenic scores. We remove four scores which
+correlate highly with other scores (educational attainment 2, hip circumference,
+waist circumference and waist-hip ratio). Figure \@ref(fig:plot-res-fe-fertility)
+shows the results.
+
 
 \FloatBarrier
 \clearpage

@@ -218,24 +218,40 @@ run_income_dist <- function (famhist) {
   # - predicted from regression, weighting multiplied by n_children
 }
 
-run_reg_fe_fertility <- function (famhist, score_names) {
-  fmls <- paste("n_children ~", score_names, "| sib_group")
-  fmls <- purrr::map(fmls, as.formula)
-  mods <- purrr::map(fmls, fixest::feols, data = famhist, 
-                       subset = famhist$kids_ss, 
-                       note = FALSE)
-  tidied_raw <- purrr::map_dfr(mods, tidy, conf.int = TRUE)
 
-  fmls <- paste("n_children ~", score_names, "+ age_fte_cat | sib_group")
-  fmls <- purrr::map(fmls, as.formula)
-  mods <- purrr::map(fmls, fixest::feols, data = famhist, subset = famhist$kids_ss, 
-                       note = FALSE)
-  tidied_mediators <- purrr::map_dfr(mods, tidy, conf.int = TRUE)
-  tidied_mediators %<>% dplyr::filter(! grepl("age_fte_cat", term))
+run_reg_fe_fertility <- function (famhist, score_names) {
   
+  # remove scores which correlate highly with others
+  # we leave EA3 and bmi_combined
+  score_names <- setdiff(score_names, c("EA2_noUKB", "hip_combined", 
+                                          "wc_combined", "whr_combined"))
+  
+  fml_scores <- paste(score_names, collapse = " + ")
+  
+  fml_raw <- paste("n_children ~ ", fml_scores, " | sib_group")
+  fml_mediators <- paste("n_children ~ ", fml_scores, " + age_fte_cat | sib_group")
+  
+  fml_raw <- as.formula(fml_raw)
+  fml_mediators <- as.formula(fml_mediators)
+  
+  mod_raw <- fixest::feols(fml_raw, data = famhist, 
+                             subset = famhist$kids_ss, note = FALSE)
+  mod_mediators <- fixest::feols(fml_mediators, data = famhist, 
+                                   subset = famhist$kids_ss, note = FALSE)
+  
+  tidied_raw <- broom::tidy(mod_raw, conf.int = TRUE)
+  tidied_raw %<>% dplyr::filter(term %in% score_names)
+  
+  tidied_mediators <- broom::tidy(mod_mediators, conf.int = TRUE)
+  tidied_mediators %<>% dplyr::filter(term %in% score_names)
   
   tidied_all <- bind_rows(Raw = tidied_raw, Controlled = tidied_mediators, 
                             .id = "Regression")
+  
+  attr(tidied_all, "n_groups") <- length(fixest::fixef(mod_raw)$sib_group)
+  attr(tidied_all, "n") <- nobs(mod_raw)
+    
+  return(tidied_all)
 }
 
 run_cor_income <- function (famhist, score_names, age_qual_weights) {
