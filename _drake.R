@@ -339,6 +339,7 @@ plan <- drake_plan(
   },
   
   res_age_birth_parents = {
+    famhist %<>% inner_join(parent_weights, by = "f.eid")
     vars <- expand_grid(
             score_name = unname(score_names), # just easier to avoid hassle... 
             control    = c("fath_age_birth", "moth_age_birth")
@@ -348,6 +349,7 @@ plan <- drake_plan(
             fml = "n_sibs ~ {score_name} + {control}",
             subset = quote(birth_order == 1),
             famhist = famhist,
+            weights = weights,
             .id = "id"
           )
     
@@ -360,12 +362,14 @@ plan <- drake_plan(
   },
   
   res_age_flb_mothers_cross = {
+    famhist %<>% inner_join(parent_weights, by = "f.eid")
     res <- map_dfr(score_names, 
                    ~run_regs_fml(
-                     fml        = "n_children ~ moth_age_birth_cat + {score_name}:moth_age_birth_cat",
+                     fml        = "n_sibs ~ moth_age_birth_cat + {score_name}:moth_age_birth_cat",
                      score_name = .x,
                      famhist    = famhist,
-                     subset     = quote(birth_order == 1)
+                     subset     = quote(birth_order == 1),
+                     weights    = weights
                    ),
                    .id = "score_name"
     )
@@ -375,12 +379,14 @@ plan <- drake_plan(
   },
   
   res_age_flb_fathers_cross = {
+    famhist %<>% inner_join(parent_weights, by = "f.eid")
     res <- map_dfr(score_names, 
                    ~run_regs_fml(
-                     fml        = "n_children ~ fath_age_birth_cat + {score_name}:fath_age_birth_cat",
+                     fml        = "n_sibs ~ fath_age_birth_cat + {score_name}:fath_age_birth_cat",
                      score_name = .x,
                      famhist    = famhist,
-                     subset     = quote( birth_order == 1)
+                     subset     = quote( birth_order == 1),
+                     weights    = weights
                    ),
                    .id = "score_name"
     )
@@ -390,11 +396,13 @@ plan <- drake_plan(
   },
   
   res_townsend_parents = {
+    famhist_townsend_71 %<>% inner_join(parent_weights, by = "f.eid")
     res <-  map_dfr(score_names,
               ~run_regs_fml(
                 "n_sibs ~ Quin71 + {score_name}:Quin71",
                 score_name = .x,
-                famhist    = famhist_townsend_71
+                famhist    = famhist_townsend_71,
+                weights    = weights
               ),
               .id = "score_name"
             )
@@ -413,16 +421,18 @@ plan <- drake_plan(
   },
   
   res_age_birth_parents_dv = {
+    famhist %<>% inner_join(parent_weights, by = "f.eid")
     vars <- expand_grid(
             score_name = unname(score_names), 
             dep.var    = c("fath_age_birth", "moth_age_birth")
           )
     res <- pmap_dfr(vars,
             run_regs_fml,
-            fml = "{dep.var} ~ {score_name}",
-            subset = quote(birth_order == 1),
+            fml     = "{dep.var} ~ {score_name}",
+            subset  = quote(birth_order == 1),
             famhist = famhist,
-            .id = "id"
+            weights = weights,
+            .id     = "id"
           )
     
     res$score_name <- vars$score_name[as.numeric(res$id)]
