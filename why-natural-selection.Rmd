@@ -1657,7 +1657,7 @@ par(op)
 \FloatBarrier
 \clearpage
 ## Parents' generation {#sec-parents}
-
+### Selection effects
 
 ```{r calc-res-sibs}
 drake::loadd(res_wt_age_qual_weights)
@@ -1847,7 +1847,7 @@ summary_period %>%
 
 \clearpage
 \FloatBarrier
-## Parents: area deprivation
+### Area deprivation
 
 
 Figure \@ref(fig:plot-siblings-townsend) plots effects on *number of siblings* by
@@ -1874,7 +1874,7 @@ res_townsend_parents %>%
 
 \clearpage
 \FloatBarrier
-## Parents: age at first live birth
+### Age at first live birth
 
 
 ```{r calc-age-birth-parents}
@@ -1910,8 +1910,8 @@ drake::loadd(res_age_flb_fathers_cross)
 
 famhist_bo1 <- famhist %>% 
                  filter(birth_order == 1) %>%
-                 select(n_siblings, whr_combined, moth_age_flb_cat, 
-                          fath_age_flb_cat)
+                 select(n_sibs, whr_combined, moth_age_birth_cat, 
+                          fath_age_birth_cat)
 
 # this counts each cross term as a separate test:
 n_regs <- as.double(nrow(res_age_flb_mothers_cross)) 
@@ -1920,7 +1920,7 @@ res_age_flb_mothers_cross %>%
       mutate(
         `Age at first live birth` = gsub("moth_age_birth_cat(.*):.*", "\\1", term),
         `Age at first live birth` = add_n(`Age at first live birth`, 
-                                          "moth_age_flb_cat", dv = "n_sibs",
+                                          "moth_age_birth_cat", dv = "n_sibs",
                                           data = famhist_bo1)
       ) %>% 
       standard_ggplot(score_col = score_name, 
@@ -1936,7 +1936,7 @@ res_age_flb_fathers_cross %>%
       mutate(
         `Age at first live birth` = gsub("fath_age_birth_cat(.*):.*", "\\1", term),
         `Age at first live birth` = add_n(`Age at first live birth`, 
-                                          "fath_age_flb_cat", dv = "n_sibs",
+                                          "fath_age_birth_cat", dv = "n_sibs",
                                           data = famhist_bo1)
       ) %>% 
       standard_ggplot(score_col = score_name, 
@@ -2110,7 +2110,7 @@ at $p = 0.05/33$.
 ## Within-siblings regressions
 
 
-```{r plot-res-fe-fertility, fig.cap = "Selection effects controlling for sibling-group fixed effects, with and without a control for education (left education before 16, 16-18, or after 18). Each set of results is from a single regression of 'n children' on 29 polygenic scores. Standard errors clustered by sibling group."}
+```{r plot-res-fe-fertility, fig.cap = "Selection effects controlling for sibling-group fixed effects, with and without a control for education (left education before 16, 16-18, or after 18). Each set of results is from a single regression of \\emph{n children} on 29 polygenic scores. Standard errors clustered by sibling group."}
 
 drake::loadd(res_fe_fertility)
 n_regs <- nrow(res_fe_fertility)/2 # Raw and Controlled treated separately
