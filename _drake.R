@@ -7,6 +7,7 @@ suppressPackageStartupMessages({
   library(readr)
   library(dplyr)
   loadNamespace("future")
+  loadNamespace("santoku")
 })
 
 source("make-data.R") 
@@ -75,6 +76,19 @@ plan <- drake_plan(
                      names(famhist) <- gsub("_resid$", "", names(famhist))
                      
                      famhist <- add_fertility_prs(famhist, fertility_data_dir)
+                     
+                     # we put these here because they're tightly tied to this
+                     # particular project
+                     mab_terciles <- quantile(famhist$moth_age_birth[famhist$birth_order == 1], 
+                                              1:2/3, na.rm = TRUE)
+                     famhist$moth_age_birth_cat <- santoku::chop(famhist$moth_age_birth, 
+                                                                 mab_terciles, 
+                                                                 labels = lbl_discrete("-"))
+                     fab_terciles <- quantile(famhist$fath_age_birth[famhist$birth_order == 1], 
+                                              1:2/3, na.rm = TRUE)
+                     famhist$fath_age_birth_cat <- santoku::chop(famhist$fath_age_birth, 
+                                                                 fab_terciles, 
+                                                                 labels = lbl_discrete("-"))
                      
                      famhist
                    },
@@ -341,6 +355,36 @@ plan <- drake_plan(
     res$control    <- vars$control[as.numeric(res$id)]
     res$id <- NULL
     res %<>% filter(term != "(Intercept)")
+    
+    res
+  },
+  
+  res_age_flb_mothers_cross = {
+    res <- map_dfr(score_names, 
+                   ~run_regs_fml(
+                     fml        = "n_children ~ moth_age_birth_cat + {score_name}:moth_age_birth_cat",
+                     score_name = .x,
+                     famhist    = famhist,
+                     subset     = quote(birth_order == 1)
+                   ),
+                   .id = "score_name"
+    )
+    res %<>% filter(grepl(":", term))
+    
+    res
+  },
+  
+  res_age_flb_fathers_cross = {
+    res <- map_dfr(score_names, 
+                   ~run_regs_fml(
+                     fml        = "n_children ~ fath_age_birth_cat + {score_name}:fath_age_birth_cat",
+                     score_name = .x,
+                     famhist    = famhist,
+                     subset     = quote( birth_order == 1)
+                   ),
+                   .id = "score_name"
+    )
+    res %<>% filter(grepl(":", term))
     
     res
   },

@@ -655,11 +655,11 @@ family structure variables including age at first live birth, presence of a part
 lifetime number of sexual partners.
 We emphasize that these categories are not necessarily exogenous to the polygenic
 scores. For example, both in the data and in our theoretical model, age at first
-live birth is a choice variable, which is endogenous to human-capital-related 
-polygenic scores. Nevertheless, differences in equation
-\@ref(eq:regression) across subgroups constrain the set of possible explanations
-for natural selection. As we show below, the economic theory predicts 
-these differences, while alternative explanations do not.
+live birth is a choice variable, which is endogenous to human-capital-related
+polygenic scores (Appendix Figure \@ref(fig:plot-age-flb-dv)). Nevertheless,
+differences in equation \@ref(eq:regression) across subgroups constrain the set
+of possible explanations for natural selection. As we show below, a simple
+economic model predicts the differences we find.
 
 
 
@@ -751,7 +751,7 @@ Effects are larger among those not living with a spouse or partner
 Lastly, we split female respondents by age at first live birth
 (AFLB).[^aflb-no-men] There is evidence for genetic effects on AFLB
 [@Barban_2016], and there is a close link between this variable and number of
-children born. Figure \@ref(fig:plot-age-flb)a shows effect sizes estimated
+children born. Figure \@ref(fig:plot-age-flb) shows effect sizes estimated
 separately for each tercile of AFLB. Several effects are strikingly different
 across terciles. ADHD and MDD are selected for amongst the youngest third of
 mothers, but selected against among the oldest two-thirds. Educational
@@ -880,21 +880,16 @@ opp_signed <- sum(
 ```
 
 
-To investigate this further, we estimate equation \@ref(eq:regression)
-*controlling* for AFLB, again among females (Figure \@ref(fig:plot-age-flb)b).
-In `r opp_signed` out of `r length(score_names)` cases, effects change sign when
-controls are added. The correlation between effect sizes controlling for AFLB,
-and raw effect sizes, is `r cor_raw_flb`. Thus, selection effects seem to come
-through two opposing channels: an effect on AFLB, and an opposite-signed effect
-on number of children controlling for AFLB. Again, we do not claim that AFLB
-is exogenous to an individual's polygenic scores. Indeed, our analyses show
-that it is not (Appendix Figure \@ref(fig:plot-age-flb-dv)). Rather, we argue
-that AFLB mediates part of the relationship between polygenic scores and
-fertility, and that once this is controlled for, the remaining part of the
-relationship has the opposite sign.
+To investigate this further, we estimate equation \@ref(eq:regression) among
+females, *controlling* for AFLB. In `r opp_signed` out of 
+`r length(score_names)` cases, effects change sign when controls are added. The
+correlation between effect sizes controlling for AFLB, and raw effect sizes, is
+`r cor_raw_flb`. Thus, selection effects seem to come through two opposing
+channels: an effect on AFLB, and an opposite-signed effect on number of children
+after AFLB is controlled for.
 
 
-```{r plot-age-flb, fig.cap = "Selection effects by age at first live birth, and controlling for age at first live birth (women only).", fig.ncol = 1,  fig.subcap = c("Effect sizes by age at first live birth terciles (women only)", "Effect sizes controlling for age at first live birth. Effect sizes without controls (for women only) shown for comparison."), fig.align = "center"}
+```{r plot-age-flb, fig.cap = "Selection effects by age at first live birth terciles (women only).", fig.align = "center"}
 
 drake::loadd(res_age_flb_cross)
 
@@ -910,18 +905,6 @@ res_age_flb_cross %>%
                       fill_col = `Age at first live birth`, n_regs = n_regs,
                       fill_direction = -1)
 
-n_regs <- as.double(nrow(res_age_flb))
-
-res_combined %>% 
-      mutate(
-        score_name = pretty_names(score_name),
-        score_name = fct_reorder(score_name, estimate, order_abs(2)),
-        Regression = ifelse(reg.type == "raw", "Uncontrolled", "Controlled for AFLB")
-      ) %>% 
-      standard_ggplot(score_col = score_name, 
-                      fill_col = Regression, n_regs = n_regs)
-
-
 ```
 
 
@@ -930,23 +913,23 @@ sib_chn_cor <- cor.test(famhist$n_sibs, famhist$n_children, use = "complete")
 stopifnot(sib_chn_cor$p.value < 2e-16)
 ```
 
-We also examine selection effects among respondents' parents, using
-information on respondents' number of siblings. Effect sizes of polygenic
-scores are highly correlated across the two generations. Median-splitting
-respondents by year of birth, we find little evidence of change in effect sizes
-among either the parents' or the respondents' generation. We check whether 
-selection effects differ by socio-economic status in the
-parents' generation. We have no information about parents' income, so we use the
-1971 Townsend deprivation score of respondents' birthplace as a proxy
-[@townsend1987deprivation]. Results show the same pattern as for respondents:
-effect sizes are larger and more often significant in the most deprived areas
-(Appendix Figure \@ref(fig:plot-siblings-townsend)); effects change
-sign when controlling for AFLB (Appendix Figure \@ref(fig:plot-age-birth-parents)). Lastly, the siblings data 
-lets us check for a "quantity-quality tradeoff" between
-number of children (of respondents' parents) and number of grandchildren. We
-do not find any: in fact, the correlation between *number of siblings* and 
-*number of children* is positive ($\rho$ = `r sib_chn_cor$estimate`, 
-$p < 2 \times 10^{-16}$).
+We also examine selection effects among respondents' parents, using information
+on respondents' number of siblings. Effect sizes of polygenic scores are highly
+correlated across the two generations. Median-splitting respondents by year of
+birth, we find little evidence of change in effect sizes among either the
+parents' or the respondents' generation. We also check whether selection effects
+vary by socio-economic status and AFLB in the parents' generation. We have no
+information about parents' income, so we use the 1971 Townsend deprivation score
+of respondents' birthplace as a proxy [@townsend1987deprivation]. Results show
+the same pattern as for respondents. Effect sizes are larger and more often
+significant in the most deprived areas (Appendix Figure
+\@ref(fig:plot-siblings-townsend)). Effects are larger among younger parents,
+and change sign when controlling for AFLB, among both mothers and fathers
+(Appendix Figure \@ref(fig:plot-age-birth-parents)). Lastly, we check for a
+"quantity-quality tradeoff" between parents' number of children and number of
+grandchildren. We do not find any: in fact, the correlation between *number of
+siblings* and *number of children* is positive ($\rho$ = 
+`r sib_chn_cor$estimate`, $p < 2 \times 10^{-16}$).
 
 \FloatBarrier
 
@@ -1009,7 +992,7 @@ individuals to choose a level of education $s \in [0,1]$, which has
 a time cost in period 1. Education is
 complementary to human capital $h > 0$, and increases period 2 wages, which take 
 the  simple functional form $w(s,h) = sh$. We normalize period 1 wages
-to 1. Letting $u(\cdot)$ take the constant relative risk aversion (CRRA) form
+to 1. Letting $u(\cdot)$ take the constant relative risk aversion form
 $u(y)=\frac{y^{1 - \sigma} - 1}{1 - \sigma}$, where $\sigma>0$ captures risk aversion
 in income, we examine total fertility $N^{*} = N_{1}^{*} + N_{2}^{*}$ and the 
 *fertility-human capital relationship*, $\frac{dN^{*}}{dh}$. For $\sigma < 1$ in
@@ -1021,10 +1004,10 @@ dominates at low income levels, but is balanced by the income effect as income
 increases.
 
 [^one-period-results]: Predictions 1-3 also hold in the one-period model with
-CRRA utility. Our empirical results are actually stronger than prediction 5, in
-that correlations with fertility are *reversed* at higher AFLB. This prediction
-can be accommodated in the model if children have a money cost as well as a time
-cost. Appendix Figure \@ref(fig:N-plot-with-m) shows an example.
+constant relative risk aversion. Our empirical results are actually stronger
+than prediction 5, in that correlations with fertility are *reversed* at higher
+AFLB. This prediction can be accommodated in the model if children have a money
+cost as well as a time cost (Appendix Figure \@ref(fig:N-plot-with-m)).
 
 
 ------------------------------------------------------------------------------------
@@ -1049,7 +1032,7 @@ cost. Appendix Figure \@ref(fig:N-plot-with-m) shows an example.
             
 5.  The relationship is weaker among those            Effects weaker among those starting 
     who start fertility in period 2                   fertility later 
-    ($N_{1}^{*} = 0$) than among those who            (Figure \@ref(fig:plot-age-flb)a).
+    ($N_{1}^{*} = 0$) than among those who            (Figure \@ref(fig:plot-age-flb)).
     start fertility in period 1 
     ($N_{1}^{*} > 0$).
 ----------------------------------------------------------------------------------------
@@ -1861,6 +1844,12 @@ summary_period %>%
       period_table("Change in selection effects between early and late born respondents (regressions on number of children).")
 ```
 
+
+\clearpage
+\FloatBarrier
+## Parents: area deprivation
+
+
 Figure \@ref(fig:plot-siblings-townsend) plots effects on *number of siblings* by
 Townsend deprivation quintile of birth area.
 
@@ -1885,7 +1874,7 @@ res_townsend_parents %>%
 
 \clearpage
 \FloatBarrier
-## Selection controlling for age at first live birth: respondents' parents
+## Parents: age at first live birth
 
 
 ```{r calc-age-birth-parents}
@@ -1906,16 +1895,64 @@ cor_unc_moth <- with(
   cor(estimate.x, estimate.y))
 ```
 
-Among the parents' generation, we can control for age at first live
-birth using the subsets of respondents who reported their mother's or
-father's age, and who had no elder siblings. We run regressions on
-*number of siblings* on these subsets, controlling for either parent's
-age at their birth. Figure \@ref(fig:plot-age-birth-parents) shows the
-results. Effect sizes are very similar, whether controlling for father's
-or mother's age. As in the respondents' generation, effect sizes
-are negatively correlated with the effect sizes from bivariate
-regressions without the age at birth control (father's age at birth: 
-$\rho$ `r cor_unc_fath`; mother's age at birth: $\rho$ `r cor_unc_moth`).
+Among the parents' generation, we can control for age at first live birth using
+the subsets of respondents who reported their mother's or father's age, and who
+had no elder siblings. We run regressions on *number of siblings* on these
+subsets. Figure \@ref(fig:plot-age-birth-parents-cross) shows selection effects
+by terciles of age at first live birth, for mothers and fathers. As in the
+respondents' generation, effect sizes are larger for younger parents. This
+holds for both sexes.
+
+```{r plot-age-birth-parents-cross, fig.cap = "Selection effects (parents' generation) by age at first live birth terciles.", fig.subcap = c("Mothers", "Fathers"), fig.ncol = 1}
+
+drake::loadd(res_age_flb_mothers_cross)
+drake::loadd(res_age_flb_fathers_cross)
+
+famhist_bo1 <- famhist %>% 
+                 filter(birth_order == 1) %>%
+                 select(n_siblings, whr_combined, moth_age_flb_cat, 
+                          fath_age_flb_cat)
+
+# this counts each cross term as a separate test:
+n_regs <- as.double(nrow(res_age_flb_mothers_cross)) 
+
+res_age_flb_mothers_cross %>% 
+      mutate(
+        `Age at first live birth` = gsub("moth_age_birth_cat(.*):.*", "\\1", term),
+        `Age at first live birth` = add_n(`Age at first live birth`, 
+                                          "moth_age_flb_cat", dv = "n_sibs",
+                                          data = famhist_bo1)
+      ) %>% 
+      standard_ggplot(score_col = score_name, 
+                      fill_col = `Age at first live birth`, n_regs = n_regs,
+                      fill_direction = -1)
+
+
+
+# this counts each cross term as a separate test:
+n_regs <- as.double(nrow(res_age_flb_fathers_cross)) 
+
+res_age_flb_fathers_cross %>% 
+      mutate(
+        `Age at first live birth` = gsub("fath_age_birth_cat(.*):.*", "\\1", term),
+        `Age at first live birth` = add_n(`Age at first live birth`, 
+                                          "fath_age_flb_cat", dv = "n_sibs",
+                                          data = famhist_bo1)
+      ) %>% 
+      standard_ggplot(score_col = score_name, 
+                      fill_col = `Age at first live birth`, n_regs = n_regs,
+                      fill_direction = -1)
+
+rm(famhist_bo1)
+
+```
+
+Figure \@ref(fig:plot-age-birth-parents) shows the regressions controlling for
+either parent's age at their birth. Effect sizes are very similar, whether
+controlling for father's or mother's age. As in the respondents' generation,
+effect sizes are negatively correlated with the effect sizes from bivariate
+regressions without the age at birth control (father's age at birth: $\rho$ 
+`r cor_unc_fath`; mother's age at birth: $\rho$ `r cor_unc_moth`).
 
 ```{r plot-age-birth-parents, fig.cap = "Selection effects (parents' generation) among eldest siblings, controlling for parents' age at birth."}
 
