@@ -940,7 +940,8 @@ parents' generation. We have no information about parents' income, so we use the
 1971 Townsend deprivation score of respondents' birthplace as a proxy
 [@townsend1987deprivation]. Results show the same pattern as for respondents:
 effect sizes are larger and more often significant in the most deprived areas
-(Appendix Figure \@ref(fig:plot-siblings-townsend)). Lastly, the siblings data 
+(Appendix Figure \@ref(fig:plot-siblings-townsend)); effects change
+sign when controlling for AFLB (Appendix Figure \@ref(fig:plot-age-birth-parents)). Lastly, the siblings data 
 lets us check for a "quantity-quality tradeoff" between
 number of children (of respondents' parents) and number of grandchildren. We
 do not find any: in fact, the correlation between *number of siblings* and 
@@ -1882,121 +1883,6 @@ res_townsend_parents %>%
 ```
 
 
-
-\clearpage
-\FloatBarrier
-## Selection effects on raw polygenic scores
-
-
-```{r calc-regs-controlled}
-
-drake::loadd(res_all)
-
-res_all_controlled <- res_all %>% 
-  select(reg.type, dep.var, term, estimate) %>% 
-  pivot_wider(names_from = c(reg.type, dep.var), values_from = estimate) %>% 
-  mutate(
-    consistent = sign(`raw_N siblings`) == sign(`raw_N children`) &
-                 sign(`raw_N siblings`) == sign(`controlled_N siblings`) &
-                 sign(`raw_N siblings`) == sign(`controlled_N children`)
-  )
-
-n_pgs  <- as.double(nrow(res_all_controlled))
-prop_consistent_controlled <- mean(res_all_controlled$consistent)
-controlled_smaller_sibs <- abs(res_all_controlled[["controlled_N siblings"]]) < 
-  abs(res_all_controlled[["raw_N siblings"]])
-controlled_smaller_children <- abs(res_all_controlled[["controlled_N children"]]) < 
-  abs(res_all_controlled[["raw_N children"]])
-median_prop_sibs <- median(abs(res_all_controlled[["controlled_N siblings"]]) /
-    abs(res_all_controlled[["raw_N siblings"]]))
-median_prop_children <- median(abs(res_all_controlled[["controlled_N children"]]) /
-    abs(res_all_controlled[["raw_N children"]]))
-
-```
-
-Figure \@ref(fig:plot-regs-controlled-pcs) compares selection effects on
-polygenic scores residualized for the top 100 principal components of the
-genetic data, to selection effects on raw, unresidualized polygenic scores. In
-siblings regressions, effect sizes are larger for raw scores  -- sometimes much
-larger, as in the case of height. `r sum(controlled_smaller_sibs)` out of 
-`r n_pgs` "raw" effect sizes have a larger absolute value than the corresponding
-"residualized" effect size. The median proportion between raw and controlled
-effect sizes is `r median_prop_sibs`. Among the children regressions, this no
-longer holds. Effect sizes are barely affected by controlling for principal
-components.
-
-Overall, `r prop_consistent_controlled * 100` per cent of effect sizes
-are consistently signed across all four regressions (on children and
-siblings, and with and without residualization).
-
-```{r plot-regs-controlled-pcs, fig.cap = "Selection effects using unresidualized polygenic scores on number of siblings/children."}
-
-drake::loadd(res_all)
-
-n_regs <- as.double(nrow(res_all))
-res_all %>% 
-      mutate(
-        term     = pretty_names(term),
-        term     = reorder_within(term, estimate, dep.var, order_abs(1)),
-        dep.var  = fct_inorder(dep.var),
-        reg.type = fct_recode(reg.type, 
-                               `Resid. for 100 PCs`  = "controlled", 
-                               Unresidualized        = "raw"
-                             )
-      ) %>% 
-      rename(p = p.value) %>% 
-      ggplot(aes(y = term, x = estimate, fill = reg.type, 
-        colour = p < 0.05/{{n_regs}})) +
-        my_vline + 
-        facet_wrap(vars(dep.var), scales = "free") +
-        pval_geom_point(position = position_dodge(0.4), alpha = 0.8) +
-        my_labs() +
-        pval_scale() +
-        my_fill_scale(n = 2, guide = guide_legend(title = "")) +
-        my_theme() +
-        scale_y_reordered() +
-        theme(
-          axis.text.x  = element_text(size = 7),
-          legend.text  = element_text(size = 8),
-          legend.title = element_text(size = 9)
-        )
-
-```
-
-```{r}
-drake::loadd(res_pcs)
-n_regs <- as.double(nrow(res_pcs))
-prop_sig <- res_pcs %>% 
-      group_by(dep.var) %>% 
-      summarize(sig = sum(p.value <= 0.05/nrow(res_pcs))) %>% 
-      pull(sig, name = dep.var)
-```
-
-To get a further insight into this we regress *n siblings* and *n children*
-on individual principal components. As Figure \@ref(fig:plot-pc-regs)
-shows, effects are larger and more significant in siblings regressions.
-`r prop_sig[["N siblings"]]` principal components significantly
-predicted number of siblings, while only `r prop_sig[["N children"]]`
-significantly predicted number of children.
-
-```{r plot-pc-regs, fig.cap = "Selection effects of 100 principal components of genetic data. Absolute effect sizes are plotted. Each dot represents one bivariate regression. Points are jittered on the Y axis.", fig.height = 2}
-
-res_pcs %>% 
-      mutate(
-        estimate = abs(estimate),
-        dep.var  = fct_relevel(dep.var, "N children")
-      ) %>% 
-      rename(p = p.value) %>% 
-      ggplot(aes(estimate, dep.var, colour = p < 0.05/{{n_regs}})) + 
-        geom_jitter(height = 0.15, width = 0, alpha = 0.8) + 
-        scale_x_log10(labels = scales::label_number(accuracy = 0.0001)) +
-        labs(x = "Effect size (log scale)", y = "") + 
-        pval_scale(aesthetics = "colour")
-        
-
-```
-
-
 \clearpage
 \FloatBarrier
 ## Selection controlling for age at first live birth: respondents' parents
@@ -2210,49 +2096,6 @@ waist circumference and waist-hip ratio). Figure \@ref(fig:plot-res-fe-fertility
 shows the results.
 
 
-\FloatBarrier
-\clearpage
-## Genetic correlations with EA3
-
-
-```{r plot-rgs-by-effect-size, fig.cap = "Selection effects plotted against genetic correlation with EA3."}
-
-# TODO: ref source of data.
-
-drake::loadd(rgs)
-drake::loadd(res_all)
-
-rgs <- left_join(rgs, 
-        res_all %>% filter(reg.type == "controlled", dep.var == "N children"), 
-        by = c("p2" = "term"))
-
-rgs_cor <- cor.test(~ rg + estimate, 
-                      data = rgs %>%
-                               filter(
-                                 p2 != "EA3_excl_23andMe_UK", 
-                                 p2 != "EA2_noUKB"
-                               )
-                    )
-rgs %>% 
-      filter(p2 != "EA3_excl_23andMe_UK", p2 != "EA2_noUKB") %>% 
-      ggplot(aes(rg, estimate)) + 
-        geom_point() +
-        my_vline +
-        my_hline +
-        labs(x = "Genetic correlation with EA3", y = "Effect on number of children")
-          
-```
-
-Another way to examine the "earnings" theory of natural selection is to compare
-selection effects of polygenic scores with their genetic correlation with educational
-attainment (EA3). Since EA3 strongly predicts earnings, if earnings drives
-differences in fertility, we'd expect a correlation between the two sets of
-results. Figure \@ref(fig:plot-rgs-by-effect-size) shows this is so: the 
-correlation, after excluding EA2, is `r rgs_cor$estimate`. Genetic
-correlations were calculated using LD score regression from GWAS summary
-statistics.
-
-
 \clearpage
 \FloatBarrier
 ## Effects on inequality
@@ -2430,6 +2273,164 @@ since for bivariate regression $R^{2}$ is the square of the correlation
 between $EA$ and $p^{*}$, which can be written $r=$$\beta\frac{\sigma_{p^{*}}^{2}}{\sigma_{EA}\sigma_{p^{*}}}$.
 We thank an anonymous commenter on https://stats.stackexchange.com/questions/238878/how-do-errors-in-variables-affect-the-r2
 for much of this proof.
+
+\clearpage
+\FloatBarrier
+## Further results
+### Selection effects on raw polygenic scores
+
+
+```{r calc-regs-controlled}
+
+drake::loadd(res_all)
+
+res_all_controlled <- res_all %>% 
+  select(reg.type, dep.var, term, estimate) %>% 
+  pivot_wider(names_from = c(reg.type, dep.var), values_from = estimate) %>% 
+  mutate(
+    consistent = sign(`raw_N siblings`) == sign(`raw_N children`) &
+                 sign(`raw_N siblings`) == sign(`controlled_N siblings`) &
+                 sign(`raw_N siblings`) == sign(`controlled_N children`)
+  )
+
+n_pgs  <- as.double(nrow(res_all_controlled))
+prop_consistent_controlled <- mean(res_all_controlled$consistent)
+controlled_smaller_sibs <- abs(res_all_controlled[["controlled_N siblings"]]) < 
+  abs(res_all_controlled[["raw_N siblings"]])
+controlled_smaller_children <- abs(res_all_controlled[["controlled_N children"]]) < 
+  abs(res_all_controlled[["raw_N children"]])
+median_prop_sibs <- median(abs(res_all_controlled[["controlled_N siblings"]]) /
+    abs(res_all_controlled[["raw_N siblings"]]))
+median_prop_children <- median(abs(res_all_controlled[["controlled_N children"]]) /
+    abs(res_all_controlled[["raw_N children"]]))
+
+```
+
+Figure \@ref(fig:plot-regs-controlled-pcs) compares selection effects on
+polygenic scores residualized for the top 100 principal components of the
+genetic data, to selection effects on raw, unresidualized polygenic scores. In
+siblings regressions, effect sizes are larger for raw scores  -- sometimes much
+larger, as in the case of height. `r sum(controlled_smaller_sibs)` out of 
+`r n_pgs` "raw" effect sizes have a larger absolute value than the corresponding
+"residualized" effect size. The median proportion between raw and controlled
+effect sizes is `r median_prop_sibs`. Among the children regressions, this no
+longer holds. Effect sizes are barely affected by controlling for principal
+components.
+
+Overall, `r prop_consistent_controlled * 100` per cent of effect sizes
+are consistently signed across all four regressions (on children and
+siblings, and with and without residualization).
+
+```{r plot-regs-controlled-pcs, fig.cap = "Selection effects using unresidualized polygenic scores on number of siblings/children."}
+
+drake::loadd(res_all)
+
+n_regs <- as.double(nrow(res_all))
+res_all %>% 
+      mutate(
+        term     = pretty_names(term),
+        term     = reorder_within(term, estimate, dep.var, order_abs(1)),
+        dep.var  = fct_inorder(dep.var),
+        reg.type = fct_recode(reg.type, 
+                               `Resid. for 100 PCs`  = "controlled", 
+                               Unresidualized        = "raw"
+                             )
+      ) %>% 
+      rename(p = p.value) %>% 
+      ggplot(aes(y = term, x = estimate, fill = reg.type, 
+        colour = p < 0.05/{{n_regs}})) +
+        my_vline + 
+        facet_wrap(vars(dep.var), scales = "free") +
+        pval_geom_point(position = position_dodge(0.4), alpha = 0.8) +
+        my_labs() +
+        pval_scale() +
+        my_fill_scale(n = 2, guide = guide_legend(title = "")) +
+        my_theme() +
+        scale_y_reordered() +
+        theme(
+          axis.text.x  = element_text(size = 7),
+          legend.text  = element_text(size = 8),
+          legend.title = element_text(size = 9)
+        )
+
+```
+
+```{r}
+drake::loadd(res_pcs)
+n_regs <- as.double(nrow(res_pcs))
+prop_sig <- res_pcs %>% 
+      group_by(dep.var) %>% 
+      summarize(sig = sum(p.value <= 0.05/nrow(res_pcs))) %>% 
+      pull(sig, name = dep.var)
+```
+
+To get a further insight into this we regress *n siblings* and *n children*
+on individual principal components. As Figure \@ref(fig:plot-pc-regs)
+shows, effects are larger and more significant in siblings regressions.
+`r prop_sig[["N siblings"]]` principal components significantly
+predicted number of siblings, while only `r prop_sig[["N children"]]`
+significantly predicted number of children.
+
+```{r plot-pc-regs, fig.cap = "Selection effects of 100 principal components of genetic data. Absolute effect sizes are plotted. Each dot represents one bivariate regression. Points are jittered on the Y axis.", fig.height = 2}
+
+res_pcs %>% 
+      mutate(
+        estimate = abs(estimate),
+        dep.var  = fct_relevel(dep.var, "N children")
+      ) %>% 
+      rename(p = p.value) %>% 
+      ggplot(aes(estimate, dep.var, colour = p < 0.05/{{n_regs}})) + 
+        geom_jitter(height = 0.15, width = 0, alpha = 0.8) + 
+        scale_x_log10(labels = scales::label_number(accuracy = 0.0001)) +
+        labs(x = "Effect size (log scale)", y = "") + 
+        pval_scale(aesthetics = "colour")
+        
+
+```
+
+
+\FloatBarrier
+\clearpage
+
+### Genetic correlations with EA3
+
+
+```{r plot-rgs-by-effect-size, fig.cap = "Selection effects plotted against genetic correlation with EA3."}
+
+# TODO: ref source of data.
+
+drake::loadd(rgs)
+drake::loadd(res_all)
+
+rgs <- left_join(rgs, 
+        res_all %>% filter(reg.type == "controlled", dep.var == "N children"), 
+        by = c("p2" = "term"))
+
+rgs_cor <- cor.test(~ rg + estimate, 
+                      data = rgs %>%
+                               filter(
+                                 p2 != "EA3_excl_23andMe_UK", 
+                                 p2 != "EA2_noUKB"
+                               )
+                    )
+rgs %>% 
+      filter(p2 != "EA3_excl_23andMe_UK", p2 != "EA2_noUKB") %>% 
+      ggplot(aes(rg, estimate)) + 
+        geom_point() +
+        my_vline +
+        my_hline +
+        labs(x = "Genetic correlation with EA3", y = "Effect on number of children")
+          
+```
+
+Another way to examine the "earnings" theory of natural selection is to compare
+selection effects of polygenic scores with their genetic correlation with educational
+attainment (EA3). Since EA3 strongly predicts earnings, if earnings drives
+differences in fertility, we'd expect a correlation between the two sets of
+results. Figure \@ref(fig:plot-rgs-by-effect-size) shows this is so: the 
+correlation, after excluding EA2, is `r rgs_cor$estimate`. Genetic
+correlations were calculated using LD score regression from GWAS summary
+statistics.
 
 
 \clearpage
