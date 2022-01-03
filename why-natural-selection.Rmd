@@ -922,7 +922,8 @@ the same pattern as for respondents. Effect sizes are larger and more often
 significant in the most deprived areas (Appendix Figure
 \@ref(fig:plot-siblings-townsend)). Effects are larger among younger parents,
 and change sign when controlling for AFLB, among both mothers and fathers
-(Appendix Figure \@ref(fig:plot-age-birth-parents)). Lastly, we check for a
+(Appendix Figures \@ref(fig:plot-age-birth-parents-cross), 
+\@ref(fig:plot-age-birth-parents)). Lastly, we check for a
 "quantity-quality tradeoff" between parents' number of children and number of
 grandchildren. We do not find any: in fact, the correlation between *number of
 siblings* and *number of children* is positive ($\rho$ = 
@@ -1596,26 +1597,25 @@ rel_sizes %>%
 \clearpage
 ## Balancing and diversifying selection
 
-Balancing selection reduces variance in the trait under selection, 
-while diversifying selection increases variance. To check for these,
-we rerun equation \@ref(eq:regression), adding a quadratic term in $PGS_i$,
-and using our age/qualification weights. Scores for hip circumference and drinks
-per week show significant balancing selection ($p < 0.05/33$, negative
-coefficient). Scores for educational attainment (EA2 and EA3) show significant
-diversifying selection ($p < 0.05/33$, positive coefficient), which reduces the
-strength of selection against educational attainment at very high levels of the 
-PGS. Figure
+Balancing selection reduces variance in the trait under selection, while
+diversifying selection increases variance. To check for these, we rerun equation
+\@ref(eq:regression), adding a quadratic term in $PGS_i$, and using our
+age/qualification weights. Scores for hip circumference show significant
+balancing selection ($p < 0.05/33$, negative coefficient on quadratic term).
+Scores for educational attainment (EA2 and EA3) show significant diversifying
+selection ($p < 0.05/33$, positive coefficient), which reduces the strength of
+selection against educational attainment at very high levels of the PGS. Figure
 \@ref(fig:plot-purifying) plots predicted number of children against polygenic
-score from these regressions. 
+score from these regressions.
 
 We also checked for balancing selection in the parents' generation, using
-age/qualification weights multiplied by the inverse of number of siblings. 
-Scores for EA2 and EA3 again show significant diversifying selection 
-($p < 0.05/33$, positive coefficient). Other scores including hip circumference 
-and drinks per week are not significant.
+age/qualification weights multiplied by the inverse of number of siblings.
+Scores for EA2 and EA3 again show significant diversifying selection ($p <
+0.05/33$, positive coefficient). Other scores including hip circumference were 
+not significant.
 
 
-```{r plot-purifying, fig.align = "center", fig.cap = "Purifying/diversifying selection: predicted number of children by polygenic score.", fig.height = 5}
+```{r plot-purifying, fig.align = "center", fig.cap = "Purifying/diversifying selection: predicted number of children by polygenic score.", fig.height = 3}
 
 drake::loadd(res_quadratic)
 sig <- res_quadratic %>% 
@@ -1623,8 +1623,7 @@ sig <- res_quadratic %>%
          filter(p.value < 0.05/33) %>% 
          pull(score_name)
 
-stopifnot(sig == c("dpw_substance_use", "EA2_noUKB", "EA3_excl_23andMe_UK",
-                     "hip_combined"))
+stopifnot(sig == c("EA2_noUKB", "EA3_excl_23andMe_UK", "hip_combined"))
 
 sig_all_terms <- res_quadratic %>% filter(score_name %in% sig)
 
@@ -1636,7 +1635,7 @@ sig_sibs <- res_sibs_quadratic %>%
          pull(score_name)
 stopifnot(sig_sibs == c("EA2_noUKB", "EA3_excl_23andMe_UK"))
 
-op <- par(mfrow = c(2,2))
+op <- par(mfrow = c(1, 3))
 for (score in sig) {
   coef <- sig_all_terms %>% filter(score_name == score) %>% pull(estimate)
   curve(
