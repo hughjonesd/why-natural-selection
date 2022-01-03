@@ -38,8 +38,12 @@ weight_by_ghs <- function (fml, ghs_subset, famhist) {
 }
 
 
-weight_parents <- function (famhist, input_weights) {
-  famhist <- inner_join(famhist, input_weights, by = "f.eid")
+weight_parents <- function (famhist, input_weights = NULL) {
+  if (is.null(input_weights)) {
+    famhist$weights <- 1
+  } else {
+    famhist <- inner_join(famhist, input_weights, by = "f.eid")
+  }
   n_sibs_are_up_to_8 <- ! is.na(famhist$n_sibs) & famhist$n_sibs <= 8
   n_sibs_up_to_8 <- famhist$n_sibs[n_sibs_are_up_to_8]
   wts <- famhist$weights[n_sibs_are_up_to_8]

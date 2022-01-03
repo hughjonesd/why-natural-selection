@@ -2392,32 +2392,34 @@ res_all %>%
 
 ```
 
-```{r}
-drake::loadd(res_pcs)
-n_regs <- as.double(nrow(res_pcs))
-prop_sig <- res_pcs %>% 
-      group_by(dep.var) %>% 
-      summarize(sig = sum(p.value <= 0.05/nrow(res_pcs))) %>% 
-      pull(sig, name = dep.var)
-```
 
 To get a further insight into this we regress *n siblings* and *n children*
-on individual principal components. As Figure \@ref(fig:plot-pc-regs)
-shows, effects are larger and more significant in siblings regressions.
-`r prop_sig[["N siblings"]]` principal components significantly
-predicted number of siblings, while only `r prop_sig[["N children"]]`
-significantly predicted number of children.
+on individual principal components. Figure \@ref(fig:plot-pc-regs)
+shows the results. Labels show the top principal components. These
+have larger effect sizes in siblings regressions. One possibility is that 
+the parents' generation was less geographically mobile, and so geographic
+patterns of childrearing were more correlated with principal components, which
+partly capture the location of people's ancestors.
 
-```{r plot-pc-regs, fig.cap = "Selection effects of 100 principal components of genetic data. Absolute effect sizes are plotted. Each dot represents one bivariate regression. Points are jittered on the Y axis.", fig.height = 2}
+
+```{r plot-pc-regs, fig.cap = "Selection effects of 100 principal components of genetic data. Each dot represents one bivariate regression. Absolute effect sizes are plotted. Points are jittered on the Y axis. Top principal components are labelled."}
+
+drake::loadd(res_pcs)
+n_regs <- as.double(nrow(res_pcs))
+
+pj <- position_jitter(height = 0.15, width = 0, seed = 12345)
 
 res_pcs %>% 
       mutate(
         estimate = abs(estimate),
-        dep.var  = fct_relevel(dep.var, "N children")
+        dep.var  = fct_relevel(dep.var, "N children"),
+        top_pcs  = ifelse(as.numeric(pc_name) <= 5, term, "")
       ) %>% 
       rename(p = p.value) %>% 
       ggplot(aes(estimate, dep.var, colour = p < 0.05/{{n_regs}})) + 
-        geom_jitter(height = 0.15, width = 0, alpha = 0.8) + 
+        geom_point(alpha = 0.8, position = pj) +
+        geom_text(aes(estimate, dep.var, label = top_pcs), position = pj, 
+                    hjust = "right", color = "black", size = 3) +
         scale_x_log10(labels = scales::label_number(accuracy = 0.0001)) +
         labs(x = "Effect size (log scale)", y = "") + 
         pval_scale(aesthetics = "colour")

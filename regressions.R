@@ -57,11 +57,13 @@ calc_pgs_over_time <- function (famhist, score_names) {
 }
 
 
-run_regs_basic <- function (dep_var, score_names, famhist, subset = NULL) {
+run_regs_basic <- function (dep_var, score_names, famhist, subset = NULL, 
+                              weights = NULL) {
   
   run_reg <- function (score_name) {
     fml <- as.formula(glue("{dep_var} ~ {score_name}_raw"))
-    reg_bv <- tidy(lm(fml, famhist, subset = eval(subset)), conf.int = TRUE) 
+    reg_bv <- tidy(lm(fml, famhist, subset = eval(subset), 
+                        weights = weights), conf.int = TRUE) 
     reg_bv <- mutate(reg_bv, term = gsub("_raw", "", term))
     reg_bv
   }
@@ -69,7 +71,8 @@ run_regs_basic <- function (dep_var, score_names, famhist, subset = NULL) {
   
   run_resid_reg <- function (score_name) {
     fml_resid <- as.formula(glue("{dep_var} ~ {score_name}"))
-    reg_resid <- tidy(lm(fml_resid, famhist, subset = eval(subset)), conf.int = TRUE) 
+    reg_resid <- tidy(lm(fml_resid, famhist, subset = eval(subset), 
+                           weights = weights), conf.int = TRUE) 
     reg_resid
   }
   resid_res <- map_dfr(score_names, run_resid_reg, .id = "score_name")
@@ -81,14 +84,15 @@ run_regs_basic <- function (dep_var, score_names, famhist, subset = NULL) {
 }
 
 
-run_regs_pcs <- function (dep_var, famhist, pcs, subset = NULL) {
+run_regs_pcs <- function (dep_var, famhist, pcs, subset = NULL, weights = NULL) {
   pc_names <- grep("PC", names(pcs), value = TRUE)
   
   fh_short <- join_famhist_pcs(famhist[c("f.eid", dep_var, "kids_ss")], pcs)
   
   run_reg_pc <- function(pc_name) {
     fml <- as.formula(glue("{dep_var} ~ {pc_name}"))
-    reg <- tidy(lm(fml, fh_short, subset = eval(subset)), conf.int = TRUE) 
+    reg <- tidy(lm(fml, fh_short, subset = eval(subset), 
+                     weights = eval(weights)), conf.int = TRUE) 
     reg %<>% filter(term != "(Intercept)")
   }
   
@@ -155,6 +159,24 @@ run_regs_fml <- function(fml, ..., subset = NULL, famhist, weights = NULL) {
   mod <- lm(fml, famhist, subset = eval(subset), weights = eval(weights))
   res <- tidy(mod, conf.int = TRUE)
   attr(res, "call") <- mod$call
+  res
+}
+
+
+run_regs_age_flb_parents_cross <- function(famhist, score_names, age_birth_var) {
+  fml <- sprintf("n_sibs ~ %s + {score_name}:%s", age_birth_var, age_birth_var)
+  res <- map_dfr(score_names, 
+                 ~run_regs_fml(
+                   fml        = fml,
+                   score_name = .x,
+                   famhist    = famhist,
+                   subset     = quote(birth_order == 1),
+                   weights    = weights
+                 ),
+                 .id = "score_name"
+  )
+  res %<>% filter(grepl(":", term))
+  
   res
 }
 

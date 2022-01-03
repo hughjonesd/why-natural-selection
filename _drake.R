@@ -36,7 +36,7 @@ fertility_data_dir <- file.path(data_dir, "fertility_PRS")
 
 weighting_scheme_syms <- rlang::syms(c("flb_weights", "age_qual_weights", 
                         "msoa_weights"))
-period_weight_syms <- rlang::syms((c("age_qual_weights", "parent_weights")))
+period_weight_syms <- rlang::syms((c("age_qual_weights", "parent_aq_weights")))
 
 plan <- drake_plan(
   
@@ -94,6 +94,11 @@ plan <- drake_plan(
                    },
                     format = "fst_tbl"
                   ),
+  
+  famhist_pw = target(
+                 inner_join(famhist, parent_weights, by = "f.eid"),
+                 format = "fst_tbl"
+               ),
 
   famhist_msoa = target(
                    find_containing_msoas(famhist, msoa_shapefile), 
@@ -143,7 +148,9 @@ plan <- drake_plan(
   
   age_qual_weights = weight_by_census_age_qual(famhist, census_age_qual),
   
-  parent_weights = weight_parents(famhist, input_weights = age_qual_weights),
+  parent_weights = weight_parents(famhist),
+  
+  parent_aq_weights = weight_parents(famhist, input_weights = age_qual_weights),
   
   msoa_weights = weight_by_census_msoa(famhist, census_msoa, famhist_msoa),
   
@@ -162,7 +169,8 @@ plan <- drake_plan(
     res_sibs <- run_regs_basic(
             dep_var     = "n_sibs", 
             score_names = score_names,
-            famhist     = famhist
+            famhist     = famhist_pw,
+            weights     = famhist_pw$weights
           )
     res_chn <- run_regs_basic(
             dep_var     = "n_children", 
@@ -178,12 +186,11 @@ plan <- drake_plan(
   },
   
   res_quadratic = {
-    famhist %<>% inner_join(age_qual_weights, by = "f.eid")
     map_dfr(score_names, 
               ~run_regs_fml(
                              "n_children ~ {score_name} + I({score_name}^2)", 
                              score_name = .x,
-                             famhist    = famhist,
+                             famhist    = famhist_pw,
                              weights    = quote(weights)
                            ),
               .id = "score_name"
@@ -191,12 +198,11 @@ plan <- drake_plan(
   },
   
   res_sibs_quadratic = {
-    famhist %<>% inner_join(parent_weights, by = "f.eid")
     map_dfr(score_names, 
             ~run_regs_fml(
               "n_sibs ~ {score_name} + I({score_name}^2)", 
               score_name = .x,
-              famhist    = famhist,
+              famhist    = famhist_pw,
               weights    = quote(weights)
             ),
             .id = "score_name"
@@ -207,14 +213,16 @@ plan <- drake_plan(
     pc_names <- grep("PC", names(pcs), value = TRUE)
     res_sibs_pcs <- run_regs_pcs( 
       dep_var     = "n_sibs", 
-      famhist     = famhist,
-      pcs         = pcs
+      famhist     = famhist_pw,
+      pcs         = pcs,
+      weights     = quote(famhist$weights) # famhist will be famhist_pw in the function
     )
     res_chn_pcs <- run_regs_pcs(
       dep_var     = "n_children", 
       famhist     = famhist,
       pcs         = pcs,
-      subset      = quote(kids_ss)
+      subset      = quote(kids_ss),
+      weights     = NULL 
     )
     dplyr::bind_rows(
       "N siblings" = res_sibs_pcs, 
@@ -239,7 +247,7 @@ plan <- drake_plan(
   res_sibs_parent_weights = map_dfr(score_names, 
                               run_regs_weighted, 
                               famhist     = famhist, 
-                              weight_data = parent_weights,
+                              weight_data = parent_aq_weights,
                               dep.var     = "n_sibs"
                             ),
   
@@ -339,7 +347,6 @@ plan <- drake_plan(
   },
   
   res_age_birth_parents = {
-    famhist %<>% inner_join(parent_weights, by = "f.eid")
     vars <- expand_grid(
             score_name = unname(score_names), # just easier to avoid hassle... 
             control    = c("fath_age_birth", "moth_age_birth")
@@ -348,7 +355,7 @@ plan <- drake_plan(
             run_regs_fml,
             fml = "n_sibs ~ {score_name} + {control}",
             subset = quote(birth_order == 1),
-            famhist = famhist,
+            famhist = famhist_pw,
             weights = weights,
             .id = "id"
           )
@@ -362,37 +369,11 @@ plan <- drake_plan(
   },
   
   res_age_flb_mothers_cross = {
-    famhist %<>% inner_join(parent_weights, by = "f.eid")
-    res <- map_dfr(score_names, 
-                   ~run_regs_fml(
-                     fml        = "n_sibs ~ moth_age_birth_cat + {score_name}:moth_age_birth_cat",
-                     score_name = .x,
-                     famhist    = famhist,
-                     subset     = quote(birth_order == 1),
-                     weights    = weights
-                   ),
-                   .id = "score_name"
-    )
-    res %<>% filter(grepl(":", term))
-    
-    res
+    run_regs_age_flb_parents_cross(famhist_pw, score_names, "moth_age_birth_cat")
   },
   
   res_age_flb_fathers_cross = {
-    famhist %<>% inner_join(parent_weights, by = "f.eid")
-    res <- map_dfr(score_names, 
-                   ~run_regs_fml(
-                     fml        = "n_sibs ~ fath_age_birth_cat + {score_name}:fath_age_birth_cat",
-                     score_name = .x,
-                     famhist    = famhist,
-                     subset     = quote( birth_order == 1),
-                     weights    = weights
-                   ),
-                   .id = "score_name"
-    )
-    res %<>% filter(grepl(":", term))
-    
-    res
+    run_regs_age_flb_parents_cross(famhist_pw, score_names, "fath_age_birth_cat")
   },
   
   res_townsend_parents = {
@@ -421,7 +402,6 @@ plan <- drake_plan(
   },
   
   res_age_birth_parents_dv = {
-    famhist %<>% inner_join(parent_weights, by = "f.eid")
     vars <- expand_grid(
             score_name = unname(score_names), 
             dep.var    = c("fath_age_birth", "moth_age_birth")
@@ -430,7 +410,7 @@ plan <- drake_plan(
             run_regs_fml,
             fml     = "{dep.var} ~ {score_name}",
             subset  = quote(birth_order == 1),
-            famhist = famhist,
+            famhist = famhist_pw,
             weights = weights,
             .id     = "id"
           )
