@@ -190,8 +190,7 @@ plan <- drake_plan(
               ~run_regs_fml(
                              "n_children ~ {score_name} + I({score_name}^2)", 
                              score_name = .x,
-                             famhist    = famhist_pw,
-                             weights    = quote(weights)
+                             famhist    = famhist
                            ),
               .id = "score_name"
             )
