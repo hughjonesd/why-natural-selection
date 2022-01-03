@@ -1283,39 +1283,38 @@ stopifnot(n_less_sig == 0)
 ```
 
 We consider three alternative theories that might explain our results. First,
-welfare benefits which incentivize child-bearing might be taken up more
-among low-income individuals. However, our effect sizes appear unchanged
-over a large span of twentieth-century history (tables \@ref(tab:tbl-siblings-by-period) and 
-\@ref(tab:tbl-children-by-period)), during which
-government spending on child-related benefits varied considerably
-[@hoc1999socsec]. In general, there is only weak evidence that welfare benefits
-affect fertility [@gauthier2007impact]. A second alternative theory is that
-polygenic scores correlate with the motivation to have children, i.e. parameter $a$
-in the model [cf. @jones2008fertility]. This theory would not explain why our
-results are weaker at higher incomes and education levels.[^note] A third
-alternative is that traits under selection are linked to externalizing behaviour
-and risk-seeking. This might be partially captured by our risk-aversion
-parameter $\sigma$, which affects fertility by changing the marginal utility of
-income, but a more direct channel is risky sexual behaviour
-[@mills2021identification]. The data here provide some support for this: scores
-which might plausibly be linked to externalizing behaviour, like ADHD and
-younger age at smoking initiation, are selected for. However, this theory is
-less good at explaining variation in selection across the full range of scores,
-including physical measures such as waist-hip ratio and BMI. We test this theory
-directly by re-estimating equation \@ref(eq:regression) controlling for a
-measure of risk attitude (UK Biobank field 2040).  The median ratio of effect
-sizes between regressions with and without controls is `r median(ratio)`; all
-scores which are significant at $p < 0.05/33$ in uncontrolled regressions remain
-so when controlling for risk attitude. This non-result could simply reflect the
+welfare benefits which incentivize child-bearing might be taken up more among
+low-income individuals. However, our effect sizes appear unchanged over a large
+span of twentieth-century history (tables \@ref(tab:tbl-siblings-by-period) and
+\@ref(tab:tbl-children-by-period)), during which government spending on
+child-related benefits varied considerably [@hoc1999socsec]. In general, there
+is only weak evidence that welfare benefits affect fertility
+[@gauthier2007impact]. A second alternative theory is that polygenic scores
+correlate with the motivation to have children, i.e. parameter $a$ in the model
+[cf. @jones2008fertility]. This theory would not explain why selection effects
+are smaller at higher incomes and education levels.[^note] A third alternative
+is that traits under selection are linked to externalizing behaviour and
+risk-seeking. This might be partially captured by our risk-aversion parameter
+$\sigma$, which affects fertility by changing the marginal utility of income,
+but a more direct channel is risky sexual behaviour [@mills2021identification].
+The data here provide some support for this: scores which might plausibly be
+linked to externalizing behaviour, like ADHD and younger age at smoking
+initiation, are selected for. However, this theory is less good at explaining
+variation in selection across the full range of scores, including physical
+measures such as waist-hip ratio and BMI. We test this theory directly by
+re-estimating equation \@ref(eq:regression) controlling for a measure of risk
+attitude (UK Biobank field 2040).  The median ratio of effect sizes between
+regressions with and without controls is `r median(ratio)`; all scores which are
+significant at $p < 0.05/33$ in uncontrolled regressions remain so when
+controlling for risk attitude. This non-result could simply reflect the
 imprecision of the risk attitude measure, which is a single yes/no question.
-However, this measure *does* predict the overall number of
-children, highly significantly ($p < 2 \times 10^{-16}$ in `r n_risk_sig` out of
-33 regressions). Given that, and the statistical power we get from our sample
-size, we believe that the non-result is real: while risk attitude does predict
-fertility in the sample, it is not an important channel for natural selection.
-
-[^note]: Indeed in the one-period model, while $\frac{dN^{*}}{da} > 0$,
-this effect becomes stronger, not weaker, at higher wages.
+However, this measure *does* predict the overall number of children, highly
+significantly ($p < 2 \times 10^{-16}$ in `r n_risk_sig` out of 33 regressions).
+Given that, and the statistical power we get from our sample size, we believe
+that the non-result is real: while risk attitude does predict fertility in the
+sample, it is not an important channel for natural selection.
+[^note]: Indeed in the one-period model, while $\frac{dN^{*}}{da} > 0$, this
+effect becomes stronger, not weaker, at higher wages.
 
 
 # Discussion
@@ -1711,7 +1710,7 @@ childless are excluded, for `r n_smaller` out of 33 scores; the median
 percentage change is `r percent(median_pct_diff)`. 
 
 
-```{r plot-res-sibs, fig.cap = "Selection effects, respondents' parents vs. respondents."}
+```{r plot-res-sibs, fig.cap = "Selection effects, respondents' parents vs. respondents. Age/qualification weights. Parental generation weights multiplied by 1/number of siblings. Respondents' regression excludes childless respondents."}
 drake::loadd(res_sibs_parent_weights)
 drake::loadd(res_children_comparison)
 
@@ -1833,7 +1832,7 @@ period_table <- function (tbl, caption) {
 summary_period %>% 
       group_by(Change_Parents) %>% 
       count() %>% 
-      period_table("Change in selection effects between parents of early and late born respondents (regressions on number of siblings).")
+      period_table("Change in selection effects between parents of early and late born respondents (regressions on number of siblings). Weights: Age/Qualification times 1/number of siblings.")
       
 ```
 
@@ -1841,7 +1840,7 @@ summary_period %>%
 summary_period %>% 
       group_by(Change_Respondents) %>% 
       count() %>% 
-      period_table("Change in selection effects between early and late born respondents (regressions on number of children).")
+      period_table("Change in selection effects between early and late born respondents (regressions on number of children). Weights: Age/Qualification.")
 ```
 
 
@@ -1853,7 +1852,7 @@ summary_period %>%
 Figure \@ref(fig:plot-siblings-townsend) plots effects on *number of siblings* by
 Townsend deprivation quintile of birth area.
 
-```{r plot-siblings-townsend, fig.cap = "Selection effects in the parents' generation by Townsend deprivation quintile of birth area.", fig.align = "center"}
+```{r plot-siblings-townsend, fig.cap = "Selection effects in the parents' generation by Townsend deprivation quintile of birth area. Higher = more deprived. Estimates weighted by 1/number of siblings.", fig.align = "center"}
 
 drake::loadd(res_townsend_parents)
 n_regs <- nrow(res_townsend_parents)
@@ -1900,10 +1899,9 @@ the subsets of respondents who reported their mother's or father's age, and who
 had no elder siblings. We run regressions on *number of siblings* on these
 subsets. Figure \@ref(fig:plot-age-birth-parents-cross) shows selection effects
 by terciles of age at first live birth, for mothers and fathers. As in the
-respondents' generation, effect sizes are larger for younger parents. This
-holds for both sexes.
+respondents' generation, effect sizes are smaller, or even oppositely signed, for older parents. Importantly, this holds for both sexes.
 
-```{r plot-age-birth-parents-cross, fig.cap = "Selection effects (parents' generation) by age at first live birth terciles.", fig.subcap = c("Mothers", "Fathers"), fig.ncol = 1}
+```{r plot-age-birth-parents-cross, fig.cap = "Selection effects (parents' generation) by age at first live birth terciles.  Estimates weighted by 1/number of siblings.", fig.subcap = c("Mothers", "Fathers"), fig.ncol = 1}
 
 drake::loadd(res_age_flb_mothers_cross)
 drake::loadd(res_age_flb_fathers_cross)
@@ -1954,7 +1952,7 @@ effect sizes are negatively correlated with the effect sizes from bivariate
 regressions without the age at birth control (father's age at birth: $\rho$ 
 `r cor_unc_fath`; mother's age at birth: $\rho$ `r cor_unc_moth`).
 
-```{r plot-age-birth-parents, fig.cap = "Selection effects (parents' generation) among eldest siblings, controlling for parents' age at birth."}
+```{r plot-age-birth-parents, fig.cap = "Selection effects (parents' generation) among eldest siblings, controlling for parents' age at birth. Estimates weighted by 1/number of siblings."}
 
 
 n_regs <- as.double(nrow(res_age_birth_parents)/2)
@@ -2018,7 +2016,7 @@ res_age_flb_dv %>% standard_ggplot(n_regs = n_regs)
 ```
 
 
-```{r plot-age-birth-parents-dv, fig.cap = "Effects of polygenic scores on parents' age at respondent's birth, eldest siblings."}
+```{r plot-age-birth-parents-dv, fig.cap = "Effects of polygenic scores on parents' age at respondent's birth, eldest siblings. Estimates weighted by 1/number of siblings."}
 
 n_regs <- as.double(nrow(res_age_birth_parents_dv))
 
@@ -2358,7 +2356,7 @@ Overall, `r prop_consistent_controlled * 100` per cent of effect sizes
 are consistently signed across all four regressions (on children and
 siblings, and with and without residualization).
 
-```{r plot-regs-controlled-pcs, fig.cap = "Selection effects using unresidualized polygenic scores on number of siblings/children."}
+```{r plot-regs-controlled-pcs, fig.cap = "Selection effects using unresidualized polygenic scores on number of siblings/children. Sibling estimates weighted by 1/number of siblings."}
 
 drake::loadd(res_all)
 
@@ -2402,7 +2400,7 @@ patterns of childrearing were more correlated with principal components, which
 partly capture the location of people's ancestors.
 
 
-```{r plot-pc-regs, fig.cap = "Selection effects of 100 principal components of genetic data. Each dot represents one bivariate regression. Absolute effect sizes are plotted. Points are jittered on the Y axis. Top principal components are labelled."}
+```{r plot-pc-regs, fig.cap = "Selection effects of 100 principal components of genetic data. Each dot represents one bivariate regression. Sibling estimates weighted by 1/number of siblings. Absolute effect sizes are plotted. Points are jittered on the Y axis. Top principal components are labelled."}
 
 drake::loadd(res_pcs)
 n_regs <- as.double(nrow(res_pcs))
