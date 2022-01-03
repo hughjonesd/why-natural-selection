@@ -407,7 +407,7 @@ We then show that a simple model of human capital, education and fertility
 choices can give rise to these empirical results. To test the theory, we show
 that polygenic scores' correlation with fertility is associated with their
 correlation with education and earnings. Furthermore, a mediation analysis shows
-that part of the correlation with fertility is indeed *via* education. Thus, contemporary natural selection on polygenic scores can be explained by their correlation with earnings-increasing human capital.
+that part of the correlation with fertility is indeed *via* education. Thus, contemporary natural selection on polygenic scores can be explained by scores' correlation with earnings-increasing human capital.
 
 Lastly, we discuss the effects of natural selection. While measured effects on
 mean genetic scores are small, natural selection may substantially increase the
@@ -1293,29 +1293,28 @@ is only weak evidence that welfare benefits affect fertility
 [@gauthier2007impact]. A second alternative theory is that polygenic scores
 correlate with the motivation to have children, i.e. parameter $a$ in the model
 [cf. @jones2008fertility]. This theory would not explain why selection effects
-are smaller at higher incomes and education levels.[^note] A third alternative
-is that traits under selection are linked to externalizing behaviour and
-risk-seeking. This might be partially captured by our risk-aversion parameter
-$\sigma$, which affects fertility by changing the marginal utility of income,
-but a more direct channel is risky sexual behaviour [@mills2021identification].
-The data here provide some support for this: scores which might plausibly be
-linked to externalizing behaviour, like ADHD and younger age at smoking
-initiation, are selected for. However, this theory is less good at explaining
-variation in selection across the full range of scores, including physical
-measures such as waist-hip ratio and BMI. We test this theory directly by
-re-estimating equation \@ref(eq:regression) controlling for a measure of risk
-attitude (UK Biobank field 2040).  The median ratio of effect sizes between
-regressions with and without controls is `r median(ratio)`; all scores which are
-significant at $p < 0.05/33$ in uncontrolled regressions remain so when
-controlling for risk attitude. This non-result could simply reflect the
+are smaller at higher incomes and education levels. (Indeed, in the model, the
+effect of $a$ on fertility becomes stronger at higher levels of human capital.) A
+third alternative is that traits under selection are linked to externalizing
+behaviour and risk-seeking. This might be partially captured by our
+risk-aversion parameter $\sigma$, which affects fertility by changing the
+marginal utility of income, but a more direct channel is risky sexual behaviour
+[@mills2021identification]. The data here provide some support for this: scores
+which might plausibly be linked to externalizing behaviour, like ADHD and
+younger age at smoking initiation, are selected for. However, this theory is
+less good at explaining variation in selection across the full range of scores,
+including physical measures such as waist-hip ratio and BMI. We test this theory
+directly by re-estimating equation \@ref(eq:regression) controlling for a
+measure of risk attitude (UK Biobank field 2040).  The median ratio of effect
+sizes between regressions with and without controls is `r median(ratio)`; all
+scores which are significant at $p < 0.05/33$ in uncontrolled regressions remain
+so when controlling for risk attitude. This non-result could simply reflect the
 imprecision of the risk attitude measure, which is a single yes/no question.
 However, this measure *does* predict the overall number of children, highly
 significantly ($p < 2 \times 10^{-16}$ in `r n_risk_sig` out of 33 regressions).
 Given that, and the statistical power we get from our sample size, we believe
 that the non-result is real: while risk attitude does predict fertility in the
 sample, it is not an important channel for natural selection.
-[^note]: Indeed in the one-period model, while $\frac{dN^{*}}{da} > 0$, this
-effect becomes stronger, not weaker, at higher wages.
 
 
 # Discussion
@@ -2192,12 +2191,12 @@ attainment $p^{*}$, i.e. the best linear unbiased predictor of educational
 attainment from genetic data. We write the measured polygenic
 score of educational attainment, "EA3" from @lee2018gene, as
 \[
-p=p^{*}+\eta.
+p = p^* + \eta.
 \]
 
 For realized educational attainment $EA$, write:
 \[
-EA = \alpha+\beta p^{*} + \varepsilon = \alpha + \beta(p+\eta) + \varepsilon
+EA = \alpha+\beta p^* + \varepsilon = \alpha + \beta(p - \eta) + \varepsilon
 \]
 We assume the classical errors-in-variables model, i.e. that $\eta$
 is independent of both $p$ and $\varepsilon$. Under these conditions,
@@ -2206,7 +2205,7 @@ $EA$, and the true $R^{2}$ of $p^{*}$ on $EA$, satisfies:
 \begin{equation}
 \frac{\textrm{plim}\hat{R}^{2}}{R^{2}} 
 = \frac{\sigma_{p}^{2} - \sigma_{\eta}^{2}}{\sigma_{p}^{2}}
-= \frac{\sigma_{p^{*}}^{2}}{\sigma_{p}^{2}}
+= \frac{\sigma_{p^*}^{2}}{\sigma_{p}^{2}}
 \equiv \lambda, \label{eq:r2-ratio}
 \end{equation}
 as we show below. The right hand side is the "reliability ratio".
@@ -2235,7 +2234,7 @@ estimate of $R_{\textrm{income}}^{2}$ after one generation of natural selection,
 holding environmental conditions unchanged.
 
 The errors-in-variables conditions are quite restrictive. In particular, they
-rule out that the unmeasured part of PSEA ($-\eta$) correlates with the error 
+rule out that the unmeasured part of PSEA ($\eta$) correlates with the error 
 term $\varepsilon$, e.g. with environmental causes of educational attainment. 
 If unmeasured PSEA correlates positively with $\varepsilon$, then the
 reliability coefficient $\lambda$ will be lower than calculated. However, the

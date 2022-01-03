@@ -448,4 +448,29 @@ this combined with weak concavity of period 1, and linearity of $a(N_{1}+N_{2})$
 shows that (\ref{eq:U}) is concave.
 \end{proof}
 
+\subsection*{Effect of $a$}
+
+\begin{lem}
+\label{lemma-a}For $\sigma<1$, $d^2N^*/dadh > 0$, i.e. the effect of $a$
+increases at higher levels of human capital.
+\end{lem}
+\begin{proof}
+Differentiating (\ref{eq:dNdh1}) with respect to $a$ gives
+
+\[
+\frac{d^2N^*_t}{dadh} = -\frac{1}{b}\frac{1}{1-2\sigma}a^{-1}\left(\frac{a}{b}\right)^{1/(1-2\sigma)}\frac{1-\sigma}{2\sigma-1}h^{(1-\sigma)/(2\sigma-1)-1}
+\]
+
+for $t=1,2$ when $N^*_1,N^*_2>0$. For $\sigma > 0.5$ this is positive.
+
+When $N^*_1 = 0,N^*_2>0$, differentiating (\ref{eq:dNdh2}) with respect to $a$ gives
+
+\[
+\frac{d^2N_{2}^{*}}{dadh} = \frac{1}{b}\frac{1}{\sigma}a^{-1}\left(\frac{a}{b}\right)^{-1/\sigma}\frac{1-\sigma}{\sigma}(s^{*}h)^{(1-2\sigma)/\sigma}(s^{*}+h\frac{ds^{*}}{dh})
+\]
+
+which is $-a^{-1}/\sigma$ times (\ref{eq:dNdh2}) and hence is positive.
+
+\end{proof}
+
 
