@@ -1,0 +1,34 @@
+---
+title: "Human capital mediates natural selection in contemporary humans"
+author: "David Hugh-Jones \\thanks{Corresponding author. School of Economics, University of East Anglia, Norwich, UK. Email: D.Hugh-Jones@uea.ac.uk}, Abdel Abdellaoui \\thanks{Department of Psychiatry, Amsterdam UMC, University of Amsterdam, Amsterdam, The Netherlands.}"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+abstract: "\\noindent Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection through the association between 33 polygenic scores and fertility, across two generations, using data from UK Biobank (N = 409,629 British subjects with European ancestry). Consistently over time, polygenic scores associated with lower (higher) earnings, education and health are selected for (against). Selection effects are concentrated among lower SES groups, younger parents, people with more lifetime sexual partners, and people not living with a partner. The direction of natural selection is reversed among older parents, or after controlling for age at first live birth. These patterns are in line with economic theories of fertility, in which earnings-increasing human capital may either increase or decrease fertility via income and substitution effects in the labour market. Studying natural selection can help us understand the genetic architecture of health outcomes: we find evidence in modern day Great Britain for multiple natural selection pressures that vary between subgroups in the direction and strength of their effects, that are strongly related to the socio-economic system, and that may contribute to health inequalities across income groups."
+bibliography: "negative-selection.bib"
+output: 
+  bookdown::pdf_document2:
+    toc: false
+    latex_engine: xelatex
+    number_sections: true
+header-includes:
+  - \usepackage{subfig}
+  - \usepackage{setspace}\doublespacing
+  - \usepackage{placeins}
+  - \usepackage[format=plain, labelfont={bf,it}, textfont=it]{caption}
+  - \usepackage{titlesec}
+  - \titleformat*{\section}{\sffamily\LARGE}
+  - \titleformat*{\subsection}{\sffamily\itshape\Large}
+  - \hypersetup{colorlinks = true, linkcolor = {blue}, linkbordercolor = {white}}
+  - \usepackage{amsthm}
+  - \theoremstyle{plain}
+  - \newtheorem{lem}{\protect\lemmaname}
+  - \providecommand{\lemmaname}{Lemma}
+  - \usepackage{etoc}
+editor_options: 
+  markdown: 
+    wrap: 72
+  chunk_output_type: console
+mainfont: Baskerville
+mathfont: Baskerville
+sansfont: "Gill Sans"
+---
+

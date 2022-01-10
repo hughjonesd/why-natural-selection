@@ -7,7 +7,7 @@ output:
   bookdown::pdf_document2:
     toc: false
     latex_engine: xelatex
-    number_sections: false
+    number_sections: true
 header-includes:
   - \usepackage{subfig}
   - \usepackage{setspace}\doublespacing
@@ -21,9 +21,7 @@ header-includes:
   - \theoremstyle{plain}
   - \newtheorem{lem}{\protect\lemmaname}
   - \providecommand{\lemmaname}{Lemma}
-  - \usepackage{lineno}
   - \usepackage{etoc}
-  - \linenumbers
 editor_options: 
   markdown: 
     wrap: 72
@@ -367,6 +365,8 @@ scale_y_reordered <- function(..., sep = "___") {
 "
 ```
 
+
+# Introduction
 
 Living organisms evolve through natural selection, in which allele frequencies
 change in the population through differential reproduction rates. Studying the
@@ -933,7 +933,7 @@ siblings* and *number of children* is positive ($\rho$ =
 
 \FloatBarrier
 
-## Human capital and natural selection
+# Human capital and natural selection
 
 These results show that selection effects are weaker, absent, or even reversed
 among some subgroups of the population. A possible explanation for this comes 
@@ -1181,7 +1181,7 @@ dfr %>%
 ```
 
 
-## Testing the theory
+# Testing the theory
 
 We test this explanation in two ways. First, the economic theory predicts that
 genetic variants will be selected for (or against) in proportion to their
