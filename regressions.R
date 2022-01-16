@@ -198,7 +198,7 @@ run_age_anova <- function (score_name, control, famhist) {
   fml <- as.formula(glue::glue(
     "n_children ~ {score_name}*({control} + 
           age_at_recruitment + I(age_at_recruitment^2))"))
-  res <- lm(fml, data = famhist, subset = kids_ss) %>% 
+  res <- lm(fml, data = famhist) %>% 
            car::Anova() %>% 
            tidy()
 }
@@ -242,7 +242,6 @@ run_income_dist <- function (famhist) {
 
 
 run_reg_fe_fertility <- function (famhist, score_names) {
-  
   # remove scores which correlate highly with others
   # we leave EA3 and bmi_combined
   score_names <- setdiff(score_names, c("EA2_noUKB", "hip_combined", 
@@ -256,10 +255,8 @@ run_reg_fe_fertility <- function (famhist, score_names) {
   fml_raw <- as.formula(fml_raw)
   fml_mediators <- as.formula(fml_mediators)
   
-  mod_raw <- fixest::feols(fml_raw, data = famhist, 
-                             subset = famhist$kids_ss, note = FALSE)
-  mod_mediators <- fixest::feols(fml_mediators, data = famhist, 
-                                   subset = famhist$kids_ss, note = FALSE)
+  mod_raw <- fixest::feols(fml_raw, data = famhist, note = FALSE)
+  mod_mediators <- fixest::feols(fml_mediators, data = famhist, note = FALSE)
   
   tidied_raw <- broom::tidy(mod_raw, conf.int = TRUE)
   tidied_raw %<>% dplyr::filter(term %in% score_names)
@@ -280,7 +277,6 @@ run_cor_income <- function (famhist, score_names, age_qual_weights) {
   famhist <- famhist %>% 
                left_join(age_qual_weights, by = "f.eid") %>% 
                filter(
-                 kids_ss,
                  ! is.na(n_children), 
                  ! is.na(income_cat), 
                  ! is.na(weights)
@@ -306,8 +302,6 @@ run_cor_income <- function (famhist, score_names, age_qual_weights) {
 }
 
 run_ineq_ea3_calcs <- function (famhist, age_qual_weights, h2) {
-  
-  famhist <- famhist %>% filter(kids_ss)
   famhist <- left_join(famhist, age_qual_weights, by = "f.eid")
   famhist$child_weights <- famhist$n_children * famhist$weights
   
@@ -344,7 +338,6 @@ run_ineq_ea3_calcs <- function (famhist, age_qual_weights, h2) {
 run_mediation <- function (famhist, score_names) {
   famhist <- famhist %>%
                filter(
-                 kids_ss,
                  ! is.na(n_children),
                  ! is.na(age_fte_cat),
                  ! is.na(sex),

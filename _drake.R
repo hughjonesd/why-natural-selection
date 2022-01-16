@@ -94,6 +94,10 @@ plan <- drake_plan(
                    },
                     format = "fst_tbl"
                   ),
+  famhist_kids = target(
+                   famhist %>% filter(kids_ss),
+                   format = "fst_tbl"
+                 ),
   
   famhist_pw = target(
                  inner_join(famhist, parent_weights, by = "f.eid"),
@@ -175,8 +179,7 @@ plan <- drake_plan(
     res_chn <- run_regs_basic(
             dep_var     = "n_children", 
             score_names = score_names, 
-            famhist     = famhist,
-            subset      = quote(kids_ss)
+            famhist     = famhist_kids
           )
     dplyr::bind_rows(
             "N siblings" = res_sibs, 
@@ -190,7 +193,7 @@ plan <- drake_plan(
               ~run_regs_fml(
                              "n_children ~ {score_name} + I({score_name}^2)", 
                              score_name = .x,
-                             famhist    = famhist
+                             famhist    = famhist_kids
                            ),
               .id = "score_name"
             )
@@ -216,11 +219,11 @@ plan <- drake_plan(
       pcs         = pcs,
       weights     = quote(famhist$weights) # famhist will be famhist_pw in the function
     )
+    
     res_chn_pcs <- run_regs_pcs(
       dep_var     = "n_children", 
-      famhist     = famhist,
+      famhist     = famhist_kids,
       pcs         = pcs,
-      subset      = quote(kids_ss),
       weights     = NULL 
     )
     dplyr::bind_rows(
@@ -230,14 +233,14 @@ plan <- drake_plan(
     ) 
   },
   
-  res_wt =  target(
-              map_dfr(score_names, 
-                run_regs_weighted,
-                famhist     = famhist,
-                weight_data = weighting_scheme,
-                dep.var     = "n_children",
-                subset      = quote(kids_ss)
-              ),
+  res_wt =  target({
+                map_dfr(score_names, 
+                  run_regs_weighted,
+                  famhist     = famhist_kids,
+                  weight_data = weighting_scheme,
+                  dep.var     = "n_children"
+                )
+              },
               transform = map(
                 weighting_scheme = !! weighting_scheme_syms
               )
@@ -252,10 +255,9 @@ plan <- drake_plan(
   
   res_children_comparison = map_dfr(score_names,
                               run_regs_weighted,
-                              famhist     = famhist %>% filter(n_children > 0),
+                              famhist     = famhist_kids %>% filter(n_children > 0),
                               weight_data = age_qual_weights,
-                              dep.var     = "n_children",
-                              subset      = quote(kids_ss)
+                              dep.var     = "n_children"
                             ),
   
   res_period =  target(
@@ -283,15 +285,14 @@ plan <- drake_plan(
           ) %>% 
             pmap_dfr(
               run_regs_subset, 
-              famhist = famhist %>% filter(kids_ss)
+              famhist = famhist_kids
             )
     res_sex$sex <- ifelse(res_sex$subset == "sex == 0", "Female", "Male") 
     
     int_pval <- map_dfr(score_names, ~ run_regs_fml(
                     fml        = "n_children ~ {score_name}*I(sex==0)",
                     score_name = .x,
-                    famhist    = famhist,
-                    subset     = quote(kids_ss)
+                    famhist    = famhist_kids
                   ),
                   .id = "score_name"
                 ) %>% 
@@ -307,8 +308,7 @@ plan <- drake_plan(
             ~run_regs_fml(
               fml        = "n_children ~ {score_name} + age_flb",
               score_name = .x, 
-              famhist    = famhist,
-              subset     = quote(kids_ss) 
+              famhist    = famhist_kids
             ), 
             .id = "score_name"
           )
@@ -322,13 +322,11 @@ plan <- drake_plan(
             ~run_regs_fml(
               fml        = "n_children ~ age_flb_cat + {score_name}:age_flb_cat",
               score_name = .x,
-              famhist    = famhist,
-              subset     = quote(kids_ss)
+              famhist    = famhist_kids
             ),
             .id = "score_name"
           )
     res %<>% filter(grepl(":", term))
-          
   },
   
   res_age_flb_dv = {
@@ -336,8 +334,7 @@ plan <- drake_plan(
             ~run_regs_fml(
               fml        = "age_flb ~ {score_name}",
               score_name = .x, 
-              famhist    = famhist,
-              subset     = quote(kids_ss)
+              famhist    = famhist_kids
             )
           )
     res %<>% filter(term != "(Intercept)")
@@ -430,7 +427,7 @@ plan <- drake_plan(
               fml        =
                 "n_children ~ lo_partners + {score_name}:lo_partners",
               score_name = .y,
-              famhist    = famhist %>% filter(kids_ss),
+              famhist    = famhist_kids,
               subset     = .x
             ),
               .id = "row_number"
@@ -447,8 +444,7 @@ plan <- drake_plan(
             ~run_regs_fml(
               "n_children ~ with_partner + {score_name}:with_partner",
               score_name = .x,
-              famhist    = famhist,
-              subset     = quote(kids_ss)
+              famhist    = famhist_kids
             ),
             .id = "score_name"
           )
@@ -464,7 +460,7 @@ plan <- drake_plan(
               fml        =
                 "n_children ~ with_partner + {score_name}:with_partner",
               score_name = .y,
-              famhist    = famhist %>% filter(kids_ss),
+              famhist    = famhist_kids,
               subset     = .x
             ),
               .id = "row_number"
@@ -496,15 +492,14 @@ plan <- drake_plan(
     famhist_tmp$with_partner_narrow <- TRUE
     famhist_tmp %<>% select(f.eid, with_partner_narrow)
     
-    famhist %<>% left_join(famhist_tmp)
-    famhist %<>% mutate(with_partner_narrow = ! is.na(with_partner_narrow))
+    famhist_kids %<>% left_join(famhist_tmp)
+    famhist_kids %<>% mutate(with_partner_narrow = ! is.na(with_partner_narrow))
     
     res <- map_dfr(score_names,
             ~run_regs_fml(
               "n_children ~ with_partner_narrow + {score_name}:with_partner_narrow",
               score_name = .x,
-              famhist    = famhist,
-              subset     = quote(kids_ss)
+              famhist    = famhist_kids
             ),
             .id = "score_name"
           )
@@ -525,7 +520,7 @@ plan <- drake_plan(
               "n_children ~ {score_name}", 
               score_name = .y, 
               subset     = .x,
-              famhist    = famhist %>% filter(kids_ss)
+              famhist    = famhist_kids
             ),
             .id = "row_number"
           ) 
@@ -548,17 +543,15 @@ plan <- drake_plan(
           ) 
     # keep variables in this order (it matters to .id):
     pars <- expand_grid(subset = subsets, score_name = score_names) 
-    fh_tmp <- famhist %>% filter(kids_ss)
     res_income <- pmap_dfr(pars,
             ~ run_regs_fml(
               "n_children ~ {score_name}", 
               score_name = .y, 
               subset     = .x,
-              famhist    = fh_tmp
+              famhist    = famhist_kids
             ),
             .id = "row_number"
           ) 
-    rm(fh_tmp)
     pars$row_number <- as.character(seq_len(nrow(pars)))
     res_income %>% left_join(pars, by = "row_number") %>% 
           filter(term != "(Intercept)") %>% 
@@ -571,7 +564,7 @@ plan <- drake_plan(
   res_income_controlled = {
     res <- map_dfr(score_names, run_age_anova, 
                      control = "factor(income_cat)", 
-                     famhist = famhist, 
+                     famhist = famhist_kids, 
                     .id = "score_name"
                    )
     res %>% filter(grepl(":factor\\(income_cat\\)", term))
@@ -580,13 +573,13 @@ plan <- drake_plan(
   res_edu_controlled = {
     res <- map_dfr(score_names, run_age_anova, 
                      control = "factor(age_fte_cat)", 
-                     famhist = famhist, 
+                     famhist = famhist_kids, 
                     .id = "score_name"
                    )
     res %>% filter(grepl(":factor\\(age_fte_cat\\)", term))
   },
   
-  res_mediation = run_mediation(famhist, score_names),
+  res_mediation = run_mediation(famhist_kids, score_names),
   
   res_risk_control = {
     # f.2040.0.0 is risk attitude (via questionnaire)
@@ -594,13 +587,12 @@ plan <- drake_plan(
               ~ run_regs_fml(
                 fml = "n_children ~ {score_name} + f.2040.0.0",
                 score_name = .x,
-                famhist    = famhist,
-                subset     = quote(kids_ss)
+                famhist    = famhist_kids
               ), 
             .id = "score_name")
   },
   
-  res_ineq = run_cor_income(famhist, score_names, age_qual_weights),
+  res_ineq = run_cor_income(famhist_kids, score_names, age_qual_weights),
   
   res_cor_income = {
     famhist <- add_ashe_income(famhist, ashe_income)
@@ -611,9 +603,9 @@ plan <- drake_plan(
     cor(famhist[score_names], famhist$age_fulltime_edu, use = "pairwise")
   },
   
-  res_ineq_ea3 = run_ineq_ea3_calcs(famhist, age_qual_weights, h2 = 0.4),
+  res_ineq_ea3 = run_ineq_ea3_calcs(famhist_kids, age_qual_weights, h2 = 0.4),
   
-  res_fe_fertility = run_reg_fe_fertility(famhist, score_names),
+  res_fe_fertility = run_reg_fe_fertility(famhist_kids, score_names),
   
   report =  {
               rmarkdown::render(
