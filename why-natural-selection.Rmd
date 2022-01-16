@@ -8,6 +8,7 @@ output:
     toc: false
     latex_engine: xelatex
     number_sections: true
+    keep_tex: true
 header-includes:
   - \usepackage{subfig}
   - \usepackage{setspace}\doublespacing
@@ -2112,7 +2113,7 @@ at $p = 0.05/33$.
 ## Within-siblings regressions
 
 
-```{r plot-res-fe-fertility, fig.cap = "Selection effects controlling for sibling-group fixed effects, with and without a control for education (left education before 16, 16-18, or after 18). Each set of results is from a single regression of \\emph{n children} on 29 polygenic scores. Standard errors clustered by sibling group."}
+```{r plot-res-fe-fertility, fig.cap = "Selection effects controlling for sibling-group fixed effects, with and without a control for education (left education before 16, 16-18, or after 18). Each set of 29 results is from a single regression of \\emph{n children} on 29 polygenic scores. Standard errors clustered by sibling group."}
 
 drake::loadd(res_fe_fertility)
 n_regs <- nrow(res_fe_fertility)/2 # Raw and Controlled treated separately
