@@ -1375,6 +1375,9 @@ Scores for EA2 and EA3 show significant disruptive selection ($p < 0.05/33$,
 positive coefficient on quadratic). Other scores including hip circumference 
 were not significant.
 
+*Weighted regressions only*: in addition to the above, 
+major depressive disorder shows diversifying selection
+and drinks per week show balancing selection.
 
 ```{r plot-purifying, fig.align = "center", fig.cap = "Stabilizing/disruptive selection: predicted number of children by polygenic score.", fig.height = 3}
 
@@ -1397,6 +1400,7 @@ sig_sibs <- res_sibs_quadratic %>%
 stopifnot(sig_sibs == c("EA2_noUKB", "EA3_excl_23andMe_UK"))
 
 op <- par(mfrow = c(1, 2))
+
 for (score in sig) {
   coef <- sig_all_terms %>% filter(score_name == score) %>% pull(estimate)
   curve(

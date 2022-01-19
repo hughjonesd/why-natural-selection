@@ -39,7 +39,8 @@ calc_pgs_over_time <- function (famhist, score_names) {
   
   run_reg <- function (score_name) {
     fml <- as.formula(glue("{score_name} ~ YOB"))
-    tidy(lm(fml, famhist))  
+    # weight-everything: use weights
+    tidy(lm(fml, famhist, weights = weights))  
   }
   time_regs <- map_dfr(score_names, run_reg, .id = "score_name")
   time_regs %<>% 
@@ -144,7 +145,8 @@ run_regs_period <- function (children, score_name, famhist, weight_data) {
 
 run_regs_subset <- function(score_name, subset, famhist) {
   fml <- as.formula(glue::glue("RLRS ~ {score_name}"))
-  mod <- lm(fml, famhist, subset = eval(subset))
+  # weights added for weight-everything branch
+  mod <- lm(fml, famhist, subset = eval(subset), weights = famhist$weights)
   res <- tidy(mod, conf.int = TRUE)
   res <- filter(res, term == {{score_name}})
   res$subset <- list(subset)
@@ -153,8 +155,8 @@ run_regs_subset <- function(score_name, subset, famhist) {
   res
 }
 
-
-run_regs_fml <- function(fml, ..., subset = NULL, famhist, weights = NULL) {
+# weights added for weight-everything branch
+run_regs_fml <- function(fml, ..., subset = NULL, famhist, weights = quote(weights)) {
   glue_args <- list(...)
   fml <- as.formula(glue::glue_data(fml, .x = glue_args))
   mod <- lm(fml, famhist, subset = eval(subset), weights = eval(weights))
@@ -199,7 +201,8 @@ run_age_anova <- function (score_name, control, famhist) {
   fml <- as.formula(glue::glue(
     "RLRS ~ {score_name}*({control} + 
           age_at_recruitment + I(age_at_recruitment^2))"))
-  res <- lm(fml, data = famhist) %>% 
+  # weight-everything branch: weights added
+  res <- lm(fml, data = famhist, weights = weights) %>% 
            car::Anova() %>% 
            tidy()
 }
@@ -247,8 +250,11 @@ run_reg_fe_fertility <- function (famhist, score_names) {
   fml_raw <- as.formula(fml_raw)
   fml_mediators <- as.formula(fml_mediators)
   
-  mod_raw <- fixest::feols(fml_raw, data = famhist, note = FALSE)
-  mod_mediators <- fixest::feols(fml_mediators, data = famhist, note = FALSE)
+  # weight-everything: weights added
+  mod_raw <- fixest::feols(fml_raw, data = famhist, weights = famhist$weights, 
+                             note = FALSE)
+  mod_mediators <- fixest::feols(fml_mediators, data = famhist, 
+                                   weights = famhist$weights,note = FALSE)
   
   tidied_raw <- broom::tidy(mod_raw, conf.int = TRUE)
   tidied_raw %<>% dplyr::filter(term %in% score_names)
@@ -380,11 +386,14 @@ run_mediation <- function (famhist, res_all) {
     controls <- "age_at_recruitment + sex + fluid_iq + height + f.2040.0.0"
     f_mediator <- as.formula(glue::glue("age_fulltime_edu ~ {score_name} +
                                            {controls}"))
-    mod_mediator <- lm(f_mediator, data = famhist)
+
+    # weight-everything: weights added
+    mod_mediator <- lm(f_mediator, data = famhist, weights = weights)
     f_y <- as.formula(glue::glue("RLRS ~ {score_name} +
                                     age_fulltime_edu +
                                     {controls}"))
-    mod_y <- lm(f_y, data = famhist)
+    # weight-everything: weights added
+    mod_y <- lm(f_y, data = famhist, weights = weights)
     
     # standard Baron/Kenny 1986;
     # dep_var ~ treatment + mediator + covariates

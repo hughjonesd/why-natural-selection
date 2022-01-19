@@ -95,12 +95,16 @@ plan <- drake_plan(
                     format = "fst_tbl"
                   ),
   famhist_kids = target(
-                   famhist %>% filter(kids_ss),
+                   famhist %>% 
+                             filter(kids_ss) %>%
+                     # added for weight-everything branch
+                             left_join(age_qual_weights, by = "f.eid"),
                    format = "fst_tbl"
                  ),
   
   famhist_pw = target(
-                 inner_join(famhist, parent_weights, by = "f.eid"),
+                 # use parent_aq_weights for weight-everything branch
+                 inner_join(famhist, parent_aq_weights, by = "f.eid"),
                  format = "fst_tbl"
                ),
 
@@ -130,7 +134,11 @@ plan <- drake_plan(
                    format = "fst_tbl"
                  ),
   
-  pgs_over_time = calc_pgs_over_time(famhist, score_names),
+  pgs_over_time = {
+                    # weight-everything: add weights and use them
+                    famhist %<>% left_join(age_qual_weights, by = "f.eid")
+                    calc_pgs_over_time(famhist, score_names)
+                  },
   
   census_age_qual =  make_census_age_qual(
                        file_in(!! DC1108EW_file),
@@ -179,12 +187,15 @@ plan <- drake_plan(
             dep_var     = "RLRS_parents", 
             score_names = score_names,
             famhist     = famhist_pw,
+            # weight-everything branch: these are now parent_aq_weights
             weights     = famhist_pw$weights
           )
     res_chn <- run_regs_basic(
             dep_var     = "RLRS", 
             score_names = score_names, 
-            famhist     = famhist_kids
+            famhist     = famhist_kids,
+            # added for weight-everything branch
+            weights     = famhist_kids$weights
           )
     dplyr::bind_rows(
             "RLRS_parents" = res_sibs, 
@@ -198,7 +209,10 @@ plan <- drake_plan(
               ~run_regs_fml(
                              "RLRS ~ {score_name} + I({score_name}^2)", 
                              score_name = .x,
-                             famhist    = famhist_kids
+                             famhist    = famhist_kids,
+                             # weight-everything: added weights
+                             # for some reason these need to be made explicit
+                             weights    = quote(weights)
                            ),
               .id = "score_name"
             )
@@ -229,7 +243,7 @@ plan <- drake_plan(
       dep_var     = "RLRS", 
       famhist     = famhist_kids,
       pcs         = pcs,
-      weights     = NULL 
+      weights     = quote(famhist$weights) # famhist will be famhist_kids in the function 
     )
     dplyr::bind_rows(
       "RLRS_parents" = res_sibs_pcs, 
@@ -239,6 +253,9 @@ plan <- drake_plan(
   },
   
   res_wt =  target({
+                # weight-everything: take away weights 
+                # before adding different ones back in
+                famhist_kids$weights <- NULL 
                 map_dfr(score_names, 
                   run_regs_weighted,
                   famhist     = famhist_kids,
@@ -258,13 +275,17 @@ plan <- drake_plan(
                               dep.var     = "RLRS_parents"
                             ),
   
-  res_children_comparison = map_dfr(score_names,
-                              run_regs_weighted,
-                              famhist     = famhist_kids %>% filter(n_children > 0),
-                              weight_data = age_qual_weights,
-                              dep.var     = "RLRS"
-                            ),
-  
+  res_children_comparison = {
+    # weight-everything: remove weights so as to add them later
+    famhist_kids$weights <- NULL
+    map_dfr(score_names,
+             run_regs_weighted,
+             famhist     = famhist_kids %>% filter(n_children > 0),
+             weight_data = age_qual_weights,
+             dep.var     = "RLRS"
+           )
+  },
+
   res_period =  target(
                   map_dfr(score_names, 
                     run_regs_period,
@@ -357,6 +378,7 @@ plan <- drake_plan(
             fml = "RLRS_parents ~ {score_name} + {control}",
             subset = quote(birth_order == 1),
             famhist = famhist_pw,
+            # weight-everything: these are now parent_aq_weights
             weights = weights,
             .id = "id"
           )
@@ -370,15 +392,18 @@ plan <- drake_plan(
   },
   
   res_age_flb_mothers_cross = {
+    # weight-everything: weights are now parent_aq_weights
     run_regs_age_flb_parents_cross(famhist_pw, score_names, "moth_age_birth_cat")
   },
   
   res_age_flb_fathers_cross = {
+    # weight-everything: weights are now parent_aq_weights
     run_regs_age_flb_parents_cross(famhist_pw, score_names, "fath_age_birth_cat")
   },
   
   res_townsend_parents = {
-    famhist_townsend_71 %<>% inner_join(parent_weights, by = "f.eid")
+    # weight-everything: use parent_aq_weights
+    famhist_townsend_71 %<>% inner_join(parent_aq_weights, by = "f.eid")
     res <-  map_dfr(score_names,
               ~run_regs_fml(
                 "RLRS_parents ~ Quin71 + {score_name}:Quin71",
@@ -412,6 +437,7 @@ plan <- drake_plan(
             fml     = "{dep.var} ~ {score_name}",
             subset  = quote(birth_order == 1),
             famhist = famhist_pw,
+            # weight-everything: weights are now parent_aq_weights
             weights = weights,
             .id     = "id"
           )
@@ -601,18 +627,38 @@ plan <- drake_plan(
             .id = "score_name")
   },
   
-  res_ineq = run_cor_income(famhist_kids, score_names, age_qual_weights),
+  res_ineq = {
+    # weight-everything: remove weights so code can re-add them
+    famhist_kids$weights <- NULL
+    run_cor_income(famhist_kids, score_names, age_qual_weights)
+  },
   
   res_cor_income = {
+    # changed to use weighted correlation
     famhist <- add_ashe_income(famhist, ashe_income)
-    cor(famhist[score_names], famhist$first_job_pay, use = "pairwise")
+    famhist <- inner_join(famhist, age_qual_weights, by = "f.eid")
+    cors <- purrr::map(score_names, ~{
+      psych::cor.wt(famhist[c("first_job_pay", .x)], w = famhist$weights)
+    })
+    cors <- purrr::map_dbl(cors, ~ .x$r[2,1])
+    as.data.frame(cors)
   },
   
   res_cor_educ = {
-    cor(famhist[score_names], famhist$age_fulltime_edu, use = "pairwise")
+    # changed to use weighted correlation
+    famhist <- inner_join(famhist, age_qual_weights, by = "f.eid")
+    cors <- purrr::map(score_names, ~{
+      psych::cor.wt(famhist[c("age_fulltime_edu", .x)], w = famhist$weights)
+    })
+    cors <- purrr::map_dbl(cors, ~ .x$r[2,1])
+    as.data.frame(cors)
   },
   
-  res_ineq_ea3 = run_ineq_ea3_calcs(famhist_kids, age_qual_weights, h2 = 0.4),
+  res_ineq_ea3 = {
+    # weight-everything: remove weights so code can re-add them
+    famhist_kids$weights <- NULL
+    run_ineq_ea3_calcs(famhist_kids, age_qual_weights, h2 = 0.4)
+  },
   
   res_fe_fertility = run_reg_fe_fertility(famhist_kids, score_names),
   
