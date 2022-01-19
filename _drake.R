@@ -617,4 +617,4 @@ plan <- drake_plan(
   
 )
 
-drake_config(plan, history = FALSE, log_build_times = FALSE)
+drake_config(plan, history = FALSE, log_build_times = FALSE, keep_going = TRUE)
