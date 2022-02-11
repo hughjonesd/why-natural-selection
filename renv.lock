@@ -707,10 +707,10 @@
     },
     "huxtable": {
       "Package": "huxtable",
-      "Version": "5.4.0.9000",
+      "Version": "5.4.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "2503c3590bb35a37eab239a6e6a4921c",
+      "Hash": "633926f3332d7a937ff16a8a98aa2192",
       "Requirements": [
         "R6",
         "assertthat",
