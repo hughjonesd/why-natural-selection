@@ -747,6 +747,16 @@
         "testthat"
       ]
     },
+    "jquerylib": {
+      "Package": "jquerylib",
+      "Version": "0.1.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5aab57a3bd297eee1c1d862735972182",
+      "Requirements": [
+        "htmltools"
+      ]
+    },
     "jsonlite": {
       "Package": "jsonlite",
       "Version": "1.7.2",
@@ -971,6 +981,16 @@
         "mlogit"
       ]
     },
+    "mnormt": {
+      "Package": "mnormt",
+      "Version": "2.0.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7e6ee68a01d6c87c69087d4a250ee763",
+      "Requirements": [
+        "tmvnsim"
+      ]
+    },
     "munsell": {
       "Package": "munsell",
       "Version": "0.5.0",
@@ -1158,6 +1178,18 @@
       "Hash": "32620e2001c1dce1af49c49dccbb9420",
       "Requirements": []
     },
+    "psych": {
+      "Package": "psych",
+      "Version": "2.1.9",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ffa6d4c281173358806341ad7d0029a0",
+      "Requirements": [
+        "lattice",
+        "mnormt",
+        "nlme"
+      ]
+    },
     "purrr": {
       "Package": "purrr",
       "Version": "0.3.4",
@@ -1274,13 +1306,14 @@
     },
     "rmarkdown": {
       "Package": "rmarkdown",
-      "Version": "2.9",
+      "Version": "2.11",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "912c09266d5470516df4df7a303cde92",
+      "Hash": "320017b52d05a943981272b295750388",
       "Requirements": [
         "evaluate",
         "htmltools",
+        "jquerylib",
         "jsonlite",
         "knitr",
         "stringr",
@@ -1307,10 +1340,10 @@
     },
     "s2": {
       "Package": "s2",
-      "Version": "1.0.6",
+      "Version": "1.0.7",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "fb018249cc4b7ae7147d511fd33ddf82",
+      "Hash": "cedf9ef196a446ee8080c14267e69410",
       "Requirements": [
         "Rcpp",
         "wk"
@@ -1372,10 +1405,10 @@
     },
     "sf": {
       "Package": "sf",
-      "Version": "1.0-0",
+      "Version": "1.0-6",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "800804f284ba87cb28cf24fc47fc4e02",
+      "Hash": "9b7b141f7844870dda255584d62775a9",
       "Requirements": [
         "DBI",
         "Rcpp",
@@ -1520,10 +1553,10 @@
     },
     "tidyr": {
       "Package": "tidyr",
-      "Version": "1.1.2",
+      "Version": "1.2.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "c40b2d5824d829190f4b825f4496dfae",
+      "Hash": "d8b95b7fee945d7da6888cf7eb71a49c",
       "Requirements": [
         "cpp11",
         "dplyr",
@@ -1561,6 +1594,14 @@
       "Requirements": [
         "xfun"
       ]
+    },
+    "tmvnsim": {
+      "Package": "tmvnsim",
+      "Version": "1.0-2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "50470c7ed0cc8099cbc17b38f0ef621f",
+      "Requirements": []
     },
     "txtq": {
       "Package": "txtq",
