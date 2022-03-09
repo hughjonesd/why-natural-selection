@@ -1482,7 +1482,7 @@ Ethics Committee (reference: 11/NW/0382). We limit the sample to white British
 participants of European descent, as defined by genetic estimated ancestry and
 self-identified ethnic group, giving a sample size of
 `r comma_num(nrow(famhist))`. For regressions on number of children we use
-participants over 45, since most fertility is completed by this age. This gives
+participants over 50 (males)/45 (females), since most fertility is completed by this age. This gives
 a sample size of `r comma_num(nrow(famhist %>% filter(kids_ss)))`.
 
 Polygenic scores were chosen so as to cover a reasonably broad range of traits,

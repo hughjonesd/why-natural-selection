@@ -61,7 +61,7 @@ plan <- drake_plan(
   famhist_no_resid      =  target({
                       fnr <- clean_famhist(famhist_raw, score_names, sib_groups)
 
-                      fnr$kids_ss <- fnr$age_at_recruitment >= 45
+                      fnr$kids_ss <- fnr$age_at_recruitment >= ifelse(fnr$female, 45, 50)
                       fnr
                     },
                     format = "fst_tbl"
