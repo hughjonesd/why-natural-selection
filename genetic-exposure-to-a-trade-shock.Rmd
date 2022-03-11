@@ -1,0 +1,326 @@
+---
+title: "Genetic exposure to a trade shock"
+author: "David Hugh-Jones, Abdel Abdellaoui"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+bibliography: "negative-selection.bib"
+output: 
+  bookdown::pdf_document2:
+    toc: false
+    latex_engine: xelatex
+    number_sections: true
+    keep_tex: true
+mainfont: Baskerville
+mathfont: Baskerville
+sansfont: "Gill Sans"
+header-includes:
+  - \usepackage{setspace}\doublespacing
+  - \usepackage{placeins}
+  - \usepackage[format=plain, labelfont={bf,it}, textfont=it]{caption}
+  - \usepackage{titlesec}
+  - \titleformat*{\section}{\sffamily\LARGE}
+  - \titleformat*{\subsection}{\sffamily\itshape\Large}
+---
+
+```{r setup, include=FALSE}
+
+remake_data <- FALSE
+
+library(sf)
+library(dplyr)
+
+loadNamespace("drake")
+loadNamespace("santoku")
+loadNamespace("tidyr")
+loadNamespace("haven")
+loadNamespace("fixest")
+loadNamespace("broom")
+loadNamespace("scales")
+loadNamespace("huxtable")
+
+source("~/import-ukbb-data/import-ukbb-data.R")
+
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r save-data, eval = remake_data}
+
+drake::loadd(famhist)
+
+fh <- famhist |>
+        tidyr::drop_na(home_lon.0.0, home_lat.0.0) |>
+        st_as_sf(coords = c("home_lon.0.0", "home_lat.0.0"))
+
+rm(famhist)
+
+projection <- '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +datum=OSGB36 +units=m +no_defs'
+st_crs(fh) <- projection
+
+nuts <- st_read("~/negative-selection-data/NUTS_Level_3_(January_2018)_Boundaries.geojson")
+nuts <- st_transform(nuts, crs = projection)
+
+
+col_stan <- haven::read_dta("~/negative-selection-data/colantone_stanig/Replication_DB_Regional.dta")
+# make colantone & stanig data spatial using the nuts geojson:
+col_stan <- left_join(nuts, col_stan, by = c("nuts318cd" = "nuts3"))
+
+fh <- st_join(fh, col_stan, join = st_covered_by)
+
+fh <- as.data.frame(fh)
+
+fh$adult_yrs_1990 <- 1990 - fh$YOB - 18  # how many years have you been 18+ in 1990?
+fh$dist_moved <- with(fh, sqrt((birth_lat.0.0 - home_lat.0.1)^2 + 
+                                 (birth_lon.0.0 - home_lon.0.1)^2))
+
+fh <- add_ashe_income(fh, drake::readd(ashe_income))
+fh <- left_join(fh, drake::readd(age_qual_weights), by = "f.eid")
+
+fh <- fh |> 
+        mutate(
+          num_sick = rowSums(across(starts_with("f.22660.0")) == 106, na.rm = TRUE),
+          num_unem = rowSums(across(starts_with("f.22660.0")) == 107, na.rm = TRUE),
+          num_pt   = rowSums(across(starts_with("f.22660.0")) == 101, na.rm = TRUE),
+          num_oolm = num_sick + num_unem + num_pt,
+          birth_decade  = santoku::chop_width(YOB, 10),
+        )
+
+
+# == long data on jobs ====
+
+
+fh$f.22617.0.0 <- as.numeric(fh$f.22617.0.0)
+
+
+# 22601: job coding
+# 22602: year job started (negative numbers are NAs of different kinds)
+# 22617: job coding (historical): this is the SOC 2000 mapping for 22601
+# 22603: year job ended (-313 is ongoing at assessment)
+# 22605: work hrs/week
+# 22660: gap coding
+# 22663: year gap started
+# 22664: year gap ended
+
+# ideally we might want to have jobs and gaps in the same columns and 
+# different rows
+
+
+fhl <- fh |> 
+  select(f.eid, starts_with("f.226"), -f.22661.0.0) |> 
+  tidyr::pivot_longer(
+    starts_with("f.226"), 
+    names_to = c(".value", "instance"),
+    names_pattern = "(f\\.\\d+\\.0)\\.(\\d+)",
+    values_drop_na = TRUE,
+    names_transform = list(instance = as.integer),
+    values_transform = list(f.22617.0 = as.character)
+  )
+
+fhl  <- left_join(fhl, drake::readd(ashe_income), by = c("f.22617.0" = "Code")) |>
+  select(-Description)
+fhl <- left_join(fhl, 
+                 fh |> select(! starts_with("f."), f.eid, f.53.0.0),
+                 by = "f.eid")
+
+fhl <- fhl |>
+         rename(
+                 job_year_start   = f.22602.0,
+                 gap_year_start   = f.22663.0,
+                 job_hours_worked = f.22605.0
+               ) |>
+         mutate( 
+               attend_year   = as.numeric(substring(f.53.0.0, 1, 4)),
+               job_year_end  = recode(f.22603.0, `-313` = attend_year),
+               gap_year_end  = recode(f.22664.0, `-313` = attend_year),
+               job_post_90   = job_year_start >= 1990,
+               gap_post_90   = gap_year_start >= 1990,
+               job_length    = job_year_end - job_year_start + 1, # round up
+               gap_length    = gap_year_end - gap_year_start + 1,
+               job_age_start = job_year_start - YOB,
+               gap_age_start = gap_year_start - YOB,
+               birth_decade  = santoku::chop_width(YOB, 10),
+               year_start_dm = job_year_start - mean(job_year_start, 
+                                                       na.rm = TRUE)
+             )
+             
+# presumably typos
+fhl$job_length[fhl$job_length < 0] <- NA
+fhl$gap_length[fhl$gap_length < 0] <- NA
+
+fhl <- mutate(fhl,
+                job_length_post_90 = case_when(
+                    job_post_90 ~ job_length,
+                    !job_post_90 & job_year_end >= 1990 ~ job_year_end - 1990,
+                    TRUE ~ 0
+                  ),
+                gap_length_post_90 = case_when(
+                  gap_post_90 ~ gap_length,
+                  !gap_post_90 & gap_year_start >= 1990 ~ gap_year_end - 1990,
+                  TRUE ~ 0
+                )
+              )
+
+fhl_sums <- fhl |> 
+  group_by(f.eid) |>
+  summarize(
+    job_years = sum(job_length, na.rm = TRUE),
+    gap_years = sum(gap_length, na.rm = TRUE),
+    job_years_post_90 = sum(job_length_post_90, na.rm = TRUE),
+    gap_years_post_90 = sum(gap_length_post_90, na.rm = TRUE)
+  )
+
+fh <- left_join(fh, fhl_sums, by = "f.eid")
+
+fhl_jobs <- fhl |> 
+              select(-starts_with("gap")) |>
+              rename_with(\(x) gsub("^job_", "", x))
+
+fhl_gaps <- fhl |> 
+              select(-starts_with("job")) |>
+              rename_with(\(x) gsub("^gap_", "", x))
+
+rm(fhl)
+
+save(fh, fhl_jobs, fhl_gaps, file = "trade.Rdata")
+```
+
+```{r load-data, eval = ! remake_data}
+load("trade.Rdata")
+```
+
+International trade can be mutually enriching. But trade shocks can also harm workers in affected industries. It's important to understand who is most vulnerable to trade shocks, as this can help policy-makers target aid.
+
+Here, we investigate the shock to the UK economy caused by import competition from China since 1990. We use an unusual source of data: a large-scale health survey with half a million participants. By examining employment history data, we find that people in areas exposed to import competiton from China had jobs in lower-paid occupations, and these jobs did not last as long.
+
+Then, we test whether genetics contributed to vulnerability to the China import shock. We interact our shock measure with individuals' polygenic scores for educational attainment, a DNA-derived measure which predicts people's education.
+
+# Data and methods
+
+```{r}
+n_indivs <- nrow(fh[! is.na(fh$f.22601.0.0),])
+n_jobs <- nrow(fhl_jobs[! is.na(fhl_jobs$year_start),])
+
+mod_uni <- lm(university ~ EA3_excl_23andMe_UK, data = fh)
+uni_prob <- scales::percent(coef(mod_uni)["EA3_excl_23andMe_UK"], 
+                              suffix = "")
+```
+
+Data comes from UK Biobank, a health-centric survey with half a million participants. Individuals were drawn from the UK population born between 1937 and 1970. UK Biobank captures health measurements, interview data and genetic data from blood samples. A follow-up online survey recorded job history data for `r n_indivs` individuals, capturing `r n_jobs` job spells.
+
+Using individuals' genetic data, we calculate their *polygenic score for educational attainment* (PSEA). A polygenic score sums estimated effects of numerous common variants (SNPs), to create an overall score that predicts an invidual characteristic - here, the number of years of education a person receives. We create our score using per-SNP statistics from @lee2018gene, recalculated excluding UK Biobank participants. The score is normalized to mean 0, variance 1. In our data, a 1 standard deviation increase in PSEA predicts a `r uni_prob` percentage point increase in an individual's chance of going to university.
+
+Our measure of the China shock comes from @colantone2018a. For each industry, they calculate the change in Chinese imports over 1992-2007, divided by total labour employed in the industry before 1992. Then, for each UK NUTS-3 region, they weight these changes by the proportion of workers employed in each industry in the region. Thus, regions with a high proportion of workers in industries with a large change in Chinese imports are more exposed to the shock. In our panel, we interact this measure with a dummy variable which is 1 if a job (or job gap) started after 1990.
+
+Workers in regions exposed to the China shock could be different, even genetically different [@abdellaoui2019genetic]. Also, some workers may migrate in response to the China shock, and stayers may be different from leavers [@abdellaoui2019genetic]. Lastly, UK industries where Chinese imports grow could be different in some way. To avoid these threats to identification, we do three things. First we include individual level fixed effects, controlling for all time-invariant characteristics of our subjects, including all genetic variation. Second, for our individual-level measure of exposure, we use the NUTS-3 region where subjects were born, not where they are living now. Third, following @colantone2018a and the literature, we instrument Chinese import growth to the UK with Chinese import growth to the USA.
+
+UK Biobank data is not a random sample of the population. Participants were sampled from a set of geographical areas near assessment centres. Also, people who responded to the invitation letter were selected, being (e.g.) richer, better educated and healthier than the population. Arguably, this makes the data better for theory testing than for estimation of population effect sizes. To mitigate this weighting respondents by age and qualification to match the UK population, using data from the 2007 General Household Survey.
+
+Our cases are individual job spells and gaps between employment. Our independent variables include log job length in years; log job pay; hours worked; and log gap length in years. UK Biobank data does not include information on job pay, but it does include the SOC2000 job code. We approximate pay by taking mean pay for the SOC2000 job code from the 2007 Annual Survey of Hours and Earnings... XXX. We include fixed effects for individual and for the year of start of each job/gap, as well as a quadratic in age.
+
+# Results
+
+```{r mods-basic}
+
+
+# individual fixed effects. Nice. The import shock is absorbed by the FE:
+mods <- list()
+mods$`Log pay` <- fixest::feols(
+                                 log(mean_pay) ~ age_start + age_start^2 |
+                                 factor(f.eid) + factor(year_start) |
+                                 i(post_90, import_shock, TRUE) ~ 
+                                 i(post_90, instrument_for_shock, TRUE),
+                                 data    = fhl_jobs,
+                                 cluster = ~ nuts2,
+                                 weights = ~ weights,
+                                 notes   = ! knitr::is_latex_output()
+                               )
+mods$`Log job length`   <- update(mods$`Log pay`, log(length) ~ . )
+mods$`Log gap length`   <- update(mods$`Log job length`, data = fhl_gaps)
+mods$`Hours worked` <- update(mods$`Log pay`, hours_worked ~ . )
+
+# could use col_stan but this is easier
+sd_shock <- sd(fhl_jobs$import_shock, na.rm = TRUE)
+
+effects_pct <- mods |>
+           lapply(broom::tidy) |> 
+           lapply(\(x) {
+             shock_term <- grepl("post_90.*shock", x$term)
+             exp(x$estimate[shock_term] * sd_shock) - 1
+           }) |>
+           lapply(scales::percent, accuracy = 0.1)
+
+# for ease of use in visual editor
+names(effects_pct) <- gsub(" ", "_", names(effects_pct))
+
+coef_names <- c(
+                 "Import shock x post 1990" = 
+                   "fit_post_90::TRUE:import_shock"
+               )
+huxreg_note <- paste0("Standard errors clustered by NUTS-2 area. {stars}.",
+                      "TODO: put in IV statistics.")
+ht_mods <- huxtable::huxreg(mods,
+                       coefs = coef_names,
+                       note = huxreg_note
+                     )
+
+extra_cols <- huxtable::as_hux(matrix(
+               c(
+                 "Indiv. dummies", rep("Yes", length(mods)),
+                 "Year dummies",  rep("Yes", length(mods)),
+                 "Age quadratic", rep("Yes", length(mods))
+               ), nrow = 3, byrow = TRUE
+             ))
+
+extra_cols <- extra_cols |>
+                huxtable::set_bottom_border(3, -1) |>
+                huxtable::set_align(1:3, -1, "right")
+                
+ht_mods <- huxtable::add_rows(ht_mods, extra_cols, after = 3)
+             
+ht_mods <- ht_mods |>
+             huxtable::set_caption("Effects of import shock on jobs")
+
+ht_mods
+```
+
+Table \@ref(tab:mods-basic) shows our central regressions. A one standard deviation increase in the value of the import shock led to a `r effects_pct$Log_pay` drop in job pay after 1990; job length dropped by `r effects_pct$Log_job_length` , while hours worked rose by `r effects_pct$Hours_worked` . There was no significant change to the length of employment gaps.
+
+```{r mods-EA3-interaction}
+
+mods_x_ea3 <- lapply(mods, update,
+                      . ~ . + i(post_90, EA3_excl_23andMe_UK, TRUE)| 
+                      . | 
+                      . + .:EA3_excl_23andMe_UK ~ 
+                      . + .:EA3_excl_23andMe_UK,
+                      notes = ! knitr::is_latex_output()
+                    )
+coef_names_ix <- c(coef_names, 
+  "Import shock x post 1990 x PSEA" =
+    "fit_post_90::TRUE:import_shock:EA3_excl_23andMe_UK",
+  "Post 1990 x PSEA" = 
+    "post_90::TRUE:EA3_excl_23andMe_UK"
+)
+
+ht_mods_x_ea3 <- huxtable::huxreg(mods_x_ea3,
+                   coefs = coef_names_ix,
+                   note  = huxreg_note
+                 )
+
+ht_mods_x_ea3 <- huxtable::add_rows(ht_mods_x_ea3, extra_cols, after = 7)
+
+ht_mods_x_ea3 <- ht_mods_x_ea3 |> 
+                   huxtable::set_caption("Import shock effects by PSEA")
+
+ht_mods_x_ea3
+
+```
+
+Table \@ref(tab:mods-EA3-interaction) interacts the post-1990 import shock with individual polygenic score for educational attainment (PSEA). The interactions are never significant, but standard errors are large, so we can neither reject the null nor confirm that estimates are close to zero.
+
+\FloatBarrier
+
+# Discussion
+
+Our results contribute to two literatures. First, we capture individual-level vulnerability to trade shocks in a detailed survey.
+
+Second, we use a macroeconomic shock to provide clean evidence of a gene-environment interaction. Gene-environment interactions are of interest to geneticists, but they are not easy to identify. Because people may select into different environments based on their genetics, supposed gene-environment interactions may actually result from gene-environment correlation. Here, our data is rich enough that we can include fixed effects, controlling completely for time-invariant individual characteristics including all forms of genetic variation. At the same time, our environmental variation derives from the economic rise of China, a historic macroeconomic change which is almost certainly independent of UK Biobank participants' genetics. We find little evidence of genetic vulnerability to trade shocks, i.e. of a gene-environment interaction.
+
+# References
