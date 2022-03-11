@@ -1,0 +1,675 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "times" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+From Stackoverflow (https://stats.stackexchange.com/questions/238878/how-do-errors
+-in-variables-affect-the-r2) with errors in variables where 
+\begin_inset Formula $x=x^{*}+\eta$
+\end_inset
+
+, we know that
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\textrm{plim}\hat{R^{2}}=R^{2}(\sigma_{x}^{2}-\sigma_{\eta}^{2})/\sigma_{x}^{2}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where the LHS is the expectation of R2 of the regression with error.
+\end_layout
+
+\begin_layout Standard
+We know 
+\begin_inset Formula $\hat{R^{2}}$
+\end_inset
+
+ from regressing 
+\begin_inset Formula $x$
+\end_inset
+
+ on 
+\begin_inset Formula $y$
+\end_inset
+
+.
+ We know 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ since it is just the heritability 
+\begin_inset Formula $h^{2}$
+\end_inset
+
+.
+ Putting these together (and assuming that 
+\begin_inset Formula $\hat{R^{2}}$
+\end_inset
+
+ is close to its plim?) we can calculate
+\begin_inset Formula 
+\[
+(\sigma_{x}^{2}-\sigma_{\eta}^{2})/\sigma_{x}^{2}=\hat{R^{2}}/h^{2}
+\]
+
+\end_inset
+
+which is probably about 0.1 to 0.2 on reasonable assumptions for PSEA.
+ The LHS can also be written 
+\begin_inset Formula $\sigma_{x^{*}}^{2}/\sigma_{x}^{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+This argument seems suspicious because it says 
+\begin_inset Formula $\hat{\beta}/\beta=\hat{R^{2}}/R^{2}$
+\end_inset
+
+.
+ Yet 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is the square of the correlation coefficient and the correlation coefficient
+ is just a scaled 
+\begin_inset Formula $\beta$
+\end_inset
+
+ when var Y = var X = 1.
+ Check the stackoverflow logic.
+\end_layout
+
+\begin_layout Plain Layout
+Nevertheless, I wrote code and it seems to work! See test-so-comment.R
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using this we can estimate the 
+\begin_inset Quotes eld
+\end_inset
+
+true
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\begin_inset Formula $\beta$
+\end_inset
+
+.
+ The formula for classical errors-in-variables is
+\begin_inset Formula 
+\[
+\textrm{plim }\hat{\beta}=\beta\frac{\sigma_{x^{*}}^{2}}{\sigma_{x}^{2}}
+\]
+
+\end_inset
+
+or rearranging
+\begin_inset Formula 
+\[
+\beta=\textrm{plim }\hat{\beta}\frac{h^{2}}{\hat{R^{2}}}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Also note that 
+\begin_inset Formula $\frac{\sigma_{x^{*}}^{2}}{\sigma_{x}^{2}}$
+\end_inset
+
+ doesn't depend on 
+\begin_inset Formula $y$
+\end_inset
+
+.
+ The formula above applies for any dependent variable.
+ In particular, if we regress e.g.
+ 
+\emph on
+Income
+\emph default
+ on PSEA, we can multiply by our estimate of 
+\begin_inset Formula $\frac{\sigma_{x^{*}}^{2}}{\sigma_{x}^{2}}$
+\end_inset
+
+ to get the regression of 
+\begin_inset Formula $Income$
+\end_inset
+
+ on 
+\begin_inset Quotes eld
+\end_inset
+
+true PSEA
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Thus, doing two regressions, once with an unweighted and once with a weighted
+ sample, we can estimate how much (proportionally) natural selection is
+ changing the regression coefficient.
+\end_layout
+
+\begin_layout Standard
+Note that mathematically, the answer will always be the same proportionally.
+ That is if 
+\begin_inset Formula $\hat{\beta}_{weighted}/\hat{\beta}_{unweighted}=\xi$
+\end_inset
+
+, then when we multiply both 
+\begin_inset Formula $\hat{\beta}$
+\end_inset
+
+ by 
+\begin_inset Formula $\frac{\sigma_{x^{*}}^{2}}{\sigma_{x}^{2}}$
+\end_inset
+
+, to estimate the true 
+\begin_inset Formula $\beta$
+\end_inset
+
+s, it will still be true that 
+\begin_inset Formula $\beta_{weighted}/\beta_{unweighted}=\xi$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+We can also make a claim about the R2 of 
+\begin_inset Quotes eld
+\end_inset
+
+true PSEA
+\begin_inset Quotes erd
+\end_inset
+
+ on income – in other words, the contribution of PSEA to income inequality.
+ The argument just uses stackoverflow again, and shows that 
+\begin_inset Formula $R^{2}(\hat{PSEA},income)=\sigma_{x^{*}}^{2}/\sigma_{x}^{2}R^{2}(PSEA,income)$
+\end_inset
+
+.
+ I think this argument carries through to if we are thinking about the 
+\begin_inset Quotes eld
+\end_inset
+
+causal R2
+\begin_inset Quotes erd
+\end_inset
+
+ that you'd get from a within-siblings regression.
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+maybe look at some other papers about this.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Formal argument
+\end_layout
+
+\begin_layout Standard
+From meta-analyses of twin studies, we know that the heritability of educational
+ attainment is about 0.4.
+ This is the variance of educational attainment explained by the 
+\begin_inset Quotes eld
+\end_inset
+
+true
+\begin_inset Quotes erd
+\end_inset
+
+ polygenic score for educational attainment 
+\begin_inset Formula $p^{*}$
+\end_inset
+
+, i.e.
+ the best linear unbiased predictor of educational attainment from genetic
+ data.
+ We assume that the measured polygenic score of educational attainment is
+\begin_inset Formula 
+\[
+p=p^{*}+\eta.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Write
+\begin_inset Formula 
+\[
+EA=\alpha+\beta p^{*}+\varepsilon=\alpha+\beta(p+\eta)+\varepsilon
+\]
+
+\end_inset
+
+We assume the classical errors-in-variables model, i.e.
+ that 
+\begin_inset Formula $\eta$
+\end_inset
+
+ is independent of both 
+\begin_inset Formula $p$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+.
+ Under these conditions, the ratio between the estimated 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ in a regression of 
+\begin_inset Formula $p$
+\end_inset
+
+ on 
+\begin_inset Formula $EA$
+\end_inset
+
+, and the true 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ of 
+\begin_inset Formula $p^{*}$
+\end_inset
+
+ on 
+\begin_inset Formula $EA$
+\end_inset
+
+, satisfies: 
+\begin_inset Formula 
+\begin{equation}
+\frac{\textrm{plim}\hat{R}^{2}}{R^{2}}=\frac{\sigma_{p}^{2}-\sigma_{\eta}^{2}}{\sigma_{p}^{2}}=\frac{\sigma_{p^{*}}^{2}}{\sigma_{p}^{2}}\equiv\lambda,\label{eq:r2-ratio}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+as we show below.
+ The right hand side is the 
+\begin_inset Quotes eld
+\end_inset
+
+reliability ratio
+\begin_inset Quotes erd
+\end_inset
+
+.
+ We regress educational attainment on PSEA in our sample, weighting by XXX,
+ to give 
+\begin_inset Formula $\textrm{plim}\hat{R}^{2}$
+\end_inset
+
+ = 
+\begin_inset Formula $XXX$
+\end_inset
+
+.
+ Plugging this into the above, with 
+\begin_inset Formula $R^{2}=h^{2}\approx0.4$
+\end_inset
+
+, gives 
+\begin_inset Formula $\lambda=XXX$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+We now consider the 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ of 
+\begin_inset Formula $p$
+\end_inset
+
+ on income, that is, the proportion of variance in income that is explained
+ by the true polygenic score of educational attainment.
+ Applying (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:r2-ratio"
+
+\end_inset
+
+) again gives that
+\begin_inset Formula 
+\begin{equation}
+\frac{\textrm{plim}\hat{R}_{\textrm{income}}^{2}}{R_{\textrm{income}}^{2}}=\lambda.\label{eq:r2-ratio-income}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+We compute 
+\begin_inset Formula $\hat{R}_{\textrm{income}}^{2}$
+\end_inset
+
+by regressing income group on PSEA, first weighting by XXX, and then by
+ XXX times respondent's number of children.
+ Results are xxx and xxx.
+ Applying (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:r2-ratio-income"
+
+\end_inset
+
+) to both estimates gives the proportion of variance in income explained
+ by true polygenic score for education attainment (a) among respondents
+ as XXX; (b) accounting for natural selection as XXX.
+ That is, the second figure gives the counterfactual estimate of 
+\begin_inset Formula $R_{\textrm{income}}^{2}$
+\end_inset
+
+after one generation of natural selection, holding environmental conditions
+ unchanged.
+\end_layout
+
+\begin_layout Subsection
+Proof of (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:r2-ratio"
+
+\end_inset
+
+) 
+\end_layout
+
+\begin_layout Standard
+Write 
+\begin_inset Formula 
+\begin{align}
+\hat{R}^{2} & =1-\frac{\sum_{i=1}^{N}(\hat{\alpha}+\hat{\beta}p_{i}-EA_{i})^{2}}{\sum_{i=1}^{N}(EA_{i}-\bar{EA})^{2}}\label{eq:r-squared}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using the fact that 
+\begin_inset Formula $\hat{\alpha}=\bar{EA}-\hat{\beta}\bar{p}$
+\end_inset
+
+, we can simplify the numerator in the above:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\sum_{i=1}^{N}(\hat{\alpha}+\hat{\beta}p_{i}-EA_{i})^{2}=\sum_{i=1}^{N}(\bar{EA}-\hat{\beta}\bar{p}+\hat{\beta}p_{i}-EA_{i})^{2}=\sum_{i=1}^{N}(\hat{\beta}(p_{i}-\bar{p})-(EA_{i}-\bar{EA}))^{2}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now, we can use 2.
+ to compute the following probability limit: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+ & \text{plim}\frac{\sum_{i=1}^{N}(\hat{\beta}(p_{i}-\bar{p})-(EA_{i}-\bar{EA}))^{2}}{N}\nonumber \\
+= & \text{plim}\frac{\sum_{i=1}^{N}\hat{\beta}^{2}(p_{i}-\bar{p})^{2}+(EA_{i}-\bar{EA})^{2}-2\hat{\beta}(p_{i}-\bar{p})(EA_{i}-\bar{EA})}{N}\nonumber \\
+= & \beta^{2}\lambda^{2}\sigma_{p}^{2}+\sigma_{EA}^{2}-2\beta\lambda\sigma_{p,EA},\label{eq:plim}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+using the standard errors-in-variables formula 
+\begin_inset Formula $\textrm{plim}\hat{\beta}=\lambda\beta$
+\end_inset
+
+, and where 
+\begin_inset Formula $\sigma_{p,EA}$
+\end_inset
+
+ is the covariance between 
+\begin_inset Formula $p$
+\end_inset
+
+ and 
+\begin_inset Formula $EA$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Write
+\begin_inset Formula 
+\begin{align*}
+\sigma_{p,EA} & =\textrm{Cov}(p^{*}+\eta,\alpha+\beta p^{*}+\varepsilon)\\
+ & =0+\beta\sigma_{p^{*}}^{2}+\beta\textrm{Cov}(\eta,p^{*})+\textrm{Cov}(\eta,\varepsilon)\\
+ & =\beta\sigma_{p^{*}}^{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+using the errors-in-variables assumption that 
+\begin_inset Formula $\eta$
+\end_inset
+
+ is independent of 
+\begin_inset Formula $p^{*}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+.
+ Plug this into (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:plim"
+
+\end_inset
+
+) to give
+\begin_inset Formula 
+\begin{align*}
+ & \text{plim}\frac{\sum_{i=1}^{N}(\hat{\beta}(p_{i}-\bar{p})-(EA_{i}-\bar{EA}))^{2}}{N}\\
+= & \beta^{2}\lambda^{2}\sigma_{p}^{2}+\sigma_{EA}^{2}-2\beta^{2}\lambda\sigma_{p^{*}}^{2}\\
+= & \beta^{2}\lambda\sigma_{p^{*}}^{2}+\sigma_{EA}^{2}-2\beta^{2}\lambda\sigma_{p^{*}}^{2}\textrm{, using \ensuremath{\sigma_{p^{*}}^{2}=\lambda\sigma_{p}^{2}},}\\
+= & \sigma_{EA}^{2}-\beta^{2}\lambda\sigma_{p^{*}}^{2}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Inserting this into (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:r-squared"
+
+\end_inset
+
+) gives
+\begin_inset Formula 
+\begin{align*}
+\textrm{plim}\hat{R}^{2} & =1-\frac{\sigma_{EA}^{2}}{\sigma_{EA}^{2}}+\frac{\beta^{2}\lambda\sigma_{p^{*}}^{2}}{\sigma_{EA}^{2}}\\
+ & =\lambda\frac{\beta^{2}\sigma_{p^{*}}^{2}}{\sigma_{EA}^{2}}\\
+ & =\lambda R^{2}
+\end{align*}
+
+\end_inset
+
+since for bivariate regression 
+\begin_inset Formula $R^{2}$
+\end_inset
+
+ is the square of the correlation between 
+\begin_inset Formula $EA$
+\end_inset
+
+ and 
+\begin_inset Formula $p^{*}$
+\end_inset
+
+, which can be written 
+\begin_inset Formula $r=$
+\end_inset
+
+
+\begin_inset Formula $\beta\frac{\sigma_{p^{*}}^{2}}{\sigma_{EA}\sigma_{p^{*}}}$
+\end_inset
+
+.
+ We thank an anonymous commenter on https://stats.stackexchange.com/questions/2388
+78/how-do-errors-in-variables-affect-the-r2 for this proof.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Oana's notes from Pishke deal with fixed effects and control variables.
+ In all these cases there's essentially going to be some attenuation factor,
+ and not much (?) reason that it will differ between the weighted and unweighted
+ regressions....
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
