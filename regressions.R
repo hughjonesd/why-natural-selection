@@ -118,7 +118,7 @@ run_regs_period <- function (children, score_name, famhist, weight_data) {
   
   famhist <- inner_join(famhist, weight_data, by = "f.eid")
   
-  dep_var  <- if (children) "n_children" else "n_sibs"
+  dep_var  <- if (children) "RLRS" else "RLRS_parents"
   subset   <- if (children) quote(kids_ss) else NULL
   famhist$year_split <- famhist$YOB >= 1950
   # evaluates to 1950:
@@ -142,7 +142,7 @@ run_regs_period <- function (children, score_name, famhist, weight_data) {
 
 
 run_regs_subset <- function(score_name, subset, famhist) {
-  fml <- as.formula(glue::glue("n_children ~ {score_name}"))
+  fml <- as.formula(glue::glue("RLRS ~ {score_name}"))
   mod <- lm(fml, famhist, subset = eval(subset))
   res <- tidy(mod, conf.int = TRUE)
   res <- filter(res, term == {{score_name}})
@@ -164,7 +164,7 @@ run_regs_fml <- function(fml, ..., subset = NULL, famhist, weights = NULL) {
 
 
 run_regs_age_flb_parents_cross <- function(famhist, score_names, age_birth_var) {
-  fml <- sprintf("n_sibs ~ %s + {score_name}:%s", age_birth_var, age_birth_var)
+  fml <- sprintf("RLRS_parents ~ %s + {score_name}:%s", age_birth_var, age_birth_var)
   res <- map_dfr(score_names, 
                  ~run_regs_fml(
                    fml        = fml,
@@ -196,7 +196,7 @@ run_regs_mnlogit <- function (score_names, fhl_mlogit) {
 
 run_age_anova <- function (score_name, control, famhist) {
   fml <- as.formula(glue::glue(
-    "n_children ~ {score_name}*({control} + 
+    "RLRS ~ {score_name}*({control} + 
           age_at_recruitment + I(age_at_recruitment^2))"))
   res <- lm(fml, data = famhist) %>% 
            car::Anova() %>% 
@@ -231,15 +231,6 @@ run_reg_income_dv <- function (famhist, score_names, ashe_income, age_qual_weigh
   famhist$pay_hat <- pay_hat
 }
 
-run_income_dist <- function (famhist) {
-  # predict individual income from PGS
-  # 3 densities:
-  # - empirically from last_job_pay, weighted by e.g. age_qual
-  # - predicted from reg of last_job_pay on PGS, same weighting
-  #   - use within-family regressions, then work out the intercept separately
-  # - predicted from regression, weighting multiplied by n_children
-}
-
 
 run_reg_fe_fertility <- function (famhist, score_names) {
   # remove scores which correlate highly with others
@@ -249,8 +240,8 @@ run_reg_fe_fertility <- function (famhist, score_names) {
   
   fml_scores <- paste(score_names, collapse = " + ")
   
-  fml_raw <- paste("n_children ~ ", fml_scores, " | sib_group")
-  fml_mediators <- paste("n_children ~ ", fml_scores, " + age_fte_cat | sib_group")
+  fml_raw <- paste("RLRS ~ ", fml_scores, " | sib_group")
+  fml_mediators <- paste("RLRS ~ ", fml_scores, " + age_fte_cat | sib_group")
   
   fml_raw <- as.formula(fml_raw)
   fml_mediators <- as.formula(fml_mediators)
@@ -277,7 +268,7 @@ run_cor_income <- function (famhist, score_names, age_qual_weights) {
   famhist <- famhist %>% 
                left_join(age_qual_weights, by = "f.eid") %>% 
                filter(
-                 ! is.na(n_children), 
+                 ! is.na(RLRS), 
                  ! is.na(income_cat), 
                  ! is.na(weights)
                ) %>%
@@ -324,21 +315,50 @@ run_ineq_ea3_calcs <- function (famhist, age_qual_weights, h2) {
   res$r2_income_true_psea <- res$r2_income_ea3 / res$lambda
   res$r2_income_true_psea_wt <- res$r2_income_ea3_wt / res$lambda
   
+  fh_sibs <- famhist %>% tidyr::drop_na(sib_group, income_cat, 
+                                          EA3_excl_23andMe_UK, weights, 
+                                          child_weights)
+  
   reg_income_ea3_fe <- fixest::feols(income_cat ~ EA3_excl_23andMe_UK | sib_group, 
-                                     data = famhist, weights = famhist$weights)
+                                       data = fh_sibs, 
+                                       weights = fh_sibs$weights,
+                                       note = FALSE
+                                     )
   reg_income_ea3_fe_wt <- fixest::feols(income_cat ~ EA3_excl_23andMe_UK | sib_group, 
-                                     data = famhist, weights = famhist$child_weights)
+                                          data = fh_sibs, 
+                                          weights = fh_sibs$child_weights,
+                                          note = FALSE
+                                        )
+  
+  # can we get std errors for these?
   res$r2_income_ea3_fe <- fixest::r2(reg_income_ea3_fe, type = "wr2")
   res$r2_income_ea3_fe_wt <- fixest::r2(reg_income_ea3_fe_wt, type = "wr2")
+  boot_r2s <- replicate(200, {
+    fh_boot <- fh_sibs %>% slice_sample(prop = 1, replace = TRUE)
+    reg_fe <- fixest::feols(income_cat ~ EA3_excl_23andMe_UK | sib_group, 
+                              data = fh_boot, 
+                              weights = fh_boot$weights,
+                              note = FALSE
+                            )
+    reg_fe_wt <- fixest::feols(income_cat ~ EA3_excl_23andMe_UK | sib_group, 
+                                 data = fh_boot, 
+                                 weights = fh_boot$child_weights,
+                                 note = FALSE
+                               )
+    c(fixest::r2(reg_fe, type = "wr2"), fixest::r2(reg_fe_wt, type = "wr2"))
+  })
+  
+  boot_r2_props <- boot_r2s[2,]/boot_r2s[1,] - 1
+  res$r2_fe_bounds <- quantile(boot_r2_props, c(0.025, 0.975))
   
   return(res)
 }
 
 
-run_mediation <- function (famhist, score_names) {
+run_mediation <- function (famhist, res_all) {
   famhist <- famhist %>%
                filter(
-                 ! is.na(n_children),
+                 ! is.na(RLRS),
                  ! is.na(age_fte_cat),
                  ! is.na(sex),
                  ! is.na(age_at_recruitment),
@@ -347,13 +367,18 @@ run_mediation <- function (famhist, score_names) {
                  ! is.na(f.2040.0.0) # risk attitude
                )
   
-  run_one_mediation <- function (score_name) {
+  sig_scores <- res_all %>% 
+                  filter(dep.var == "RLRS", reg.type == "controlled") %>% 
+                  filter(p.value < 0.05/33) %>% 
+                  pull(score_name)
+  
+  run_one_mediation <- function (score_name, famhist = famhist) {
     
     controls <- "age_at_recruitment + sex + fluid_iq + height + f.2040.0.0"
     f_mediator <- as.formula(glue::glue("age_fulltime_edu ~ {score_name} +
                                            {controls}"))
     mod_mediator <- lm(f_mediator, data = famhist)
-    f_y <- as.formula(glue::glue("n_children ~ {score_name} +
+    f_y <- as.formula(glue::glue("RLRS ~ {score_name} +
                                     age_fulltime_edu +
                                     {controls}"))
     mod_y <- lm(f_y, data = famhist)
@@ -362,13 +387,13 @@ run_mediation <- function (famhist, score_names) {
     # dep_var ~ treatment + mediator + covariates
     # mediator ~ treatment + covariates
     # indirect effect = b_mediator * b_med_treat
-    b_mediator <- coef(mod_y)["age_fulltime_edu"]
-    b_med_treat <- coef(mod_mediator)[score_name]
-    indirect_effect <- b_mediator * b_med_treat
+    b_mediator   <- coef(mod_y)["age_fulltime_edu"]
+    b_med_treat  <- coef(mod_mediator)[score_name]
+    estimate_ind <- b_mediator * b_med_treat
                          
     # total effect = b_treatment + b_mediator * b_med_treat (from 1)
     b_treat <- coef(mod_y)[score_name]
-    total_effect <- b_treat + indirect_effect
+    estimate_total <- b_treat + estimate_ind
     
     se_b_mediator <- coef(summary(mod_y))["age_fulltime_edu", "Std. Error"]
     se_b_med_treat <- coef(summary(mod_mediator))[score_name, "Std. Error"]
@@ -376,23 +401,49 @@ run_mediation <- function (famhist, score_names) {
     # s.e. of indirect effect = sqrt of:
     # b_mediator^2 * var(b_treatment) + b_treatment^2 * var(b_mediator)
     # = b_mediator^2 * se(b_treatment)^2 + b_treatment^2 * se(b_mediator)^2
-    var_ind_eff <- b_mediator^2 * se_b_med_treat^2 + 
-                   b_med_treat^2 * se_b_mediator^2 + 
-                   se_b_med_treat^2 * se_b_mediator^2
-    se_ind_eff <- sqrt(var_ind_eff)
+    var_ind <- b_mediator^2 * se_b_med_treat^2 + 
+                 b_med_treat^2 * se_b_mediator^2 + 
+                 se_b_med_treat^2 * se_b_mediator^2
+    se_ind <- sqrt(var_ind)
     
     tibble(
       term           = score_name, 
-      estimate_total = total_effect,
-      estimate_ind   = indirect_effect, 
-      se_ind         = se_ind_eff,
-      statistic_ind  = indirect_effect/se_ind_eff,
-      p.value_ind    = 2 * pnorm(abs(statistic_ind), mean = 0, 
+      estimate_total = estimate_total,
+      estimate_ind   = estimate_ind,
+      prop_ind       = estimate_ind/estimate_total,
+      se_ind         = se_ind,
+      statistic_ind  = estimate_ind/se_ind,
+      p_value_ind    = 2 * pnorm(abs(statistic_ind), mean = 0, 
                                    lower.tail = FALSE)
     )
   }
   
-  res <- purrr::map_dfr(score_names, run_one_mediation)
+  res <- purrr::map_dfr(sig_scores, run_one_mediation, famhist = famhist)
+  
+  # bootstraps
+  boot_res <- purrr::map_dfr(1:100, function (r) {
+                              fh_boot <- famhist %>% 
+                                           slice_sample(prop = 1, replace = TRUE)
+                              br <- purrr::map_dfr(sig_scores, 
+                                                   run_one_mediation, famhist = fh_boot)
+                              br <- br[c("term", "estimate_total", "estimate_ind")]
+                              br["rep"] <- r
+                              br
+                            })
+  
+  # problem: se isn't helpful because ratio not normal
+  # but quantiles for 0.05/33 require 660 reps, v slow
+  boot_res %<>% 
+             group_by(term) %>% 
+             mutate(
+               prop_ind = estimate_ind/estimate_total
+             ) %>%
+             summarize(
+               prop_ind_conf_low   = quantile(prop_ind, 0.025),
+               prop_ind_conf_high  = quantile(prop_ind, 0.975)
+             )
+  
+  res <- left_join(res, boot_res, by = "term")
   
   res
 }

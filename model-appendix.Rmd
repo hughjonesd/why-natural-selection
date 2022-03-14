@@ -65,7 +65,8 @@ as:
 \frac{d\mathcal{L}}{ds}=-Y_{1}^{-\sigma}+h(1-bN_{2}^{*})Y_{2}^{-\sigma}+\mu & =0;\label{eq:kkt3}\\
 N_{1}^{*},N_{2}^{*},s^{*},\lambda_{1},\lambda_{2},\lambda_{3},\mu & \ge0;N_{2}^{*}\le\frac{1}{b}.
 \end{align}
-Note that the Inada condition ($\lim_{x\rightarrow0}u'(x)=\infty$)
+Note that the Inada condition (that marginal utility of income grows without 
+bound as income approaches zero, $\lim_{x\rightarrow0}u'(x)=\infty$)
 for period 1 rules out $s^{*}=1$ and $N_{1}=1/b$, so we need not
 impose these constraints explicitly. Also, so long as $N_{2}^{*}<1/b$,
 the same condition rules out $s^{*}=0$. We consider four cases,
@@ -190,10 +191,17 @@ then reduces to $(s^{*})^{2}>0$. Putting these facts together, for
 $\sigma$ sufficiently close to 1, $\frac{d^{2}N_{2}^{*}}{dh^{2}}>0$,
 i.e. $N_{2}^{*}$ is convex in $h$. 
 
-Conditions (\ref{eq:kkt1}) and (\ref{eq:kkt2}) give the bounds for
-this case. When $\sigma<1$, (\ref{eq:kkt1}) puts a minimum on $h$
-and (\ref{eq:kkt2}) puts a maximum on $h$. The situation is reversed
-for $\sigma>1$.
+This case holds for intermediate values on $h$. Equation (\ref{eq:dNdh2}) 
+shows that for $\sigma < 1$, $N_2$ decreases in $h$; the requirement that
+$N_2>0$ therefore puts a maximum on $h$. When $\sigma>1$, $N_2$ increases in
+$h$ and this puts a minimum on $h$. The requirement $N_1 = 0$ provides the 
+other bound. Equation (\ref{eq:kkt1}) 
+requires $-bY_{1}^{-\sigma}+a \le 0$ since $\lambda_1$ must be non-negative. 
+The LHS is increasing in $Y_1$, and hence decreasing in $s$ as $Y_1 = 1-s$ since 
+$N_1=0$. Lastly, optimal choice of education $s^*$ increases in $h$ for 
+$\sigma<1$, and decreases for $\sigma > 1$. Hence for $\sigma < 1$, (\ref{eq:kkt1})
+puts a minimum on $h$, and for $\sigma > 1$ it puts a maximum on $h$.
+
 
 Summarizing:
 \begin{lem}

@@ -61,7 +61,7 @@ make_census_age_qual <- function (DC1108EW_file, DC5202SC_file) {
   sc_age_qual <- readr::read_csv(DC5202SC_file, skip = 12)
   sc_age_qual %<>% 
     select(
-      age_cat = `...1`,            # new names reflect values in the columns
+      age_cat =  X1,            # new names reflect values in the columns
       qual    = `Ethnicity (Flat)`, 
       value   = `White: Total`
     ) %>% 

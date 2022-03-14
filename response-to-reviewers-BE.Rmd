@@ -1,0 +1,480 @@
+---
+title: "Response to reviewers"
+author: "David Hugh-Jones and Abdel Abdellaoui"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output: 
+  pdf_document:
+    toc: false
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{subfig}
+  - \hypersetup{colorlinks = true, linkcolor = {blue}, linkbordercolor = {white}}
+---
+
+```{r echo=FALSE}
+
+suppressWarnings(suppressPackageStartupMessages(library(dplyr)))
+library(ggplot2)
+library(forcats)
+
+drake::loadd(res_edu)
+
+theme_set(theme_minimal())
+
+order_abs <- function (n = 1) {
+  function (x) x[n] 
+}
+
+pretty_names <- function (names) {
+  pretty <- c(
+    ADHD_2017               = "ADHD",
+    age_at_menarche         = "Age at menarche",
+    age_at_menopauze        = "Age at menopause",
+    agreeableness           = "Agreeableness",
+    ai_substance_use        = "Age at smoking initiation",
+    alcohol_schumann        = "Alcohol use",
+    alzheimer               = "Alzheimer",
+    autism_2017             = "Autism",
+    bipolar                 = "Bipolar",
+    bmi_combined            = "BMI",
+    body_fat                = "Body Fat",
+    caffeine                = "Caffeine",
+    cannabis                = "Cannabis (ever vs. never)",
+    cognitive_ability       = "Cognitive Ability",
+    conscientiousness       = "Conscientiousness",
+    coronary_artery_disease = "Coronary Artery Disease",
+    cpd_substance_use       = "Cigarettes per day",
+    diagram_T2D             = "Type 2 Diabetes",
+    dpw_substance_use       = "Drinks per week",
+    EA2_noUKB               = "Educ. attainment 2 (no UKBB)",
+    EA3_excl_23andMe_UK     = "Educ. attainment 3 (no UK)",
+    eating_disorder         = "Eating disorder",
+    extraversion            = "Extraversion",
+    height_combined         = "Height",
+    hip_combined            = "Hip circumference",
+    MDD_PGC2_noUKB          = "Major Depressive Disorder",
+    neuroticism             = "Neuroticism",
+    openness                = "Openness",
+    sc_substance_use        = "Smoking cessation",
+    SCZ2                    = "Schizophrenia",
+    si_substance_use        = "Smoking initiation",
+    wc_combined             = "Waist circumference",
+    whr_combined            = "Waist-hip ratio"
+  )
+  
+  pretty[names]
+}
+
+
+add_n <- function (var, ...) {
+  var <- as.factor(var)
+  n <- c(88274, 99987, 154603)
+  levels(var) <- sprintf("%s (N = %s)", levels(var), 
+                         prettyNum(n[seq_len(nlevels(var))], big.mark = ","))
+  # var_n <- sprintf("%s (N = %s)", var, prettyNum(n[var], big.mark = ","))
+  # var_n[is.na(var)] <- NA
+  var
+}
+
+my_hline <- geom_hline(yintercept = 0, colour = "grey20", linetype = "dotted")
+my_vline <- geom_vline(xintercept = 0, colour = "grey20", linetype = "dotted")
+pval_palette <- c("FALSE" = "grey65", "TRUE" = "#FAC32D")
+
+standard_ggplot <- function (
+  dfr, 
+  fill_col, 
+  n_regs, 
+  ...,
+  score_col = quo(term), 
+  order_idx = 1, 
+  fill_direction = 1,
+  n_cats    = NULL,
+  conf_int  = NULL
+) {
+  if (! missing(score_col)) score_col <- enquo(score_col)
+  
+  mfc <- missing(fill_col)
+  fill_col <- if (mfc) quo(NULL) else enquo(fill_col)
+  if (missing(n_cats)) {
+    n_cats <- if (mfc) 1 else length(unique(pull(dfr, {{fill_col}})))
+  }
+  
+  if (is.null(conf_int)) conf_int <- "conf.low" %in% names(dfr)
+  
+  n_regs <- as.double(n_regs)
+  
+  confint_geom_segment <- if (conf_int) confint_geom_segment() else NULL
+  
+  dfr %>% mutate(
+    !! score_col := pretty_names(!! score_col),
+    !! score_col := fct_reorder(!! score_col, estimate, order_abs(order_idx))
+  ) %>% 
+    rename(p = p.value) %>% 
+    ggplot(aes(estimate, {{score_col}}, yend = {{score_col}}, 
+               fill = {{fill_col}}, ..., colour = p < 0.05/{{n_regs}})) +
+    my_vline + 
+    confint_geom_segment +
+    pval_geom_point(fill = if(rlang::quo_is_null(fill_col)) "steelblue") +
+    pval_scale() +
+    my_fill_scale(n = n_cats, direction = fill_direction) +
+    my_labs() +
+    my_theme() +
+    scale_linetype_manual(name = "", values = c("95% c.i." = 1))
+}
+
+
+shapes_ggplot <- function (
+  dfr, 
+  fill_col, 
+  n_regs, 
+  ...,
+  score_col = quo(term), 
+  order_idx = 1, 
+  fill_direction = 1,
+  n_cats    = NULL,
+  conf_int  = NULL
+) {
+  if (! missing(score_col)) score_col <- enquo(score_col)
+  
+  mfc <- missing(fill_col)
+  fill_col <- if (mfc) quo(NULL) else enquo(fill_col)
+  if (missing(n_cats)) {
+    n_cats <- if (mfc) 1 else length(unique(pull(dfr, {{fill_col}})))
+  }
+  
+  if (is.null(conf_int)) conf_int <- "conf.low" %in% names(dfr)
+  
+  n_regs <- as.double(n_regs)
+  
+  confint_geom_segment <- if (conf_int) confint_geom_segment() else NULL
+  
+  dfr %>% mutate(
+    !! score_col := pretty_names(!! score_col),
+    !! score_col := fct_reorder(!! score_col, estimate, order_abs(order_idx))
+  ) %>% 
+    rename(p = p.value) %>% 
+    ggplot(aes(estimate, {{score_col}}, yend = {{score_col}}, 
+               shape = {{fill_col}}, ..., colour = p < 0.05/{{n_regs}})) +
+    my_vline + 
+    confint_geom_segment +
+    geom_point(size = 1.8, alpha = 0.8) +
+    scale_color_manual(values = c("FALSE" = "grey45", "TRUE" = "orange"), ...) +
+    scale_shape_manual(values = 1:n_cats + 14) +
+    my_labs() +
+    my_theme() +
+    scale_linetype_manual(name = "", values = c("95% c.i." = 1))
+  
+}
+
+
+tweaked_ggplot <- function (
+  dfr, 
+  fill_col, 
+  n_regs, 
+  ...,
+  score_col = quo(term), 
+  order_idx = 1, 
+  fill_direction = 1,
+  n_cats    = NULL,
+  conf_int  = NULL
+) {
+  if (! missing(score_col)) score_col <- enquo(score_col)
+  
+  mfc <- missing(fill_col)
+  fill_col <- if (mfc) quo(NULL) else enquo(fill_col)
+  if (missing(n_cats)) {
+    n_cats <- if (mfc) 1 else length(unique(pull(dfr, {{fill_col}})))
+  }
+  
+  if (is.null(conf_int)) conf_int <- "conf.low" %in% names(dfr)
+  
+  n_regs <- as.double(n_regs)
+  
+  confint_geom_segment <- if (conf_int) confint_geom_segment() else NULL
+  
+  dfr %>% mutate(
+    !! score_col := pretty_names(!! score_col),
+    !! score_col := fct_reorder(!! score_col, estimate, order_abs(order_idx))
+  ) %>% 
+    rename(p = p.value) %>% 
+    ggplot(aes(estimate, {{score_col}}, yend = {{score_col}}, 
+               fill = {{fill_col}}, ..., colour = p < 0.05/{{n_regs}})) +
+    my_vline + 
+    confint_geom_segment +
+    pval_geom_point(size = 1.6, stroke = 0.8, fill = if(rlang::quo_is_null(fill_col)) "steelblue") +
+    scale_color_manual(values = c("FALSE" = "grey65", "TRUE" = "#f3b372")) +
+    my_fill_scale(n = n_cats, direction = fill_direction) +
+    my_labs() +
+    my_theme() +
+    scale_linetype_manual(name = "", values = c("95% c.i." = 1))
+}
+
+
+my_theme <- function (...) theme(axis.text.y = element_text(size = 7), ...)
+
+
+pval_scale <- function (...) scale_color_manual(values = pval_palette, ...)
+
+
+pval_geom_point <- function (size = 1.5, stroke = 0.5, fill = NULL, ...) {
+  if (is.null(fill)) {
+    geom_point(shape = 21, size = size, stroke = stroke, ...)
+  } else {
+    geom_point(shape = 21, size = size, stroke = stroke, fill = fill, ...)
+  }
+}
+
+
+confint_geom_segment <- function () {
+  geom_segment(aes(x = conf.low, xend = conf.high, linetype = "95% c.i."), 
+               color = "grey60", alpha = 0.25, size = 1.1, 
+               lineend = "round")
+}
+
+
+my_fill_scale <- function (n, aesthetics = "fill", ...) {
+  
+  fill_colors <- c("steelblue4", "#D63C3C")
+  
+  if (n <= 2) {
+    dots <- list(...)
+    dots$direction <- NULL
+    do.call(scale_colour_manual, c(list(values = fill_colors[1:n],
+                                        aesthetics = aesthetics), 
+                                   dots))
+  } else {
+    scale_color_brewer(aesthetics = aesthetics, ...)
+  }
+}
+
+
+my_labs <- function (x = "Effect size", y = "", ...) labs(x = x, y = y, ...)
+
+
+
+n_regs <- as.double(nrow(res_edu))
+res_edu <- res_edu %>% 
+  mutate(
+    "Age left FTE" = fct_relevel(age_fte_cat, "< 16", "16-18", "> 18"),
+    "Age left FTE" = add_n(`Age left FTE`, "age_fte_cat")
+  ) 
+
+```
+
+Dear Professor Keller,
+
+Thank you very much for the chance to revise our manuscript. We would also like to thank both reviewers for their comments. Below we deal with the points they raised.
+
+## Editor
+
+> In particular, Reviewer 2 makes several good points that I believe can improve the clarity and flow of the manuscript and I suggest you consider these carefully. Reviewer 1 was highly favorable but also makes several excellent suggestions -- including pointing out that a similar observation has been made (remarkably) almost 100 years ago by Fisher. This seems important to include.
+
+See below.
+
+## Reviewer 1
+
+> This is an outstanding paper, perhaps the most important that will be published in the field of behavioral genetics this year.
+
+Thank you 😊.
+
+> Most curious is the failure to cite Fisher (1930).... The overlap in theory and observations with the present work is striking, so much so that the omission is equally striking.
+
+We thank the reviewer for giving us this reference. Indeed it is striking. Fisher's theory about the positive correlation he mentions is that it's driven by selection bias: Yale parents who can afford to send 6 children to Yale are "more able" than those who can only send 1, and as a result, among Yale students, children from bigger families are smarter. This is related to the income effect in our theory. We now mention this work in our conclusion. XXX maybe do more.
+
+> The authors do not have to respond to my next point. This paper already has a lot. But I am curious as to whether the authors have an opinion about Fisher's proposed solution to this problem (if it is a problem). He in essence suggested that the population be stratified into classes based on "human capital," as we might say now, and that within each stratum redistribution should be performed so as to reward parents of larger families. The basic idea is that if I have four children, while an academic colleague who is the same age as me has none (which has allowed him to publish twice as many papers), the tax-and-spend system will take away some of his income and give it to me, the total amount of redistribution being such as to remove the fundamental tradeoff. Can this work in theory? Can it be made politically feasible?
+
+Indeed, we don't want to talk about policy in the paper - we think we do not yet know enough. For what it's worth, here are my personal thoughts as corresponding author. First, government schemes to encourage fertility have a poor track record, see e.g. Gauthier (2007). Second, my strong gut feeling is that it is wrong for governments to (bluntly) institute breeding programs for their citizens. I wrote more informally on this topic [here](https://wyclif.substack.com/p/the-natural-selection-paper-part-822?s=w).
+
+> Another general point is that there is some uncertainty over whether the fertility-IQ correlation is negative in entire populations. Some suggest that its negative value in unrepresentative samples is the result of ascertainment bias (e.g., Higgins, Reed, & Reed, 1962; Kolk & Kieron, 2019). In fact, I have reviewed a manuscript where the authors declined using the UK Biobank for a particular analysis (while using it for all others) on the grounds that the fertility-IQ relationship cannot be accurately inferred in that dataset. My position is that the fertility-IQ correlation has been negative, at most times since relevant data have been collected, while being less so at certain atypical times (e.g., the Baby Boom) and in men. In the present work, the authors use sample reweighting to address ascertainment bias in the UK Biobank, but this is not guaranteed to be effective. A brief literature review addressing the sign of the fertility-IQ correlation, in most Western populations in recent decades, therefore seems warranted to provide some reassurance. My suggestion is to begin with Lynn and Van Court (2004), Meisenberg (2010), and Reeve, Heeney, and Woodley (2018).
+
+We agree this is an important topic, but we are more focused on human capital and earnings than IQ specifically. (Of course the polygenic score for educational attainment does also predict IQ.) The negative fertility-income relationship, in developed countries, is a very well-established stylized fact, and we mention some papers that also show income is causal.
+
+Regarding ascertainment bias, the reviewer is right that there are no guarantees we can eliminate it. When we do correct for ascertainment bias, every correction increases our estimated effect sizes. So we expect that any remaining ascertainment also probably biases our estimates towards zero. We now point this out. (XXX say this somewhere?) 
+
+> abstract: "Consistently over time, polygenic scores associated with lower (higher) earnings, education and health are selected for (against)." This is hard to understand. How about: "Consistently over time, polygenic scores predicting higher earnings, education, and health also predict lower fertility."
+
+Done.
+
+> p\. 2: "natural selection may substantially increase the correlation between genetic scores and income, i.e. the "genetic lottery" (Harden, 2021)." Although the meaning eventually becomes clear, this sentence may be very cryptic.
+
+We have made it more explicit: "natural selection may substantially increase the correlation between genetic scores and income, increasing genetic differences between different social groups, and thus making the "genetic lottery" (Harden 2021) more unfair."
+
+> p\. 4, footnote 1: That the covariance between the number of children and the polygenic score for a given phenotype is equal to the evolutionary change in the phenotype between generations is, after some adjustment of terminology, Robertson's (1966, 1968) Secondary Theorem of Natural Selection (see also Walsh & Lynch, 2018, pp. 165-167). I think this should be pointed out.
+
+We now cite Robertson (1966).
+
+> p\. 4: It should be "stabilizing" selection, not "balancing" selection. The latter refers to any kind of selection that favors the coexistence of two or more alleles at a site. The former refers to selection that favors an intermediate value of a quantitative trait, and this is clearly what the authors mean. While I believe the term "diversifying" selection is sometimes uses for selection favoring both extremes of a quantitative trait, "disruptive" selection is probably more common. A similar point applies on p. 20.
+
+We have changed vocabulary accordingly.
+
+> p\. 10: I am interested in the functional form chosen for u(y). This has sensible properties for sigma \< 1 near 1, including being increasing in y for y somewhat greater than zero and being concave. Intuitively, this means that utility increases with income (net of costs of childrearing) but less so as income increases. Is there any particular reason for this functional form as opposed to others that also satisfy these properties? Also, is there any empirical evidence that "utility" obeys this relationship?
+
+The functional form is a standard one in economics. It has the specific property that relative risk aversion is constant. That is, if you have CRRA utility and £100, and you are indifferent to a 50-50 bet between winning £30 and losing £20, then if you had £1000 you would be indifferent between a 50-50 to win £300 or lose £200.
+
+The literature on estimating utility functions is vast (see e.g. Chuang and Schechter 2015). One issue is that of context. CRRA may make sense for risky financial decisions. Here, as Reviewer 2 points out, the "curvature" of the utility function is used not to explain attitudes to risk, but to trade off income against children at different income levels. This author wishes there was a single utility function that worked to explain all human behaviour across contexts... in reality, economists tend to use "what works". We use the CRRA form because it is tractable; we expect that using other forms, intermediate levels of risk aversion would still generate our empirical results, but the maths would be uglier. For a useful discussion of microeconomic theories of fertility, including functional forms, see Jones et al. (2008).
+
+> p\. 30: I feel that more thought might be given to the choice of covariates. For example, if fluid IQ is on the causal path between the PGS and EA, then controlling it will bias downward the estimate of the the PGS effect on EA. But since this mediation analysis seems tentative and not crucial to the paper, perhaps some looseness here can be tolerated.
+
+Yes. Conversely, fluid IQ might affect fertility choices via other pathways than human capital in the labour market, and not controlling for it might leave these to be picked up by EA. We prefer to be "conservative" in controlling for it, in the sense that we'd rather bias the estimate indirect effect of EA towards zero than away from zero. We now mention this issue in the appendix.
+
+That said, the mediation analysis is really the central test of our theory. So we have tried to make it seem less tentative. See our response to Reviewer 2.
+
+> p\. 34: For various reasons I think this section (and the bit in the main text that it supports) ought to be eliminated. The point is to show that natural selection increases the correlation between the EA PGS and income from one generation to the next, correcting for the noise in the PGS. I think a qualitative statement about this point is adequate; the more quantitative attempt by the authors has some problems.
+>
+> (1) "PSEA" is not defined, although I'm guessing this means "polygenic score for educational attainment."
+>
+> (2) It happens that there is a more recent meta-analysis of relevant twin studies (Silventoinen et al., 2020).
+>
+> (3) There appears to be substantial passive gene-environment correlation ("genetic nurture," some now call it), as a result of highly educated parents providing both favorable genes and a social status promoting educational attainment (e.g., Kong et al., 2018). I am sure this complicates the analysis in some way. The authors might respond that they deal with this by using within-family estimates, but see below.
+>
+> (4) The proof of Equation 5 uses the "standard errors-in-variables formula" plim \\hat\\beta = \\lambda\\beta. While this relationship seems plausible, it may not be standard to behavioral geneticists.
+>
+> (5) When there is genetic nurture, what is the right PGS effect to use in order to address the question here? The effect in the population, or the effect within families? If it is the latter, a problem is that the estimate of a 142.6% change in R\^2 between generations seems far too high and indicative of low statistical precision.
+>
+> (6) The assumption that eta is independent of p_star seems very strong. It includes, for example, the assumption that the PGS over rare variants is uncorrelated with the PGS over common variants. I think this is unlikely to be true, as a result of assortative mating (Yengo et al., 2018).
+
+We accept point (6) in particular. On the other hand, we do state that this is a "back of the envelope calculation". We've had pushback from people saying "this is no big deal", so we want to show that at least under some assumptions, yes it might be. Note also that as we say:
+
+"If unmeasured PSEA correlates positively with $\varepsilon$, then the reliability coefficient $\lambda$ will be lower than calculated. However, the proportional effect of natural selection on the PSEA-income relationship will remain the same, so long as $\lambda$ does not differ between the two sets of weighted regressions."
+
+The within-family estimate should remove the worries about exogeneity of p\*, but they are estimated with a smaller sample. We agree that the estimate is high. The bootstrapped 95% confidence interval is from around 0% to 300%, which is not really informative, though it does suggest that genetic nurture is more likely to bias our results downwards than upwards. We've removed the discussion.
+
+> p\. 40 and following: I confess to not following the derivations completely. The authors seem adept at what they do, and I trust that they have made no serious errors.
+
+We hope so too.
+
+> (1) This is my first encounter with the Karush-Kun-Tucker conditions or the Inada condition.
+
+KTK are the standard conditions for constrained optimization (see e.g. Sundaram 1996). We think people who want to follow the proofs will know about them. The Inada condition is a bit more specific to economics. We are now more explicit about what it means. It can be derived in this case by differentiating $u$ to give $u'(y) = y^{-\sigma}$ which for $\sigma > 0$ approaches infinity as $y \rightarrow 0$.
+
+> (2) Below Equation 25, I did not verify the second derivative of N_2 with respect to h. This seems to require simple (if tedious) applications of the product and chain rules. The important conclusion, that N_2 is convex in h for sigma close to 1, is something that I will accept by analogy to the case N_1, N_2 > 0.
+
+This is correct.
+
+> (3) I do not understand in what way Equations 13 and 14 determine when the case N_1 = 0, N_2 > 0 holds. Nevertheless, I accept the intuitive conclusion that it holds for intermediate values of h because too small a value of h (which determines s\*) will make N_1\* in Equation 17 greater than zero and because too high a value will make N_2\* in 18 negative. In a similar way, I accept that no children at all is the optimum for very high values of h; this seems reasonable for this model.
+
+That is the right intuition. Here are the details. Equation 13 requires
+
+$$
+-bY_{1}^{-\sigma}+a \le 0
+$$
+
+since $\lambda_1$ must be non-negative. The LHS is increasing in $Y_1$. $Y_1=1-s$ since $N_1=0$. So the LHS is decreasing in $s$ and the inequality puts a minimum value on $s$. Lastly, optimal choice of education $s^*$ increases in $h$ for $\sigma<1$ (and decreases for $\sigma>1$). Hence for $\sigma<1$, the inequality puts a minimum on $h$, and for $\sigma>1$ it puts a maximum on $h$.
+
+Equation 14 similarly bounds on $h$, as follows. Equation 22 rearranges equation 14. Equation 25 differentiates equation 22 to show how $N_2$ changes in $h$; for $\sigma<1$, it decreases, for $\sigma>1$ it increases. Therefore, the requirement that $N_2>0$ (for this solution) means that when $\sigma<1$, $h$ cannot be too high, and when $\sigma>1$ it cannot be too low.
+
+We have tweaked the discussion slightly to reflect the above. The best way to gain intuition is probably to try a few numerical examples.
+
+## Reviewer 2  
+
+> 1\. The authors have improved the presentation of their results, but it can still be further improved. There are still so many results, plus a model, and as a result the paper still reads like a disconnected set of findings and lacks an overall coherent narrative (although a bit less so than before).
+
+We have tried to work on this... XXX.
+
+> In my opinion, the paper's most important finding is that human capital mediates natural selection. I suspect the authors agree with me on this point, since the title of their manuscript says just that. Still, when reading the paper, one does not get to the topic of human capital and natural selection until p. 9 (and the paper has only 15 pages)! The lengthy discussion of the stratified analysis (Figures 3-5) is interesting, and the authors have edited the text (vs. in the earlier version) to explain that these results are related to predictions of their model, but that discussion is too long and distracts from the main point of the paper. Plus, the stratified analyses are\
+> limited and only so much can be learned from them. As the authors acknowledge, "these categories are not necessarily exogenous to the polygenic scores. For example, both in the data and in our theoretical model, age at first live birth is a choice variable, which is endogenous to human-capital-related polygenic." Thus, I recommend that that discussion be shortened and the figures consolidated (the authors should find a way to show the must important results in Figures 3-5 on \~1 page.
+
+We think these analyses are important. First, they motivate our theory. As we say, though the mediating variables are endogenous, we build a theory in which (e.g.) education is an endogenous choice variable.
+
+We also think the results matter in their own right. Any theory of contemporary natural selection needs to explain why correlations with fertility are lower at higher levels of income, education, etc. Non-causal explanations would be fine, but theories which don't generate these correlations must be missing something. Note that Fisher, cited by Reviewer 1, used observed correlations quite like ours to differentiate between theories of the fertility-income relationship. Generally, significant correlations have often led to important theoretical literatures, even when the direction of causality is uncertain (e.g. education/wages in labour economics, or democracy/GDP levels in political economy).
+
+We have shortened the discussion as follows... XXX.
+
+> 2\. The authors test their human-capital-mediation theory in two ways in Section 4, but I think their analysis can and should be improved, since this section contains the core empirical results supporting the authors' main claim about human capital mediation. First, the authors show that a PGS's correlation with two measures of human capital negatively correlates with selection effects for the PGS (Figure 6); second, they run a formal mediation analysis.
+>
+> \> Can the authors introduce a basic econometric framework and assess whether their results in Figure 6 are consistent with those from the mediation analysis (i.e., could the amount of mediation reported in Table 5 for each phenotype explain the results shown in Figure 6)?
+
+The result in Figure 6 is that the size of a score's selection effect correlates with the score's correlation with education and earnings. Intuitively, the fact that part of the selection effect comes from the mediation indeed helps to explains table 6. That is, if
+
+*PGS effect on fertility = PGS correlation with education X education effect on fertility + direct effect of PGS on fertility*
+
+then indeed PGS effect on fertility, and PGS correlation with education, will be correlated. In that sense, the mediation analysis is just a more precise version of Figure 6 (more precise because it also estimates the education effect on fertility). We're not sure if there is an obvious way to work out "how much" of the Figure 6 correlation is explained by mediation. It may be a bit like asking "how much of a bivariate correlation is explained by the same correlation but with controls": these are really two alternate models of the same process, one less controlled than than the other. We are probably hitting the limits of our econometric expertise, so we are open to suggestions.
+
+> \> In the mediation analysis, why do the authors only use education as the mediator? The mediation framework they use can easily accommodate many mediators (see Section 6 of the Supplementary Information of the "EA2" paper by Okbay et al., Nature Genetics 2016). I would like to see a more full-fledged mediation analysis that also includes other proxies for human capital as mediators, including earnings in a respondent's first job as well as household income (though the later is not an ideal variable for that, especially for females).
+
+We would like to have more mediators, but appropriate variables are hard to find. Earnings in first job reduces our N by a factor of 10, which makes results too noisy to be useful. As the reviewer suggests, current household income is very much endogenous not only to human capital, but also to previous fertility, which makes it inappropriate as a mediator.
+
+> \> Also, in the mediation analysis, some of the ratios of indirect to total effects are negative or larger than 100%. This could indicate that the indirect and direct effects have opposite signs, but could also be due to the imprecision of the estimates. The authors should estimate 95% CIs for the ratio of indirect/total effects (these can be obtained by bootstrapping). They could then focus their discussion on the ratios that are significant and not on those that are just noisy estimates.
+
+Bootstrapping ratios is not so simple, since if the confidence interval for the denominator contains 0, the ratio confidence set may contain infinity and may not be a single interval, and the standard approach of taking quantiles can be misleading (see Franz 2007). Alternatives like the Fieller method have the same problem. Another issue is that to estimate Bonferroni-corrected significance at p = 0.05/33 we'd need 0.075- and 99.925-percentiles of the distribution, which would require many thousands of bootstraps (infeasibly slow, given our sample size).
+
+Following the advice of Franz (2007), we compromise: we bootstrap uncorrected 95% CIs of the ratio, but only when the denominator (i.e. the total effect) is significantly different from 0 at $p$ \< 0.05/33. This is substantively sensible anyway: if we can't reject that a PGS has no effect on fertility, it does not make much sense to ask whether the effect is mediated. We continue to report p values for the indirect effect only, following Zhao et al. (2010).
+
+> \> Also, in the older version, the authors had a nice figure illustrating how education mediates selection (their old Appendix Figure 17, which showed results from re-estimating Equation 1 for each PGS while controlling for education vs. the baseline estimates). The mediation analysis is in a way more thorough version of that figure, but that figure (ideally also showing the effects of controlling for earnings and any other human capital variables) was nice and helpful and could go in the main text
+
+We have introduced a new figure in the main text, showing the results of the mediation analysis with the bootstrapped confidence intervals.
+
+> \> More generally, I think the authors can improve their empirical analysis of human capital as a mediator of natural selection (the above comments should help with this).
+
+We welcome any further thoughts.
+
+> \
+> 3. To adjust for ascertainment bias, the authors adjust their estimates using three weighting schemes. Why not combine all the variables from the three schemes and add other observables that could impact ascertainment (including also sex, proximity to a recruitment center, number of individuals in the household, and household income)? If the authors' goal is to adjust their estimates for ascertainment in the UKB, they should use all relevant observables to create UKB weights so that their estimates more closely resemble those they'd obtain in a more representative sample. This is particularly important here since we're interested in selection, and estimates can be severely biased in a selected sample like the UKB.\
+> \
+> Also, instead of presenting a small subset of the results with various weighting schemes in Figure 2, it'd be preferable for the authors to pick what they think is the best weighting scheme and then present all results with that scheme. Then, they can briefly discuss the robustness of their results to various weighting schemes.
+
+XXX Probably get in touch with those guys with their own weighting.\
+
+> 4\. On p. 4, line 13, the authors write that "Beta is the expected polygenic score among children of the sample", with a footnote explaining the reason. However, since the authors use N=number of children rather than relative number of children (=number of children/mean number of children), I don't think that's correct. See Beauchamp PNAS 2016. More generally, why not use relative lifetime reproductive success (rLRS) instead of number of children as the dependent variable in equation 1?
+
+We now use RLRS as the dependent variable for both respondents and parents. Results are not much changed, except there is now slightly more evidence for larger selection effects over time: 9 polygenic scores show a significant increase in size when we median-split respondents by birth year.
+
+> 5\. How were the 33 PGSs selected? For instance, why didn't the authors include a PGS of risk preferences? (I'm not requesting that the authors include that specific PGS, but only that they explain their selection process.)
+
+We address this in the Materials and Methods section: "Polygenic scores were chosen so as to cover a reasonably broad range of traits, and based on the availability of a large and powerful GWAS which did not include UK Biobank."
+
+> 6\. Did the authors use an age cutoff to include males and females in their selection analyses. To ensure measured fertility is completed fertility, the authors should only use males who were at least 50 years old and females who were at least 45 years old at the time of measurement.
+
+We used 45 years old. We have adjusted this to 50 male/45 female as suggested. Results are little changed, except that EA3 is no longer undergoing significant diversifying selection in the respondents' generation.
+
+> 7\. The authors write that sigma captures risk aversion in income in their model. But that's confusing and not a good way of describing this for their model, because as far as I understand there's no income risk! They should clarify this and say that sigma regulates the curvature of the utility function, and explain what this means in their riskless model.
+
+It is a fair point. We have rewritten accordingly: "$\sigma > 0$ measures the curvature of the utility function, i.e. the decline in marginal utility of income as income increases".\
+\
+OTHER COMMENTS AND SUGGESTIONS
+
+> 8\. Most figures are hard to read. For example, Figures 3-5 are hard to read. In Figure 3a, the dot color indicate education and the dot border color indicates significance; that's very difficult to read quickly (for instance, a blue dot with a yellow border looks green). Instead, the authors could use different symbols (crosses, squares) for education and colors for significance, or vice-versa.
+
+We have experimented a lot with these figures, and they may not be easy to improve. For example, we tried using symbols, but in our judgment the added visual noise makes it harder to see the pattern of the results across rows. Below we show three alternative versions of one of our figures: our original, a version using symbols, and one with subtle tweaks to colors and stroke sizes. We prefer our tweaked version (and have used it in the revision), but we are open to suggestions.
+
+```{r different-plots, echo = FALSE, fig.cap = "Alternative plot styles", fig.subcap = c("original", "shapes", "tweaked"), fig.ncol = 1, fig.height=2.5, fig.align="center"}
+
+res_edu <- res_edu %>% filter(grepl("^[a-o]", term))
+n_regs <- nrow(res_edu)
+
+standard_ggplot(res_edu, n_regs = n_regs, fill_col = `Age left FTE`, fill_direction = -1)
+
+shapes_ggplot(res_edu, n_regs = n_regs, fill_col = `Age left FTE`, fill_direction = -1)
+
+tweaked_ggplot(res_edu, n_regs = n_regs, fill_col = `Age left FTE`, fill_direction = -1)
+```
+
+> 9\. The authors should provide more info to help readers understand the details of the analyses whose results are shown in Appendix Tables 3-4.
+
+We now say: 'We report the number of scores showing significant changes over time (i.e. a significant interaction between polygenic score and the "late born" dummy): either a significant change in sign, a significant increase in size, or a significant decrease in size.'
+
+> 10\. The authors do not refer to Figure 10 in the main text.
+
+Fixed.
+
+> 11\. As mentioned above, only so much can be learned from the stratified analyses, and I recommend that less space be devoted to them in the main text. Still, the authors should consider showing the results (probably in the Appendix, given space restriction) stratified by geographical variables, which are more plausibly exogenous (though not perfectly so), such as being born in the North vs. South, in coal mining area vs. not, in rural areas vs. in towns. This may not related directly to their model, though.
+
+See above for our thoughts on exogeneity versus theory. We have added in results for respondents' RLRS, stratified by Townsend deprivation of birthplace. These look very similar to the results for parents' RLRS. Note, though, that since polygenic scores are inherited, and correlate with parents' mobility (Abdellaoui et al. 2019), geographic variables are indeed not exogenous.
+
+## References
+
+Abdellaoui, A., Hugh-Jones, D., Yengo, L., Kemper, K.E., Nivard, M.G., Veul, L., Holtz, Y., Zietsch, B.P., Frayling, T.M., Wray, N.R. and Yang, J., 2019. Genetic correlates of social stratification in Great Britain. *Nature human behaviour*, *3*(12), pp.1332-1342.
+
+Acemoglu, D., Johnson, S., Robinson, J.A. and Yared, P., 2008. Income and democracy. *American economic review*, *98*(3), pp.808-42.
+
+Chuang, Y. and Schechter, L., 2015. Stability of experimental and survey measures of risk, time, and social preferences: A review and some new results. *Journal of development economics*, *117*, pp.151-170.
+
+Franz, V.H., 2007. Ratios: A short guide to confidence limits and proper use. *arXiv preprint arXiv:0710.2024*.
+
+Gauthier, A.H., 2007. The impact of family policies on fertility in industrialized countries: a review of the literature. *Population research and policy review*, *26*(3), pp.323-346.
+
+Jones, L.E., Schoonbroodt, A. and Tertilt, M., 2008. *Fertility theories: can they explain the negative fertility-income relationship?* (No. w14266). National Bureau of Economic Research.
+
+Sundaram, R.K., 1996. *A first course in optimization theory*. Cambridge University Press.
+
+Zhao, X., Lynch Jr, J.G. and Chen, Q., 2010. Reconsidering Baron and Kenny: Myths and truths about mediation analysis. *Journal of consumer research*, *37*(2), pp.197-206.
