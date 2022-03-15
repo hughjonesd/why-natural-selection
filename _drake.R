@@ -439,6 +439,20 @@ plan <- drake_plan(
           select(-row_number, -subset)
   },
   
+  res_partners_joint = {
+    res <- map_dfr(score_names,
+                     ~ run_regs_fml(
+                       fml        =
+                         "RLRS ~ lo_partners + {score_name}:lo_partners",
+                       score_name = .x,
+                       famhist    = famhist_kids
+                     ),
+                     .id = "score_name"
+                   )
+    res %<>% filter(term != "(Intercept)")
+    res
+  },
+  
   res_with_partner = {
     res <- map_dfr(score_names,
             ~run_regs_fml(

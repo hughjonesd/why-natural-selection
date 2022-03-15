@@ -6,10 +6,14 @@ output:
 header-includes:
   - \usepackage{subfig}
   - \hypersetup{colorlinks = true, linkcolor = {blue}, linkbordercolor = {white}}
+  - \usepackage{tcolorbox}
+  - \newtcolorbox{myquote}{colback=green!5!white, colframe=green!75!black}
+  - \renewenvironment{quote}{\begin{myquote}}{\end{myquote}}
 mainfont: Baskerville
+fontsize: 12pt
 ---
 
-```{r echo=FALSE}
+```{r setup, echo=FALSE}
 
 suppressWarnings(suppressPackageStartupMessages(library(dplyr)))
 library(ggplot2)
@@ -152,16 +156,27 @@ shapes_ggplot <- function (
   ) %>% 
     rename(p = p.value) %>% 
     ggplot(aes(estimate, {{score_col}}, yend = {{score_col}}, 
-               shape = {{fill_col}}, ..., colour = p < 0.05/{{n_regs}})) +
+               shape = {{fill_col}}, ...)) +
     my_vline + 
     confint_geom_segment +
-    geom_point(size = 1.8, alpha = 0.8) +
-    scale_color_manual(values = c("FALSE" = "grey45", "TRUE" = "orange"), ...) +
+    geom_point(size = 1.8, aes(color = {{fill_col}})) +
+    geom_point(size = 0.7, color = "white", aes(alpha = p < 0.05/33)) +
+    scale_color_manual(
+                         values = rev(c("lightblue3", "dodgerblue2", "dodgerblue4"))
+                       ) +
     scale_shape_manual(values = 1:n_cats + 14) +
     my_labs() +
     my_theme() +
-    scale_linetype_manual(name = "", values = c("95% c.i." = 1))
-  
+    scale_linetype_manual(name = "", values = c("95% c.i." = 1)) +
+    scale_alpha_discrete(range = c(1, 0),
+                         guide = guide_legend(
+                           override.aes = list(
+                             shape = c(1, 16),
+                             color = "black",
+                             alpha = 1,
+                             size = 1.8
+                           )
+                         ))
 }
 
 
@@ -280,7 +295,7 @@ See below.
 
 > This is an outstanding paper, perhaps the most important that will be published in the field of behavioral genetics this year.
 
-Thank you 😊.
+Thank you!
 
 > Most curious is the failure to cite Fisher (1930).... The overlap in theory and observations with the present work is striking, so much so that the omission is equally striking.
 
@@ -345,9 +360,7 @@ We accept point (6) in particular. On the other hand, we do state that this is a
 The within-family estimate should remove the worries about exogeneity of p\*, but they are estimated with a smaller sample. We agree that the estimate is high. The bootstrapped 95% confidence interval is from around 0% to 300%, which is not really informative, though it does suggest that genetic nurture is more likely to bias our results downwards than upwards. We've removed the discussion.
 
 > p\. 40 and following: I confess to not following the derivations completely. The authors seem adept at what they do, and I trust that they have made no serious errors.
-
-We hope so too.
-
+>
 > (1) This is my first encounter with the Karush-Kun-Tucker conditions or the Inada condition.
 
 KTK are the standard conditions for constrained optimization (see e.g. Sundaram 1996). We think people who want to follow the proofs will know about them. The Inada condition is a bit more specific to economics. We are now more explicit about what it means. It can be derived in this case by differentiating $u$ to give $u'(y) = y^{-\sigma}$ which for $\sigma > 0$ approaches infinity as $y \rightarrow 0$.
@@ -366,7 +379,7 @@ $$
 
 since $\lambda_1$ must be non-negative. The LHS is increasing in $Y_1$. $Y_1=1-s$ since $N_1=0$. So the LHS is decreasing in $s$ and the inequality puts a minimum value on $s$. Lastly, optimal choice of education $s^*$ increases in $h$ for $\sigma<1$ (and decreases for $\sigma>1$). Hence for $\sigma<1$, the inequality puts a minimum on $h$, and for $\sigma>1$ it puts a maximum on $h$.
 
-Equation 14 similarly bounds on $h$, as follows. Equation 22 rearranges equation 14. Equation 25 differentiates equation 22 to show how $N_2$ changes in $h$; for $\sigma<1$, it decreases, for $\sigma>1$ it increases. Therefore, the requirement that $N_2>0$ (for this solution) means that when $\sigma<1$, $h$ cannot be too high, and when $\sigma>1$ it cannot be too low.
+Equation 14 similarly bounds $h$, as follows. Equation 22 rearranges equation 14. Equation 25 differentiates equation 22 to show how $N_2$ changes in $h$; for $\sigma<1$, it decreases, for $\sigma>1$ it increases. Therefore, the requirement that $N_2>0$ (for this solution) means that when $\sigma<1$, $h$ cannot be too high, and when $\sigma>1$ it cannot be too low.
 
 We have tweaked the discussion slightly to reflect the above. The best way to gain intuition is probably to try a few numerical examples.
 
@@ -381,11 +394,11 @@ We don't want to go too far, by pretending that the theory came to us fully-form
 > In my opinion, the paper's most important finding is that human capital mediates natural selection. I suspect the authors agree with me on this point, since the title of their manuscript says just that. Still, when reading the paper, one does not get to the topic of human capital and natural selection until p. 9 (and the paper has only 15 pages)! The lengthy discussion of the stratified analysis (Figures 3-5) is interesting, and the authors have edited the text (vs. in the earlier version) to explain that these results are related to predictions of their model, but that discussion is too long and distracts from the main point of the paper. Plus, the stratified analyses are\
 > limited and only so much can be learned from them. As the authors acknowledge, "these categories are not necessarily exogenous to the polygenic scores. For example, both in the data and in our theoretical model, age at first live birth is a choice variable, which is endogenous to human-capital-related polygenic." Thus, I recommend that that discussion be shortened and the figures consolidated (the authors should find a way to show the must important results in Figures 3-5 on \~1 page.
 
-We think these analyses are important. First, they motivate our theory. As we say, though the mediating variables are endogenous, we build a theory in which (e.g.) education is an endogenous choice variable.
+We think these analyses are important. First, they motivate our theory, in which education, income, AFLB etc. are indeed endogenous choice variables which are co-determined with fertility. If these mediators were *not* endogenous, we'd need a different theory.
 
 We also think the results matter in their own right. Any theory of contemporary natural selection needs to explain why correlations with fertility are lower at higher levels of income, education, etc. Non-causal explanations would be fine, but theories which don't generate these correlations must be missing something. Note that Fisher, cited by Reviewer 1, used observed correlations quite like ours to differentiate between theories of the fertility-income relationship. Generally, significant correlations have often led to important theoretical literatures, even when the direction of causality is uncertain (e.g. education/wages in labour economics, or democracy/GDP levels in political economy).
 
-As described above, we have shortened Section 2 to focus on the key results of variation by income, education, number of partners, partner presence and AFLB. These empirics now take up just 39 lines of text, plus Figures 3-5.
+As described above, we have shortened Section 2 to focus on the key results of variation by income, education, number of partners, partner presence and AFLB. These empirics now take up just 39 lines of text, plus Figures 3-5. We no longer split respondents by sex in Figure 4. This saves two figures, and should reduce space in the final version.
 
 > 2\. The authors test their human-capital-mediation theory in two ways in Section 4, but I think their analysis can and should be improved, since this section contains the core empirical results supporting the authors' main claim about human capital mediation. First, the authors show that a PGS's correlation with two measures of human capital negatively correlates with selection effects for the PGS (Figure 6); second, they run a formal mediation analysis.
 >
@@ -399,11 +412,11 @@ then indeed PGS effect on fertility, and PGS correlation with education, will be
 
 > \> In the mediation analysis, why do the authors only use education as the mediator? The mediation framework they use can easily accommodate many mediators (see Section 6 of the Supplementary Information of the "EA2" paper by Okbay et al., Nature Genetics 2016). I would like to see a more full-fledged mediation analysis that also includes other proxies for human capital as mediators, including earnings in a respondent's first job as well as household income (though the later is not an ideal variable for that, especially for females).
 
-We would like to have more mediators, but appropriate variables are hard to find. Earnings in first job reduces our N by a factor of 10, which makes results too noisy to be useful. As the reviewer suggests, current household income is very much endogenous not only to human capital, but also to previous fertility, which makes it inappropriate as a mediator.
+We would like to have more mediators, but appropriate variables are hard to find. Earnings in first job reduces our N by a factor of 10, which makes results too noisy to be informative. As the reviewer suggests, current household income is very much endogenous not only to human capital, but also to previous fertility, which makes it inappropriate as a mediator.
 
 > \> Also, in the mediation analysis, some of the ratios of indirect to total effects are negative or larger than 100%. This could indicate that the indirect and direct effects have opposite signs, but could also be due to the imprecision of the estimates. The authors should estimate 95% CIs for the ratio of indirect/total effects (these can be obtained by bootstrapping). They could then focus their discussion on the ratios that are significant and not on those that are just noisy estimates.
 
-Bootstrapping ratios is not so simple, since if the confidence interval for the denominator contains 0, the ratio confidence set may contain infinity and may not be a single interval, and the standard approach of taking quantiles can be misleading (see Franz 2007). Alternatives like the Fieller method have the same problem. Another issue is that to estimate Bonferroni-corrected significance at p = 0.05/33 we'd need 0.075- and 99.925-percentiles of the distribution, which would require many thousands of bootstraps (infeasibly slow, given our sample size).
+Bootstrapping ratios is not so simple, since if the confidence interval for the denominator contains 0, the ratio confidence set may contain infinity and may not be a single interval, and the standard approach of taking quantiles can be misleading (see Franz 2007). Alternatives like the Fieller method have the same problem. Another issue is that to estimate Bonferroni-corrected significance at p = 0.05/33 we'd need 0.00075- and 0.99925-quantiles of the distribution, which would require many thousands of bootstraps (unfeasibly slow, given our sample size).
 
 Following the advice of Franz (2007), we now compromise: we bootstrap uncorrected 95% CIs of the ratio, but only when the denominator (i.e. the total effect) is significantly different from 0 at $p$ \< 0.05/33. This is substantively sensible anyway: if we can't reject that a PGS has no effect on fertility, it does not make much sense to ask whether the effect is mediated. We continue to report p values for the indirect effect only, following Zhao et al. (2010).
 
@@ -444,9 +457,11 @@ OTHER COMMENTS AND SUGGESTIONS
 
 > 8\. Most figures are hard to read. For example, Figures 3-5 are hard to read. In Figure 3a, the dot color indicate education and the dot border color indicates significance; that's very difficult to read quickly (for instance, a blue dot with a yellow border looks green). Instead, the authors could use different symbols (crosses, squares) for education and colors for significance, or vice-versa.
 
-We experimented a lot with these figures, and they may not be easy to improve. For example, we tried using symbols, but in our judgment the added visual noise makes it harder to see the pattern of the results across rows. Below we show three alternative versions of one of our figures: our original, a version using symbols, and one with subtle tweaks to colors and stroke sizes. We prefer our tweaked version (and have used it in the revision), but we will bow to the reviewers or editor.
+We experimented a lot with our basic figures, and they may not be easy to improve. The graphs' key message is "effect sizes in one category are larger than others". To see that the eye needs to be able to quickly differentiate between categories. We have tried several variants using symbols, but in our judgment the added visual noise makes it harder to follow the categories across rows. The figure below shows three alternative versions: our original, a version using symbols, and one with subtle tweaks to colors and stroke sizes, which we hope fix the greenness issue and make p-values clearer. We prefer our tweaked version (and have used it in the revision), but we will bow to the reviewers or editor.
 
-```{r different-plots, echo = FALSE, fig.cap = "Alternative plot styles", fig.subcap = c("original", "shapes", "tweaked"), fig.ncol = 1, fig.height=2.5, fig.align="center"}
+We've worked on Figures 1 and 2 to improve readability.
+
+```{r different-plots, echo = FALSE, fig.cap = "Alternative plot styles", fig.subcap = c("Original", "Symbols", "Tweaked"), fig.ncol = 1, fig.height=2.5, fig.align="center"}
 
 res_edu <- res_edu %>% filter(grepl("^[a-o]", term))
 n_regs <- nrow(res_edu)
@@ -473,8 +488,6 @@ See above for our thoughts on exogeneity versus theory. We have added in results
 ## References
 
 Abdellaoui, A., Hugh-Jones, D., Yengo, L., Kemper, K.E., Nivard, M.G., Veul, L., Holtz, Y., Zietsch, B.P., Frayling, T.M., Wray, N.R. and Yang, J., 2019. Genetic correlates of social stratification in Great Britain. *Nature human behaviour*, *3*(12), pp.1332-1342.
-
-Acemoglu, D., Johnson, S., Robinson, J.A. and Yared, P., 2008. Income and democracy. *American economic review*, *98*(3), pp.808-42.
 
 Chuang, Y. and Schechter, L., 2015. Stability of experimental and survey measures of risk, time, and social preferences: A review and some new results. *Journal of development economics*, *117*, pp.151-170.
 
