@@ -50,6 +50,7 @@ library(glue)
 library(broom)
 library(huxtable)
 loadNamespace("scales")
+loadNamespace("shades")
 
 # nasty hack to make add_ashe_income work later:
 if (! exists("add_ashe_income")) source("~/import-ukbb-data/import-ukbb-data.R")
@@ -139,49 +140,6 @@ standard_ggplot <- function (
                          ))
 }
 
-old_ggplot <- function (
-        dfr, 
-        fill_col, 
-        n_regs, 
-        ...,
-        score_col = quo(term), 
-        order_idx = 1, 
-        fill_direction = 1,
-        n_cats    = NULL,
-        conf_int  = NULL
-      ) {
-  if (! missing(score_col)) score_col <- enquo(score_col)
-  
-  mfc <- missing(fill_col)
-  fill_col <- if (mfc) quo(NULL) else enquo(fill_col)
-  if (missing(n_cats)) {
-    n_cats <- if (mfc) 1 else length(unique(pull(dfr, {{fill_col}})))
-  }
-  
-  if (is.null(conf_int)) conf_int <- "conf.low" %in% names(dfr)
-  
-  n_regs <- as.double(n_regs)
- 
-  confint_geom_segment <- if (conf_int) confint_geom_segment() else NULL
-  
-  dfr %>% mutate(
-          !! score_col := pretty_names(!! score_col),
-          !! score_col := fct_reorder(!! score_col, estimate, order_abs(order_idx))
-        ) %>% 
-        rename(p = p.value) %>% 
-        ggplot(aes(estimate, {{score_col}}, yend = {{score_col}}, 
-                     fill = {{fill_col}}, ..., colour = p < 0.05/{{n_regs}})) +
-          my_vline + 
-          confint_geom_segment +
-          pval_geom_point(fill = if(rlang::quo_is_null(fill_col)) "steelblue") +
-          pval_scale() +
-          my_fill_scale(n = n_cats, direction = fill_direction) +
-          my_labs() +
-          my_theme() +
-          scale_linetype_manual(name = "", values = c("95% c.i. uncorrected" = 1))
-
-}
-
 
 my_theme <- function (...) theme(axis.text.y = element_text(size = 7), ...)
 
@@ -216,7 +174,8 @@ my_fill_scale <- function (n, aesthetics = "fill", ...) {
                                         aesthetics = aesthetics), 
                                    dots))
   } else {
-    scale_color_brewer(aesthetics = aesthetics, ...)
+    shades::lightness(scale_color_brewer(aesthetics = aesthetics, ...), 
+                        shades::scalefac(0.85))
   }
 }
 
