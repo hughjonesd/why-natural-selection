@@ -2312,7 +2312,7 @@ Overall, `r prop_consistent_controlled * 100` per cent of effect sizes
 are consistently signed across all four regressions (on children and
 siblings, and with and without residualization).
 
-```{r plot-regs-controlled-pcs, fig.cap = "Selection effects using unresidualized polygenic scores on number of siblings/children. Sibling estimates weighted by 1/number of siblings."}
+```{r plot-regs-controlled-pcs, fig.cap = "Selection effects using unresidualized polygenic scores on number of siblings/children. Sibling estimates weighted by 1/number of siblings.", fig.height = 6}
 
 drake::loadd(res_all)
 
@@ -2322,6 +2322,10 @@ res_all %>%
         term     = pretty_names(term),
         term     = reorder_within(term, estimate, dep.var, order_abs(1)),
         dep.var  = fct_inorder(dep.var),
+        dep.var  = fct_recode(dep.var, 
+                                `Respondents' RLRS` = "RLRS",
+                                `Parents' RLRS` = "RLRS_parents" 
+                              ),
         reg.type = fct_recode(reg.type, 
                                `Resid. for 100 PCs`  = "controlled", 
                                Unresidualized        = "raw"
@@ -2331,7 +2335,7 @@ res_all %>%
       ggplot(aes(y = term, x = estimate, fill = reg.type, 
         colour = p < 0.05/{{n_regs}})) +
         my_vline + 
-        facet_wrap(vars(dep.var), scales = "free") +
+        facet_grid(rows = vars(dep.var), scales = "free") +
         pval_geom_point(position = position_dodge(0.4), alpha = 0.8) +
         my_labs() +
         pval_scale() +
