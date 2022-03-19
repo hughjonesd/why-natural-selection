@@ -87,7 +87,59 @@ my_vline <- geom_vline(xintercept = 0, colour = "grey20", linetype = "dotted")
 pval_palette <- c("FALSE" = "grey65", "TRUE" = "#f3b372")
 
 
+
 standard_ggplot <- function (
+  dfr, 
+  fill_col, 
+  n_regs, 
+  ...,
+  score_col = quo(term), 
+  order_idx = 1, 
+  fill_direction = 1,
+  n_cats    = NULL,
+  conf_int  = NULL
+) {
+  if (! missing(score_col)) score_col <- enquo(score_col)
+  
+  mfc <- missing(fill_col)
+  fill_col <- if (mfc) quo(NULL) else enquo(fill_col)
+  if (missing(n_cats)) {
+    n_cats <- if (mfc) 1 else length(unique(pull(dfr, {{fill_col}})))
+  }
+  
+  if (is.null(conf_int)) conf_int <- "conf.low" %in% names(dfr)
+  confint_geom_segment <- if (conf_int) confint_geom_segment() else NULL
+  
+  n_regs <- as.double(n_regs)
+  
+  dfr %>% mutate(
+    !! score_col := pretty_names(!! score_col),
+    !! score_col := fct_reorder(!! score_col, estimate, order_abs(order_idx))
+  ) %>% 
+    rename(p = p.value) %>% 
+    ggplot(aes(estimate, {{score_col}}, yend = {{score_col}}, 
+               shape = {{fill_col}}, ...)) +
+    my_vline + 
+    confint_geom_segment +
+    geom_point(size = 1.8, aes(color = {{fill_col}})) +
+    geom_point(size = 0.7, color = "white", aes(alpha = p < 0.05/33)) +
+    my_fill_scale(aesthetics = "color", n = n_cats, direction = fill_direction) +
+    scale_shape_manual(values = 1:n_cats + 14) +
+    my_labs() +
+    my_theme() +
+    scale_linetype_manual(name = "", values = c("95% c.i." = 1)) +
+    scale_alpha_discrete(range = c(1, 0),
+                         guide = guide_legend(
+                           override.aes = list(
+                             shape = c(1, 16),
+                             color = "black",
+                             alpha = 1,
+                             size = 1.8
+                           )
+                         ))
+}
+
+old_ggplot <- function (
         dfr, 
         fill_col, 
         n_regs, 
@@ -2075,7 +2127,16 @@ drake::loadd(res_fe_fertility)
 n_regs <- nrow(res_fe_fertility)/2 # Raw and Controlled treated separately
 
 standard_ggplot(res_fe_fertility, fill_col = Regression, n_regs = n_regs,
-                  fill_direction = -1)
+                  fill_direction = -1) +
+  guides(alpha = guide_legend(
+                   override.aes = list(
+                             shape = 1,
+                             color = "black",
+                             alpha = 1,
+                             size = 1.8
+                   )
+                 )
+  )
 
 n_groups <- attr(res_fe_fertility, "n_groups")
 n <- attr(res_fe_fertility, "n")
