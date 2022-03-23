@@ -332,19 +332,20 @@ changes could reflect natural selection within the UK population, but also
 emigration, or ascertainment bias within the sample [@10.1093/aje/kwx246]. 
 
 
-```{r plot-means-over-time, fig.height = 6, fig.cap = "Mean polygenic scores (PGS) by birth year in UK Biobank. Points are means for 5-year intervals. Lines are 95% confidence intervals. Circles show a significant linear increase (green) or decrease (red) over time (p < 0.05/33)."}
+```{r plot-means-over-time, fig.height = 6, fig.cap = "Mean polygenic scores (PGS) by birth year in UK Biobank. Circles are means for 5-year intervals. Lines are 95% confidence intervals. Solid circles show a significant linear increase (green) or decrease (red) over time (p < 0.05/33)."}
 
 drake::loadd(pgs_over_time)
 
 pgs_over_time %>% 
       mutate(score_name = pretty_names(score_name)) %>% 
       ggplot(aes(YOB, group = score_name, colour = Change, shape = Change)) + 
-      geom_pointrange(aes(ymin = score_lo, y = score, ymax = score_hi), 
-        fatten = 1.2) +
+      geom_linerange(aes(ymin = score_lo, ymax = score_hi), color = "grey60", 
+                       size = 3) +
+      geom_point(aes(y = score), size = 2) +
       facet_wrap(~score_name, ncol = 6) +
       my_hline +
-      scale_color_manual(values = c("-" = "red", "+" = "darkgreen", "o" = "black")) +
-      scale_shape_manual(values = c("-" = "circle", "+" = "circle", "o" = "square")) +
+      scale_color_manual(values = c("-" = "darkred", "+" = "darkgreen", "o" = "black")) +
+      scale_shape_manual(values = c("-" = "circle", "+" = "circle", "o" = "circle open")) +
       theme(
         line        = element_line(size = 0.5, lineend = "round"),
         strip.text  = element_text(size = 6), 
@@ -357,7 +358,7 @@ pgs_over_time %>%
 
 
 To test more directly for natural selection, we regress respondents' relative 
-lifetime reproductive success ($RLRS_i$) on their polygenic scores (PGS):
+lifetime reproductive success (RLRS) on their polygenic scores (PGS):
 
 
 ```{=tex}
@@ -543,16 +544,19 @@ res_wt_combined %>%
 ```
 
 
-To motivate our economic model, we split the sample by demographic
-and social variables, and re-estimate \@ref(eq:regression) within each subgroup.
-We examine socio-demographic variables including income and education, and
-family structure variables including age at first live birth, presence of a
-partner, and lifetime number of sexual partners. Figure
-\@ref(fig:plot-income-educ-level) plots selection effects for each polygenic
-score, grouping respondents by age of completing full-time education, and by
-household income. Effects are larger and more significant for the lowest income
-category, and for the lowest education category. These results are robust to
-controlling for respondents' age (Appendix section \@ref(sec:age-control)).
+We now show the empirical puzzles which motivate our economic model. Each
+concerns differences in the strength of natural selection across different
+subgroups in the sample. Splitting the sample by demographic and social
+variables, we re-estimate \@ref(eq:regression) within each subgroup. We use
+socio-economic variables including income and education, and family structure
+variables including age at first live birth, presence of a partner, and lifetime
+number of sexual partners.
+
+Figure \@ref(fig:plot-income-educ-level) plots selection effects for each
+polygenic score, grouping respondents by age of completing full-time education,
+and by household income. Effects are larger and more significant for the lowest
+income category, and for the lowest education category. These results are robust
+to controlling for respondents' age (Appendix section \@ref(sec:age-control)).
 
 
 ```{r plot-income-educ-level, fig.cap = "Selection effects by education and income.", fig.subcap = c("Age left full-time education", "Household income"), fig.ncol = 1}
@@ -626,7 +630,6 @@ res_with_partner %>%
 ```
 
 
-
 ```{r calc-age-flb-cross}
 
 drake::loadd(res_age_flb_cross)
@@ -636,20 +639,6 @@ cor_age_flb <- res_age_flb_cross %>%
       pivot_wider(score_name, names_from = category, values_from = estimate) %>%              {cor(.$`age_flb_cat10-22`, .$`age_flb_cat28-52`)}
 
 ```
-
-
-Lastly, we split female respondents by age at first live birth
-(AFLB).[^aflb-no-men] There is evidence for genetic effects on AFLB
-[@Barban_2016], and there is a close link between this variable and number of
-children born. Figure \@ref(fig:plot-age-flb) shows effect sizes estimated
-separately for each tercile of AFLB. Effects are strikingly different
-across terciles. Educational attainment, ADHD and MDD are selected for amongst
-the youngest third of mothers, but selected against among the oldest two-thirds.
-Similarly, several polygenic scores for body measurements are selected against
-only among older mothers. The correlation between effect sizes for the youngest
-and oldest terciles is `r cor_age_flb`.
-
-[^aflb-no-men]: AFLB is unavailable for men.
 
 
 ```{r calc-corr-age-flb}
@@ -686,13 +675,24 @@ opp_signed <- sum(
 ```
 
 
-To investigate this further, we estimate equation \@ref(eq:regression) among
-females, *controlling* for AFLB. In `r opp_signed` out of 
-`r length(score_names)` cases, effects change sign when controls are added. The
-correlation between effect sizes controlling for AFLB, and raw effect sizes, is
-`r cor_raw_flb`. Thus, selection effects seem to come through two opposing
-channels: a correlation with AFLB, and an opposite-signed correlation with 
-number of children after AFLB is controlled for.
+Lastly, we split female respondents by age at first live birth
+(AFLB).[^aflb-no-men] There is evidence for genetic effects on AFLB
+[@Barban_2016], and there is a close link between this variable and number of
+children born. Figure \@ref(fig:plot-age-flb) shows effect sizes estimated
+separately for each tercile of AFLB. Effects are strikingly different
+across terciles. Educational attainment, ADHD and MDD are selected for amongst
+the youngest third of mothers, but selected against among the oldest two-thirds.
+Similarly, several polygenic scores for body measurements are selected against
+only among older mothers. The correlation between effect sizes for the youngest
+and oldest terciles is `r cor_age_flb`. To investigate this further, we estimate
+equation \@ref(eq:regression) among females, *controlling* for AFLB. In 
+`r opp_signed` out of `r length(score_names)` cases, effects change sign when
+controls are added. The correlation between effect sizes controlling for AFLB,
+and raw effect sizes, is `r cor_raw_flb`. Thus, selection effects seem to come
+through two opposing channels: a correlation with AFLB, and an opposite-signed
+correlation with number of children after AFLB is controlled for.
+
+[^aflb-no-men]: AFLB is unavailable for men.
 
 
 ```{r plot-age-flb, fig.cap = "Selection effects by age at first live birth terciles (women only).", fig.align = "center"}
@@ -720,13 +720,15 @@ stopifnot(sib_chn_cor$p.value < 2e-16)
 ```
 
 
-We emphasize that our categories are not necessarily exogenous to the polygenic
-scores. For example, in the data, and also in our theoretical model, age at first
-live birth is a choice variable, which is endogenous to human-capital-related
-polygenic scores (Appendix Figure \@ref(fig:plot-age-flb-dv)). Nevertheless,
-differences in equation \@ref(eq:regression) across subgroups constrain the set
-of possible explanations for natural selection. As we show below, a simple
-economic model predicts the differences we find.
+We emphasize that our categories are not necessarily exogenous to polygenic
+scores. For example -- both in the data (Appendix Figure
+\@ref(fig:plot-age-flb-dv)) and in our model -- age at first live birth is a
+choice variable, which is endogenous to an individual's human capital and
+related polygenic scores. Nevertheless, observed differences in equation
+\@ref(eq:regression) across subgroups constrain the set of possible
+theories; a good theory of contemporary natural selection needs to explain
+how these results arise. As we show below, a model based on the economic
+theory of fertility can do just that.
 
 We also examine selection effects among respondents' parents, using information
 on respondents' number of siblings to calculate parents' RLRS. Effect sizes of
@@ -749,6 +751,7 @@ and change sign when controlling for AFLB, among both mothers and fathers
 grandchildren. We do not find any: in fact, the correlation between respondents' 
 and parents' RLRS is positive ($\rho$ = `r sib_chn_cor$estimate`, 
 $p < 2 \times 10^{-16}$).
+
 
 \FloatBarrier
 
@@ -784,9 +787,9 @@ U = u(Y)+aN.
 Here $a$ captures the strength of preference for children. $u(\cdot)$ captures
 the taste for income, and is increasing and concave. We treat $N$ as continuous,
 in line with the literature: this can be thought of as the expected number of
-children among similar people. The marginal benefit of an extra child is
-$\frac{dU}{dN} = -bWu'(Y)+a$. The effect of an increase in human capital on this
-marginal benefit is
+children among people with a given $a$, $b$ and $W$. The marginal
+benefit of an extra child is $\frac{dU}{dN} = -bWu'(Y)+a$. The effect of an
+increase in human capital on this marginal benefit is
 
 \[
 \frac{d^{2}U}{dNdh}=\underbrace{-bu'(Y)}_{\textrm{Substitution effect}}\underbrace{-bYu''(Y)}_{\textrm{Income effect}}.
@@ -805,22 +808,21 @@ that credit markets are imperfect so that agents cannot borrow. Write
 U(N_{1},N_{2}) = u(Y_{1}) + u(Y_{2}) + aN_{1} + aN_{2}\label{eq:U}
 \end{equation}
 
-Instead of identifying human capital with wages, we now allow
-individuals to choose a level of education $s \in [0,1]$, which has
-a time cost in period 1. Education is
-complementary to human capital $h > 0$, and increases period 2 wages, which take 
-the  simple functional form $w(s,h) = sh$. We normalize period 1 wages
-to 1, and let $u(\cdot)$ take the constant relative risk aversion form
-$u(y)=\frac{y^{1 - \sigma} - 1}{1 - \sigma}$. $\sigma > 0$ measures the curvature
-of the utility function, i.e. the decline in marginal utility of income as income
-increases. We examine total fertility $N^{*} = N_{1}^{*} + N_{2}^{*}$ and the 
-*fertility-human capital relationship*, $\frac{dN^{*}}{dh}$. For $\sigma < 1$ in
-a neighbourhood of $\sigma = 1$, Table \@ref(tab:theory) shows five theoretical
-predictions, along with our corresponding empirical results for the correlation
-between polygenic scores and RLRS.[^one-period-results] The key insight of
-the model is that for middling levels of $\sigma$, the substitution effect
-dominates at low income levels, but is balanced by the income effect as income
-increases.
+Instead of identifying human capital with wages, we now allow individuals to
+choose a level of education $s \in [0,1]$, which has a time cost in period 1.
+Education is complementary to human capital $h > 0$, and increases period 2
+wages, which take the  simple functional form $w(s,h) = sh$. We normalize period
+1 wages to 1, and let $u(\cdot)$ take the constant relative risk aversion form
+$u(y)=\frac{y^{1 - \sigma} - 1}{1 - \sigma}$. $\sigma > 0$ measures the
+curvature of the utility function, i.e. the decline in marginal utility of
+income as income increases. We examine total fertility 
+$N^{*} = N_{1}^{*} + N_{2}^{*}$ and the *fertility-human capital relationship*,
+$\frac{dN^{*}}{dh}$. For $\sigma < 1$ in a neighbourhood of $\sigma = 1$, Table
+\@ref(tab:theory) shows five theoretical predictions, along with our
+corresponding empirical results for the correlation between polygenic scores and
+RLRS.[^one-period-results] The key insight of the model is that for middling
+levels of $\sigma$, the substitution effect dominates at low income levels, but
+is balanced by the income effect as income increases.
 
 [^one-period-results]: Predictions 1-3 also hold in the one-period model with
 constant relative risk aversion. Our empirical results are actually stronger
@@ -867,7 +869,7 @@ affect age at first birth and fertility. Income decreases fertility at low
 income levels, but increases it at higher income levels [@cohen2013financial].
 US fertility decreases faster with education among single mothers than married
 mothers [@baudin2015fertility], in line with our prediction 3 and as predicted by
-@becker1981treatise. There is also a literature showing negative correlations
+@becker1981treatise. A related literature shows negative correlations
 between IQ and fertility [e.g. @lynn2004new; @reeve2018systematic].
 
 
@@ -1025,8 +1027,8 @@ stopifnot(n_less_sig == 0)
 We consider three alternative theories that might explain our results. First,
 welfare benefits which incentivize child-bearing might be taken up more among
 low-income individuals. However, the majority of effect sizes appear unchanged
-over a large span of twentieth-century history (Appendix Tables
-\@ref(tab:tbl-siblings-by-period) and \@ref(tab:tbl-children-by-period)), during
+over a large span of twentieth-century history (Appendix Table
+\@ref(tab:tbl-change-by-period)), during
 which government spending on child-related benefits varied considerably
 [@hoc1999socsec]. In general, there is only weak evidence that welfare benefits
 affect fertility [@gauthier2007impact]. Future
