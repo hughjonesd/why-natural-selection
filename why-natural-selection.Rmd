@@ -1245,7 +1245,7 @@ iterative post-stratification using the `rake()` function, on Census Middle Laye
 Super Output Areas, sex and presence/absence of a partner.
 
 Code for this paper is available at 
-https://github.com/hughjonesd/negative-selection.
+https://github.com/hughjonesd/why-natural-selection.
 
 ## Acknowledgements 
 
