@@ -278,7 +278,7 @@ Dear Professor Keller,
 
 Thank you very much for the chance to revise our manuscript. We would also like to thank both reviewers for their comments. Below we deal with the points they raised.
 
-Code to produce this paper is now publicly available at <https://github.com/hughjonesd/negative-selection>. XXX
+Code to produce this paper is now publicly available at <https://github.com/hughjonesd/why-natural-selection>. XXX
 
 With best wishes,
 
