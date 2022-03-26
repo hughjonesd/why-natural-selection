@@ -3,6 +3,9 @@
 Code for the paper "Human capital mediates natural selection in 
 contemporary humans" by Abdel Abdellaoui and David Hugh-Jones.
 
+# The paper
+
+The current version is available at https://github.com/hughjonesd/why-natural-selection/blob/master/why-natural-selection.pdf.
 
 # To download
 
