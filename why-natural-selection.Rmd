@@ -1564,13 +1564,19 @@ The UK Biobank data contains information on respondents' number of siblings
 polygenic scores are equal in expectation to the mean scores of their parents,
 we can use this to look at selection effects in the parents' generation. We
 estimate equation (\ref{eq:regression}) using parents' RLRS as the dependent
-variable. The parents' generation has an additional source of ascertainment
+variable.[^parent-RLRS] The parents' generation has an additional source of ascertainment
 bias: sampling parents of respondents overweights parents who have many
 children. For instance, parents of three children will have, on average, three
 times more children represented in UK Biobank than parents of one child. Parents
 of no children will by definition not be represented. To compensate, we reweight
 our preferred weightings (Age/Qualification) by the inverse of *number of
 siblings*.
+
+[^parent-RLRS]: We don't have data on parents' year of birth for most 
+respondents. To create parents' RLRS, we divide respondents' number of siblings 
+by the average number of siblings of all respondents born in the same year,
+weighting the average by respondents' inverse of number of siblings to 
+compensate for ascertainment bias.
 
 Figure \@ref(fig:plot-res-sibs) shows regressions of parents' RLRS on
 polygenic scores. For a clean comparison with the respondents' generation, we
