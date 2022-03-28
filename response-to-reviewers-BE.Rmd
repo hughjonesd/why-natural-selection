@@ -278,7 +278,11 @@ Dear Professor Keller,
 
 Thank you very much for the chance to revise our manuscript. We would also like to thank both reviewers for their comments. Below we deal with the points they raised.
 
-Code to produce this paper is now publicly available at <https://github.com/hughjonesd/why-natural-selection>.
+We've also made some other changes:
+
+-   We moved the results on causality of polygenic scores to the appendix. We thought they were a distraction from the key point of Section 4, which is to test our theory.
+
+-   Code to reproduce this paper is now publicly available at <https://github.com/hughjonesd/why-natural-selection>.
 
 With best wishes,
 
@@ -299,17 +303,17 @@ Thank you!
 
 > Most curious is the failure to cite Fisher (1930).... The overlap in theory and observations with the present work is striking, so much so that the omission is equally striking.
 
-We thank the reviewer for giving us this reference. Indeed it is striking. Fisher's theory about the positive correlation he mentions is that it's driven by selection bias: Yale parents who can afford to send 6 children to Yale are "more able" than those who can only send 1, and as a result, among Yale students, children from bigger families are smarter. This is related to the income effect in our theory. We now mention this work in our conclusion.
+We thank the reviewer for giving us this reference. Indeed it is striking. Fisher's theory about the positive correlation he mentions is that it's driven by selection bias: Yale parents who can afford to send 6 children to Yale are "more able" than those who can only send 1, and as a result, among Yale students, children from bigger families are smarter. This is related to the income effect in our theory. We now mention this work in our conclusion ("Strikingly, some of these results were predicted by Fisher (1930), pp. 253-254.")
 
 > The authors do not have to respond to my next point. This paper already has a lot. But I am curious as to whether the authors have an opinion about Fisher's proposed solution to this problem (if it is a problem). He in essence suggested that the population be stratified into classes based on "human capital," as we might say now, and that within each stratum redistribution should be performed so as to reward parents of larger families. The basic idea is that if I have four children, while an academic colleague who is the same age as me has none (which has allowed him to publish twice as many papers), the tax-and-spend system will take away some of his income and give it to me, the total amount of redistribution being such as to remove the fundamental tradeoff. Can this work in theory? Can it be made politically feasible?
 
-Indeed, we don't want to talk about policy in the paper - we think we do not yet know enough. For what it's worth, here are my personal thoughts as corresponding author. First, government schemes to encourage fertility have a poor track record, see e.g. Gauthier (2007). Second, my strong gut feeling is that it is wrong for governments to (bluntly put) institute breeding programs for their citizens. I wrote more informally on this topic [here](https://wyclif.substack.com/p/the-natural-selection-paper-part-822?s=w).
+Indeed, we don't want to talk about policy in the paper - we think we do not yet know enough about the underlying forces. The proposed policy sounds close to some things that already exist e.g. child benefit in the UK, which is a non-means-tested per-child benefit. For what it's worth, my personal view is that government schemes to encourage fertility have a poor track record, see e.g. Gauthier (2007), though see also the recent Bergsvig et al. (2021). I wrote more informally on the policy issue [here](https://wyclif.substack.com/p/the-natural-selection-paper-part-822?s=w).
 
 > Another general point is that there is some uncertainty over whether the fertility-IQ correlation is negative in entire populations. Some suggest that its negative value in unrepresentative samples is the result of ascertainment bias (e.g., Higgins, Reed, & Reed, 1962; Kolk & Kieron, 2019). In fact, I have reviewed a manuscript where the authors declined using the UK Biobank for a particular analysis (while using it for all others) on the grounds that the fertility-IQ relationship cannot be accurately inferred in that dataset. My position is that the fertility-IQ correlation has been negative, at most times since relevant data have been collected, while being less so at certain atypical times (e.g., the Baby Boom) and in men. In the present work, the authors use sample reweighting to address ascertainment bias in the UK Biobank, but this is not guaranteed to be effective. A brief literature review addressing the sign of the fertility-IQ correlation, in most Western populations in recent decades, therefore seems warranted to provide some reassurance. My suggestion is to begin with Lynn and Van Court (2004), Meisenberg (2010), and Reeve, Heeney, and Woodley (2018).
 
-We agree this is an important topic, but we are more focused on human capital and earnings than IQ specifically. (Of course the polygenic score for educational attainment does also predict IQ.) The negative fertility-income relationship, in developed countries, is a very well-established stylized fact, and we mention some papers that also show income is causal. We now mention two of the cited papers.
+We agree this is an important topic, but we are more focused on human capital and earnings than IQ specifically. (Of course the polygenic score for educational attainment also captures a portion of the polygenic effects on IQ.) The negative fertility-income relationship, in developed countries, is a very well-established stylized fact, and we mention some papers that also show income is causal. We now mention two of the cited papers: "A related literature shows negative correlations between IQ and fertility (e.g. Lynn and Van Court 2004; Reeve, Heeney, and Menie 2018)".
 
-Regarding ascertainment bias, the reviewer is right that there are no guarantees we can eliminate it. When we do correct for ascertainment bias, every correction increases our estimated effect sizes. So we expect that any remaining ascertainment is also probably biasing our estimates towards zero. We now say this.
+Regarding ascertainment bias, the reviewer is right that there are no guarantees we can eliminate it. When we do correct for ascertainment bias, every correction increases our estimated effect sizes. So we expect that any remaining ascertainment is also probably biasing our estimates towards zero. We now say this: "There may be remaining sources of ascertainment bias after our weighting; if so, we expect that, like the sources of ascertainment we have controlled for, they probably bias our results towards zero."
 
 > abstract: "Consistently over time, polygenic scores associated with lower (higher) earnings, education and health are selected for (against)." This is hard to understand. How about: "Consistently over time, polygenic scores predicting higher earnings, education, and health also predict lower fertility."
 
@@ -325,7 +329,7 @@ We now cite Robertson (1966).
 
 > p\. 4: It should be "stabilizing" selection, not "balancing" selection. The latter refers to any kind of selection that favors the coexistence of two or more alleles at a site. The former refers to selection that favors an intermediate value of a quantitative trait, and this is clearly what the authors mean. While I believe the term "diversifying" selection is sometimes uses for selection favoring both extremes of a quantitative trait, "disruptive" selection is probably more common. A similar point applies on p. 20.
 
-We have changed vocabulary accordingly.
+We have changed vocabulary accordingly, using "stabilizing" and "disruptive" throughout.
 
 > p\. 10: I am interested in the functional form chosen for u(y). This has sensible properties for sigma \< 1 near 1, including being increasing in y for y somewhat greater than zero and being concave. Intuitively, this means that utility increases with income (net of costs of childrearing) but less so as income increases. Is there any particular reason for this functional form as opposed to others that also satisfy these properties? Also, is there any empirical evidence that "utility" obeys this relationship?
 
@@ -335,7 +339,7 @@ The literature on estimating utility functions is vast (see e.g. Chuang and Sche
 
 > p\. 30: I feel that more thought might be given to the choice of covariates. For example, if fluid IQ is on the causal path between the PGS and EA, then controlling it will bias downward the estimate of the the PGS effect on EA. But since this mediation analysis seems tentative and not crucial to the paper, perhaps some looseness here can be tolerated.
 
-Yes. Conversely, fluid IQ might affect fertility choices via other pathways than human capital in the labour market, and not controlling for it might leave these to be picked up by EA. We prefer to be "conservative" in controlling for it, in the sense that we'd rather bias the estimate indirect effect of EA towards zero than away from zero. We now mention this issue in the appendix.
+Yes. Conversely, fluid IQ might affect fertility choices via other pathways than human capital in the labour market, and not controlling for it might leave these to be picked up by EA. We prefer to be "conservative" in controlling for it, in the sense that we'd rather bias the estimate indirect effect of EA towards zero than away from zero. We now mention this issue in the appendix: "Note that controlling for fluid IQ is conservative, in the sense that IQ might also measure human capital; nevertheless, we control for it because fluid IQ might affect fertility decisions via other channels than human capital."
 
 That said, the mediation analysis is really the central test of our theory. So we have tried to make it seem less tentative. See our response to Reviewer 2.
 
@@ -353,17 +357,15 @@ That said, the mediation analysis is really the central test of our theory. So w
 >
 > (6) The assumption that eta is independent of p_star seems very strong. It includes, for example, the assumption that the PGS over rare variants is uncorrelated with the PGS over common variants. I think this is unlikely to be true, as a result of assortative mating (Yengo et al., 2018).
 
-We accept point (6) in particular. On the other hand, we do state that this is a "back of the envelope calculation". We've had pushback from people saying "this is no big deal", so we want to show that at least under some assumptions, yes it might be. Note also that as we say:
-
-"If unmeasured PSEA correlates positively with $\varepsilon$, then the reliability coefficient $\lambda$ will be lower than calculated. However, the proportional effect of natural selection on the PSEA-income relationship will remain the same, so long as $\lambda$ does not differ between the two sets of weighted regressions."
-
-The within-family estimate should remove the worries about exogeneity of p\*, but they are estimated with a smaller sample. We agree that the estimate is high. The bootstrapped 95% confidence interval is from around 0% to 300%, which is not really informative, though it does suggest that genetic nurture is more likely to bias our results downwards than upwards. We've removed the discussion.
+We accept point (6) in particular. We had pushback from people saying "this is no big deal", so we want to show that at least under some assumptions, yes it might be. The within-family estimate should remove many of the worries about exogeneity of p\*, but they are estimated with a smaller sample. We agree that the estimate seems high, and indeed, the bootstrapped 95% confidence interval is from around 0% to 300%, which is not really informative, though it does suggest that genetic nurture is more likely to bias our results downwards than upwards. We've removed the discussion.
 
 > p\. 40 and following: I confess to not following the derivations completely. The authors seem adept at what they do, and I trust that they have made no serious errors.
 >
 > (1) This is my first encounter with the Karush-Kun-Tucker conditions or the Inada condition.
 
-KTK are the standard conditions for constrained optimization (see e.g. Sundaram 1996). We think people who want to follow the proofs will know about them. The Inada condition is a bit more specific to economics. We are now more explicit about what it means. It can be derived in this case by differentiating $u$ to give $u'(y) = y^{-\sigma}$ which for $\sigma > 0$ approaches infinity as $y \rightarrow 0$.
+KKT are the standard first order conditions for constrained optimization (see e.g. Sundaram 1996). We think people who want to follow the proofs will know about them. The Inada condition is a bit more specific to economics. We are now more explicit about what it means: "the Inada condition (that marginal utility of income grows without
+
+bound as income approaches zero, $\lim_{x\rightarrow0}u'(x)=\infty$ )". It can be derived in this case by differentiating $u$ to give $u'(y) = y^{-\sigma}$ which for $\sigma > 0$ approaches infinity as $y \rightarrow 0$. An intuitive interpretation is that if you have extremely low income, your need for income overrides other considerations.
 
 > (2) Below Equation 25, I did not verify the second derivative of N_2 with respect to h. This seems to require simple (if tedious) applications of the product and chain rules. The important conclusion, that N_2 is convex in h for sigma close to 1, is something that I will accept by analogy to the case N_1, N_2 \> 0.
 
@@ -396,7 +398,7 @@ We don't want to go too far, by pretending that the theory came to us fully-form
 
 We think these analyses are important. First, they motivate our theory, in which education, income, AFLB etc. are indeed endogenous choice variables which are co-determined with fertility. If these mediators were *not* endogenous, we'd need a different theory.
 
-We also think the results matter in their own right. Any theory of contemporary natural selection needs to explain why correlations with fertility are lower at higher levels of income, education, etc. Non-causal explanations would be fine, but theories which don't generate these correlations must be missing something. Note that Fisher, cited by Reviewer 1, used observed correlations quite like ours to differentiate between theories of the fertility-income relationship. Generally, significant correlations have often led to important theoretical literatures, even when the direction of causality is uncertain (e.g. education/wages in labour economics, or democracy/GDP levels in political economy).
+We also think the results matter in their own right. Any theory of contemporary natural selection needs to explain why correlations with fertility are lower at higher levels of income, education, etc. Non-causal explanations are fine, but theories which don't generate these correlations must be missing something. Note that Fisher, cited by Reviewer 1, used observed correlations quite like ours to differentiate between theories of the fertility-income relationship. Generally, significant correlations have often led to important theoretical literatures, even when the direction of causality is initially uncertain (e.g. education/wages in labour economics, or democracy/GDP levels in political economy).
 
 As described above, we have shortened Section 2 to focus on the key results of variation by income, education, number of partners, partner presence and AFLB. These empirics now take up just 39 lines of text, plus Figures 3-5. We no longer split respondents by sex in Figure 4. This saves two figures, and should reduce space in the final version.
 
@@ -412,7 +414,7 @@ then indeed PGS effect on fertility, and PGS correlation with education, will be
 
 > \> In the mediation analysis, why do the authors only use education as the mediator? The mediation framework they use can easily accommodate many mediators (see Section 6 of the Supplementary Information of the "EA2" paper by Okbay et al., Nature Genetics 2016). I would like to see a more full-fledged mediation analysis that also includes other proxies for human capital as mediators, including earnings in a respondent's first job as well as household income (though the later is not an ideal variable for that, especially for females).
 
-We would like to have more mediators, but appropriate variables are hard to find. Earnings in first job reduces our N by a factor of 10, which makes results too noisy to be informative. As the reviewer suggests, current household income is very much endogenous not only to human capital, but also to previous fertility, which makes it inappropriate as a mediator.
+We would like to have more mediators, but appropriate variables are hard to find. Earnings in first job reduces our N by a factor of 10, and this makes results too noisy to be informative. As the reviewer suggests, current household income is very much endogenous not only to human capital, but also to previous fertility, which makes it inappropriate as a mediator.
 
 > \> Also, in the mediation analysis, some of the ratios of indirect to total effects are negative or larger than 100%. This could indicate that the indirect and direct effects have opposite signs, but could also be due to the imprecision of the estimates. The authors should estimate 95% CIs for the ratio of indirect/total effects (these can be obtained by bootstrapping). They could then focus their discussion on the ratios that are significant and not on those that are just noisy estimates.
 
@@ -433,13 +435,13 @@ We welcome any further suggestions.
 > \
 > Also, instead of presenting a small subset of the results with various weighting schemes in Figure 2, it'd be preferable for the authors to pick what they think is the best weighting scheme and then present all results with that scheme. Then, they can briefly discuss the robustness of their results to various weighting schemes.
 
-XXX Probably get in touch with those guys with their own weighting.\
+We agree with this. Combining all the variables is hard: age at first live birth is only available for females, and some of the data comes from different sources. Our ideal option is to use the weights that are being developed by Sjoerd van Alten and coauthors. Their working paper is specifically dedicated to weighting UK Biobank, so it seems good to use the "industry standard" solution rather than rolling our own. We now use these weights throughout. XXX
 
 > 4\. On p. 4, line 13, the authors write that "Beta is the expected polygenic score among children of the sample", with a footnote explaining the reason. However, since the authors use N=number of children rather than relative number of children (=number of children/mean number of children), I don't think that's correct. See Beauchamp PNAS 2016. More generally, why not use relative lifetime reproductive success (rLRS) instead of number of children as the dependent variable in equation 1?
 
 Oops, yes. We hope the corrected footnote is now right.
 
-We now use RLRS as the dependent variable for both respondents and parents. Results are not much changed, except there is now slightly more evidence for larger selection effects over time: 9 polygenic scores show a significant increase in effect size on respondents' RLRS when we median-split them by birth year. In turn, this makes us less sure that we can rule out that the welfare state is a relevant explanation for natural selection, so we have slightly qualified our comments on this topic.
+We now use RLRS as the dependent variable for both respondents and parents. Beyond the obvious change in absolute effect sizes, results are not much changed, except there is now slightly more evidence for larger selection effects over time: 9 polygenic scores show a significant increase in effect size on respondents' RLRS when we median-split them by birth year. Probably this was masked when we used absolute fertility, by the fall in fertility over time. In turn, this makes us less sure that we can rule out that the welfare state is a relevant explanation for natural selection, so we have slightly qualified our comments on this topic.
 
 > 5\. How were the 33 PGSs selected? For instance, why didn't the authors include a PGS of risk preferences? (I'm not requesting that the authors include that specific PGS, but only that they explain their selection process.)
 
@@ -447,17 +449,17 @@ We address this in the Materials and Methods section: "Polygenic scores were cho
 
 > 6\. Did the authors use an age cutoff to include males and females in their selection analyses. To ensure measured fertility is completed fertility, the authors should only use males who were at least 50 years old and females who were at least 45 years old at the time of measurement.
 
-We used 45 years old. We have adjusted this to 50 male/45 female as suggested. Results are little changed, except that EA3 is no longer undergoing diversifying selection in the respondents' generation at the p = 0.05/33 significance threshold.
+We used 45 years old. We have adjusted this to 50 male/45 female as suggested. Results are little changed, except that EA3 is no longer undergoing disruptive/diversifying selection in the respondents' generation at the p = 0.05/33 significance threshold.
 
 > 7\. The authors write that sigma captures risk aversion in income in their model. But that's confusing and not a good way of describing this for their model, because as far as I understand there's no income risk! They should clarify this and say that sigma regulates the curvature of the utility function, and explain what this means in their riskless model.
 
 It is a fair point. We have rewritten accordingly: "$\sigma > 0$ measures the curvature of the utility function, i.e. the decline in marginal utility of income as income increases".\
-\
-OTHER COMMENTS AND SUGGESTIONS
 
+> OTHER COMMENTS AND SUGGESTIONS
+>
 > 8\. Most figures are hard to read. For example, Figures 3-5 are hard to read. In Figure 3a, the dot color indicate education and the dot border color indicates significance; that's very difficult to read quickly (for instance, a blue dot with a yellow border looks green). Instead, the authors could use different symbols (crosses, squares) for education and colors for significance, or vice-versa.
 
-We experimented a lot with our basic figures, and they may not be easy to improve. The graphs' key message is "effect sizes in one category are larger than others". To see that the eye needs to be able to quickly differentiate between categories. We have tried several variants using symbols, but in our judgment the added visual noise makes it harder to follow the categories across rows. The figure below shows three alternative versions: our original, a version using symbols, and one with subtle tweaks to colors and stroke sizes, which we hope fix the greenness issue and make p-values clearer. We prefer our tweaked version (and have used it in the revision), but we will bow to the reviewers or editor. For comparison, a version of the whole paper using the symbols plot is available [here](https://raw.githubusercontent.com/hughjonesd/why-natural-selection/alt-plots/why-natural-selection-weighted.pdf).
+We experimented a lot with our basic figures. The graphs' key message is "effect sizes in one category are larger than others". To see that the eye needs to be able to quickly differentiate between categories. We have tried several variants using symbols, but in our judgment the added visual noise makes it harder to follow the categories across rows. The figure below shows three alternative versions: our original, a version using symbols, and one with subtle tweaks to colors and stroke sizes, which we hope fix the greenness issue and make p-values clearer. We prefer our tweaked version (and have used it in the revision), but we will bow to the reviewers or editor. For comparison, a version of the paper using the symbols plot is available [here](https://raw.githubusercontent.com/hughjonesd/why-natural-selection/alt-plots/why-natural-selection-weighted.pdf).
 
 We've worked on Figures 1 and 2 to improve readability.
 
@@ -488,6 +490,8 @@ See above for our thoughts on exogeneity versus theory. We have added in results
 ## References
 
 Abdellaoui, A., Hugh-Jones, D., Yengo, L., Kemper, K.E., Nivard, M.G., Veul, L., Holtz, Y., Zietsch, B.P., Frayling, T.M., Wray, N.R. and Yang, J., 2019. Genetic correlates of social stratification in Great Britain. *Nature human behaviour*, *3*(12), pp.1332-1342.
+
+Bergsvik, J., Fauske, A. and Hart, R.K., 2021. Can Policies Stall the Fertility Fall? A Systematic Review of the (Quasi‐) Experimental Literature. *Population and Development Review*, *47*(4), pp.913-964.
 
 Chuang, Y. and Schechter, L., 2015. Stability of experimental and survey measures of risk, time, and social preferences: A review and some new results. *Journal of development economics*, *117*, pp.151-170.
 
