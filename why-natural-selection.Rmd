@@ -1937,13 +1937,13 @@ res_age_birth_parents_dv %>%
 ## Mediation analysis
 
 We run a standard mediation analysis in the framework of @baron1986moderator.
-For each polygenic score where the bivariate correlation with fertility is 
+For each polygenic score where the bivariate correlation with RLRS is 
 significant at $p$ < 0.05/33, we estimate 
 \begin{align}
-N_i & = \alpha + \beta PGS_i + \gamma EA_i + X_i\mu + \varepsilon_i \\
+RLRS_i & = \alpha + \beta PGS_i + \gamma EA_i + X_i\mu + \varepsilon_i \\
 EA_i & = \delta + \zeta PGS_i + X_i\mu + \eta_i
 \end{align}
-where $N_i$ is fertility, $PGS_i$ is the polygenic score, $EA_i$ is educational
+where $RLRS_i$ is fertility, $PGS_i$ is the polygenic score, $EA_i$ is educational
 attainment (age of leaving fulltime education), and $X_i$ is a vector of
 controls. The total effect of $PGS$ on number of children is $\beta + \gamma
 \zeta$. The "indirect effect" mediated by $EA$ is $\gamma \zeta$. The standard
