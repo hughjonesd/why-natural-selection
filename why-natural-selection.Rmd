@@ -1114,16 +1114,6 @@ drake::loadd(res_ineq)
 n_increases <- sum(res_ineq$ratio > 1)
 median_pct_change <- (median(res_ineq$ratio) - 1) * 100
 
-cor_ea3 <- res_ineq[res_ineq$score == "EA3_excl_23andMe_UK", ]
-cor_ea3$increase_pct <- (cor_ea3$ratio - 1) * 100
-
-
-drake::loadd(res_ineq_ea3)
-
-r2_income_true_psea <- scales::percent(res_ineq_ea3$r2_income_true_psea, 
-                                         accuracy = 0.1)
-r2_income_true_psea_wt <- scales::percent(res_ineq_ea3$r2_income_true_psea_wt, 
-                                            accuracy = 0.1)
 ```
 
 Because selection effects are concentrated in lower-income groups, they may also
@@ -1138,22 +1128,15 @@ income distribution, and this increases the differences between groups.
 Overall, natural selection increases the correlation of polygenic scores with
 income for `r n_increases` out of 33 polygenic scores, with a median
 percentage increase of `r median_pct_change`% (Appendix Table
-\@ref(tab:tbl-inequality-effects)). 
-
-If inequalities in polygenic scores are important for understanding social
-structure and mobility [@belsky2018genetic;
-@Rimfeld_2018; @harden2021genetic], then these increases are substantive. A
-back-of-the-envelope calculation, using estimated heritability for educational
-attainment of 0.4 [@branigan2013variation], gives the proportion of variance in
-household income attributable to the "true" polygenic score for educational
-attainment as `r r2_income_true_psea` among respondents. Natural selection would
-raise this proportion to `r r2_income_true_psea_wt` among respondents' children,
-counterfactually holding environmental conditions constant. Similarly, since
-many polygenic scores are predictive of disease risk, they could potentially
-increase health inequalities. In general, the evolutionary history of
-anatomically modern humans is related to disease risk [@benton2021influence];
-understanding the role of contemporary natural selection may aid in mapping the
-genetic architecture of current health disparities.
+\@ref(tab:tbl-inequality-effects)).  If inequalities in polygenic scores are
+important for understanding social structure and mobility 
+[@belsky2018genetic; @Rimfeld_2018; @harden2021genetic], then these increases
+are substantive. Similarly, since many polygenic scores are predictive of
+disease risk, they could potentially increase health inequalities. In general,
+the evolutionary history of anatomically modern humans is related to disease
+risk [@benton2021influence]; understanding the role of contemporary natural
+selection may aid in mapping the genetic architecture of current health
+disparities.
 
 
 ```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean polygenic score for educational attainment (EA3) of children by household income group. Blue is actual. Grey is hypothetical in the absence of selection effects. Respondents weighted by Age/Qualification.", fig.width = 4}
@@ -2130,148 +2113,6 @@ res_ineq %>%
       set_position("center")
 ```
 
-## Estimating the effect of natural selection on the contribution of polygenic scores for educational attainment to inequality
-
-
-```{r calc-load-ineq-ea3}
-
-res <- drake::readd(res_ineq_ea3)
-
-prop_effect_selection <- res$r2_income_ea3_wt/res$r2_income_ea3 - 1
-prop_effect_selection <- scales::percent(prop_effect_selection, accuracy = 0.1)
-
-prop_wt_fe <- res$r2_income_ea3_fe_wt/res$r2_income_ea3_fe - 1
-prop_wt_fe <- scales::percent(prop_wt_fe, accuracy = 0.1)
-
-prop_wt_fe_bounds <- scales::percent(res$r2_fe_bounds, accuracy = 0.1)
-
-res <- lapply(res, format, digits = 3)
-
-```
-
-From the meta-analysis of twin studies in @branigan2013variation, we take the
-heritability of educational attainment to be around 0.4. This is the variance of
-educational attainment explained by the "true" polygenic score for educational
-attainment (PSEA) $p^{*}$, i.e. the best linear unbiased predictor of educational
-attainment from genetic data. We write the measured polygenic
-score of educational attainment, "EA3" from @lee2018gene, as
-\[
-p = p^* + \eta.
-\]
-
-For realized educational attainment $EA$, write:
-\[
-EA = \alpha+\beta p^* + \varepsilon = \alpha + \beta(p - \eta) + \varepsilon
-\]
-We assume the classical errors-in-variables model, i.e. that $\eta$
-is independent of both $p$ and $\varepsilon$. Under these conditions,
-the ratio between the estimated $R^{2}$ in a regression of $p$ on
-$EA$, and the true $R^{2}$ of $p^{*}$ on $EA$, satisfies: 
-\begin{equation}
-\frac{\textrm{plim}\hat{R}^{2}}{R^{2}} 
-= \frac{\sigma_{p}^{2} - \sigma_{\eta}^{2}}{\sigma_{p}^{2}}
-= \frac{\sigma_{p^*}^{2}}{\sigma_{p}^{2}}
-\equiv \lambda, \label{eq:r2-ratio}
-\end{equation}
-as we show below. The right hand side is the "reliability ratio".
-We regress educational attainment on EA3 in our sample, weighting
-by our Age/Qualification weights, to give 
-$\textrm{plim}\hat{R}^2 = `r res$r2_edu_ea3`$. Plugging this
-into the above, with $R^2 = h^2\approx0.4$, gives $\lambda=`r res$lambda`$. 
-
-We now consider the $R^2$ of $p$ on income, that is, the proportion
-of variance in income that is explained by the true polygenic score
-of educational attainment. Applying (\ref{eq:r2-ratio}) again gives
-that
-\begin{equation}
-\frac{\textrm{plim}\hat{R}_{\textrm{income}}^{2}}{R_{\textrm{income}}^{2}}=\lambda.\label{eq:r2-ratio-income}
-\end{equation}
-
-We compute $\hat{R}_{\textrm{income}}^{2}$by regressing income group on EA3,
-first weighting by age/qualification, and then by age/qualification weights
-times respondent's number of children. The estimated $R^2$ are 
-`r res$r2_income_ea3` and `r res$r2_income_ea3_wt` respectively. Applying
-(\ref{eq:r2-ratio-income}) to both estimates gives the proportion of variance in
-income explained by true polygenic score for education attainment (a) among
-respondents as `r res$r2_income_true_psea`; (b) accounting for natural selection
-as `r res$r2_income_true_psea_wt`. The second figure gives the counterfactual
-estimate of $R_{\textrm{income}}^{2}$ after one generation of natural selection,
-holding environmental conditions unchanged.
-
-The errors-in-variables conditions are quite restrictive. In particular, they
-rule out that the unmeasured part of PSEA ($\eta$) correlates with the error 
-term $\varepsilon$, e.g. with environmental causes of educational attainment. 
-If unmeasured PSEA correlates positively with $\varepsilon$, then the
-reliability coefficient $\lambda$ will be lower than calculated. However, the
-proportional effect of natural selection on the PSEA-income relationship will
-remain the same, so long as $\lambda$ does not differ between the two sets of
-weighted regressions.
-
-The estimate above uses a pooled regression of income on EA3, which may include
-confounding environmental variation such as genetic nurture. Within-siblings
-regression avoid this, but the smaller N makes estimates noisier. Running
-within-siblings regressions of EA3 on income group gives within-$R^2$ estimates
-of `r res$r2_income_ea3_fe` (weighted by age and qualification) and `r
-res$r2_income_ea3_fe_wt` (multiplying weights by number of children). Thus, this
-procedure estimates the proportional change in $R^2_{income}$ due to natural
-selection as `r prop_wt_fe`. However, bootstrap 95% confidence intervals
-are large (`r prop_wt_fe_bounds[1]` to `r prop_wt_fe_bounds[2]`). We therefore
-view this result more as suggesting that environmental confounds likely
-bias the estimated change in $R^2_{income}$ towards zero.
-
-### Proof of \@ref(eq:r2-ratio)
-
-
-Write 
-\begin{align}
-\hat{R}^{2} & =1-\frac{\sum_{i=1}^{N}(\hat{\alpha}+\hat{\beta}p_{i}-EA_{i})^{2}}{\sum_{i=1}^{N}(EA_{i}-\bar{EA})^{2}}\label{eq:r-squared}
-\end{align}
-
-Using the fact that $\hat{\alpha}=\bar{EA}-\hat{\beta}\bar{p}$, where bars signify
-sample averages, we can simplify the numerator in the above:
-
-\[
-\sum_{i=1}^{N}(\hat{\alpha}+\hat{\beta}p_{i}-EA_{i})^{2}=\sum_{i=1}^{N}(\bar{EA}-\hat{\beta}\bar{p}+\hat{\beta}p_{i}-EA_{i})^{2}=\sum_{i=1}^{N}(\hat{\beta}(p_{i}-\bar{p})-(EA_{i}-\bar{EA}))^{2}
-\]
-
-Now, we can compute the following probability limit: 
-
-\begin{align}
- & \text{plim}\frac{\sum_{i=1}^{N}(\hat{\beta}(p_{i}-\bar{p})-(EA_{i}-\bar{EA}))^{2}}{N}\nonumber \\
-= & \text{plim}\frac{\sum_{i=1}^{N}\hat{\beta}^{2}(p_{i}-\bar{p})^{2}+(EA_{i}-\bar{EA})^{2}-2\hat{\beta}(p_{i}-\bar{p})(EA_{i}-\bar{EA})}{N}\nonumber \\
-= & \beta^{2}\lambda^{2}\sigma_{p}^{2}+\sigma_{EA}^{2}-2\beta\lambda\sigma_{p,EA},\label{eq:plim}
-\end{align}
-
-using the standard errors-in-variables formula $\textrm{plim}\hat{\beta}=\lambda\beta$,
-and where $\sigma_{p,EA}$ is the covariance between $p$ and $EA$.
-
-Write
-\begin{align*}
-\sigma_{p,EA} & =\textrm{Cov}(p^{*}+\eta,\alpha+\beta p^{*}+\varepsilon)\\
- & =0+\beta\sigma_{p^{*}}^{2}+\beta\textrm{Cov}(\eta,p^{*})+\textrm{Cov}(\eta,\varepsilon)\\
- & =\beta\sigma_{p^{*}}^{2}
-\end{align*}
-
-using the errors-in-variables assumption that $\eta$ is independent
-of $p^{*}$ and $\varepsilon$. Plug this into (\ref{eq:plim}) to
-give
-\begin{align*}
- & \text{plim}\frac{\sum_{i=1}^{N}(\hat{\beta}(p_{i}-\bar{p})-(EA_{i}-\bar{EA}))^{2}}{N}\\
-= & \beta^{2}\lambda^{2}\sigma_{p}^{2}+\sigma_{EA}^{2}-2\beta^{2}\lambda\sigma_{p^{*}}^{2}\\
-= & \beta^{2}\lambda\sigma_{p^{*}}^{2}+\sigma_{EA}^{2}-2\beta^{2}\lambda\sigma_{p^{*}}^{2}\textrm{, using \ensuremath{\sigma_{p^{*}}^{2}=\lambda\sigma_{p}^{2}},}\\
-= & \sigma_{EA}^{2}-\beta^{2}\lambda\sigma_{p^{*}}^{2}
-\end{align*}
-
-Inserting this into (\ref{eq:r-squared}) gives
-\begin{align*}
-\textrm{plim}\hat{R}^{2} & =1-\frac{\sigma_{EA}^{2}}{\sigma_{EA}^{2}}+\frac{\beta^{2}\lambda\sigma_{p^{*}}^{2}}{\sigma_{EA}^{2}}\\
- & =\lambda\frac{\beta^{2}\sigma_{p^{*}}^{2}}{\sigma_{EA}^{2}}\\
- & =\lambda R^{2}
-\end{align*}
-since for bivariate regression $R^{2}$ is the square of the correlation
-between $EA$ and $p^{*}$, which can be written $r=$$\beta\frac{\sigma_{p^{*}}^{2}}{\sigma_{EA}\sigma_{p^{*}}}$.
-We thank an anonymous commenter on https://stats.stackexchange.com/questions/238878/how-do-errors-in-variables-affect-the-r2
-for much of this proof.
 
 \clearpage
 \FloatBarrier
