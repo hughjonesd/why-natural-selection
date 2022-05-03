@@ -186,8 +186,7 @@ weight_van_alten <- function (famhist_raw, van_alten_dir) {
   on.exit(setwd(od), add = TRUE)
   # we run everything separately because it's a separate project
   system2("sh", "GitWeightCreate.sh")
-  weight_df <- readr::read_table(
-               file.path(van_alten_dir, "UKBSelectionWeights.tab"))
+  weight_df <- readr::read_table("UKBSelectionWeights.tab")
   names(weight_df) <- c("f.eid", "weights")
   
   weight_df

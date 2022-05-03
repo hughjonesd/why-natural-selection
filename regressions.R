@@ -208,9 +208,9 @@ run_age_anova <- function (score_name, control, famhist) {
 }
 
 
-run_reg_income_dv <- function (famhist, score_names, ashe_income, age_qual_weights) {
+run_reg_income_dv <- function (famhist, score_names, ashe_income, weights) {
   famhist %<>% add_ashe_income(ashe_income)
-  famhist %<>% left_join(age_qual_weights, by = "f.eid")
+  famhist %<>% left_join(weights, by = "f.eid")
   
   most_score_names <- setdiff(score_names, c("EA2_noUKB", "whr_combined", 
                                 "wc_combined", "hip_combined", "body_fat"))
@@ -271,9 +271,9 @@ run_reg_fe_fertility <- function (famhist, score_names) {
   return(tidied_all)
 }
 
-run_cor_income <- function (famhist, score_names, age_qual_weights) {
+run_cor_income <- function (famhist, score_names, weights) {
   famhist <- famhist %>% 
-               left_join(age_qual_weights, by = "f.eid") %>% 
+               left_join(weights, by = "f.eid") %>% 
                filter(
                  ! is.na(RLRS), 
                  ! is.na(income_cat), 
@@ -299,8 +299,8 @@ run_cor_income <- function (famhist, score_names, age_qual_weights) {
   res
 }
 
-run_ineq_ea3_calcs <- function (famhist, age_qual_weights, h2) {
-  famhist <- left_join(famhist, age_qual_weights, by = "f.eid")
+run_ineq_ea3_calcs <- function (famhist, weights, h2) {
+  famhist <- left_join(famhist, weights, by = "f.eid")
   famhist$child_weights <- famhist$n_children * famhist$weights
   
   res <- list()
