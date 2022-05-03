@@ -156,36 +156,41 @@ weight_by_census_msoa <- function (famhist, census_msoa, famhist_msoa) {
 
 
 weight_van_alten <- function (famhist_raw, van_alten_dir) {
-  fh_for_weights <- famhist_raw %>% 
-                          select( 
-                            f.eid,
-                            f.31.0.0,
-                            f.34.0.0,
-                            f.54.0.0,
-                            f.20074.0.0,
-                            f.20075.0.0,
-                            f.709.0.0,
-                            f.6138.0.0,
-                            f.6138.0.1,
-                            f.6138.0.2,
-                            f.6138.0.3,
-                            f.6138.0.4,
-                            f.6138.0.5,
-                            f.2178.0.0,
-                            f.6142.0.0,
-                            f.680.0.0,
-                            f.728.0.0,
-                            f.21000.0.0,
-                            f.40000.0.0,
-                            f.845.0.0 = age_fulltime_edu.0.0
-                          )
-  
-  readr::write_tsv(fh_for_weights, 
-                   file.path(van_alten_dir, "UKB-weight-variables.tab"))
-  od <- setwd(van_alten_dir)
-  on.exit(setwd(od), add = TRUE)
-  # we run everything separately because it's a separate project
-  system2("sh", "GitWeightCreate.sh")
+  if (file.exists("UKBSElectionWeights.tab")) {
+    warning("Using existing weights file UKBSElectionWeights.tab")
+    warning("Delete if this is really out-of-date")
+  } else {
+    fh_for_weights <- famhist_raw %>% 
+                            select( 
+                              f.eid,
+                              f.31.0.0,
+                              f.34.0.0,
+                              f.54.0.0,
+                              f.20074.0.0,
+                              f.20075.0.0,
+                              f.709.0.0,
+                              f.6138.0.0,
+                              f.6138.0.1,
+                              f.6138.0.2,
+                              f.6138.0.3,
+                              f.6138.0.4,
+                              f.6138.0.5,
+                              f.2178.0.0,
+                              f.6142.0.0,
+                              f.680.0.0,
+                              f.728.0.0,
+                              f.21000.0.0,
+                              f.40000.0.0,
+                              f.845.0.0 = age_fulltime_edu.0.0
+                            )
+    
+    readr::write_tsv(fh_for_weights, 
+                     file.path(van_alten_dir, "UKB-weight-variables.tab"))
+    od <- setwd(van_alten_dir)
+    on.exit(setwd(od), add = TRUE)
+    # we run everything separately because it's a separate project
+    system2("sh", "GitWeightCreate.sh")
+  }
   weight_df <- readr::read_table("UKBSelectionWeights.tab")
   names(weight_df) <- c("f.eid", "weights")
   
