@@ -331,9 +331,11 @@ run_ineq_ea3_calcs <- function (famhist, age_qual_weights, h2) {
                                           note = FALSE
                                         )
   
+  # workaround bug in current fixest
+  r2 <- fixest::r2
   # can we get std errors for these?
-  res$r2_income_ea3_fe <- fixest::r2(reg_income_ea3_fe, type = "wr2")
-  res$r2_income_ea3_fe_wt <- fixest::r2(reg_income_ea3_fe_wt, type = "wr2")
+  res$r2_income_ea3_fe <- r2(reg_income_ea3_fe, type = "wr2")
+  res$r2_income_ea3_fe_wt <- r2(reg_income_ea3_fe_wt, type = "wr2")
   boot_r2s <- replicate(200, {
     fh_boot <- fh_sibs %>% slice_sample(prop = 1, replace = TRUE)
     reg_fe <- fixest::feols(income_cat ~ EA3_excl_23andMe_UK | sib_group, 
@@ -346,7 +348,7 @@ run_ineq_ea3_calcs <- function (famhist, age_qual_weights, h2) {
                                  weights = fh_boot$child_weights,
                                  note = FALSE
                                )
-    c(fixest::r2(reg_fe, type = "wr2"), fixest::r2(reg_fe_wt, type = "wr2"))
+    c(r2(reg_fe, type = "wr2"), r2(reg_fe_wt, type = "wr2"))
   })
   
   boot_r2_props <- boot_r2s[2,]/boot_r2s[1,] - 1
