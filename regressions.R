@@ -156,10 +156,10 @@ run_regs_subset <- function(score_name, subset, famhist) {
 }
 
 # weights added for weight-everything branch
-run_regs_fml <- function(fml, ..., subset = NULL, famhist, weights = quote(weights)) {
+run_regs_fml <- function(fml, ..., subset = NULL, famhist, use_weights = quote(weights)) {
   glue_args <- list(...)
   fml <- as.formula(glue::glue_data(fml, .x = glue_args))
-  mod <- lm(fml, famhist, subset = eval(subset), weights = eval(weights))
+  mod <- lm(fml, famhist, subset = eval(subset), weights = eval(use_weights))
   res <- tidy(mod, conf.int = TRUE)
   attr(res, "call") <- mod$call
   res

@@ -204,15 +204,27 @@ plan <- drake_plan(
           )
   },
   
+  res_unweighted = {
+    map_dfr(score_names, 
+            ~run_regs_fml(
+              "RLRS ~ {score_name}", 
+              score_name  = .x,
+              famhist     = famhist_kids,
+              use_weights = NULL
+            ),
+            .id = "score_name"
+    )
+  },
+  
   res_quadratic = {
     map_dfr(score_names, 
               ~run_regs_fml(
                              "RLRS ~ {score_name} + I({score_name}^2)", 
-                             score_name = .x,
-                             famhist    = famhist_kids,
+                             score_name  = .x,
+                             famhist     = famhist_kids,
                              # weight-everything: added weights
                              # for some reason these need to be made explicit
-                             weights    = quote(weights)
+                             use_weights = quote(weights)
                            ),
               .id = "score_name"
             )
@@ -222,9 +234,9 @@ plan <- drake_plan(
     map_dfr(score_names, 
             ~run_regs_fml(
               "RLRS_parents ~ {score_name} + I({score_name}^2)", 
-              score_name = .x,
-              famhist    = famhist_pw,
-              weights    = quote(weights)
+              score_name  = .x,
+              famhist     = famhist_pw,
+              use_weights = quote(weights)
             ),
             .id = "score_name"
     )
@@ -379,7 +391,7 @@ plan <- drake_plan(
             subset = quote(birth_order == 1),
             famhist = famhist_pw,
             # weight-everything: these are now parent_va_weights
-            weights = weights,
+            use_weights = quote(weights),
             .id = "id"
           )
     
@@ -407,9 +419,9 @@ plan <- drake_plan(
     res <-  map_dfr(score_names,
               ~run_regs_fml(
                 "RLRS_parents ~ Quin71 + {score_name}:Quin71",
-                score_name = .x,
-                famhist    = famhist_townsend_71,
-                weights    = weights
+                score_name  = .x,
+                famhist     = famhist_townsend_71,
+                use_weights = quote(weights)
               ),
               .id = "score_name"
             )
@@ -434,11 +446,11 @@ plan <- drake_plan(
           )
     res <- pmap_dfr(vars,
             run_regs_fml,
-            fml     = "{dep.var} ~ {score_name}",
-            subset  = quote(birth_order == 1),
-            famhist = famhist_pw,
+            fml         = "{dep.var} ~ {score_name}",
+            subset      = quote(birth_order == 1),
+            famhist     = famhist_pw,
             # weight-everything: weights are now parent_va_weights
-            weights = weights,
+            use_weights = quote(weights),
             .id     = "id"
           )
     
@@ -591,7 +603,7 @@ plan <- drake_plan(
   
   res_townsend = {
     fhk <- famhist_townsend_71 %>% filter(kids_ss)
-    fhk <- inner_join(van_alten_weights, by = "f.eid")
+    fhk %<>% inner_join(van_alten_weights, by = "f.eid")
     res <-  map_dfr(score_names,
                     ~run_regs_fml(
                       "RLRS ~ Quin71 + {score_name}:Quin71",
