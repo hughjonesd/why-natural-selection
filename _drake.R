@@ -591,6 +591,7 @@ plan <- drake_plan(
   
   res_townsend = {
     fhk <- famhist_townsend_71 %>% filter(kids_ss)
+    fhk <- inner_join(van_alten_weights, by = "f.eid")
     res <-  map_dfr(score_names,
                     ~run_regs_fml(
                       "RLRS ~ Quin71 + {score_name}:Quin71",
