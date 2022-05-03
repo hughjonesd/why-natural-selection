@@ -340,7 +340,7 @@ principal components (see Materials and Methods). Figure
 5-year birth intervals. Several scores show consistent increases or declines
 over this 30-year period, of the order of 5% of a standard deviation. These
 changes could reflect natural selection within the UK population, but also
-emigration, or ascertainment bias within the sample [@10.1093/aje/kwx246]. 
+emigration, or ascertainment bias in the sample [@10.1093/aje/kwx246]. 
 
 
 ```{r plot-means-over-time, fig.height = 6, fig.cap = "Mean polygenic scores (PGS) by birth year in UK Biobank. Circles are means for 5-year intervals. Lines are 95% confidence intervals. Solid circles show a significant linear increase (green) or decrease (red) over time (p < 0.05/33)."}
@@ -419,14 +419,7 @@ res_wt_combined <- bind_rows(
   .id = "Weights"
 )
 
-res_significance <- res_wt_combined %>% 
-                      group_by(term) %>% 
-                      summarize(
-                        all = all(p.value < 0.05/33), 
-                        any = any(p.value < 0.05/33)
-                      )
-res_sig_all <- sum(res_significance$all)
-res_sig_any <- sum(res_significance$any)
+n_sig <- sum(res_wt_van_alten_weights$p.value < 0.05/33)
 
 res_wt_cb_wide <- res_wt_combined %>% 
                     tidyr::pivot_wider(
@@ -452,7 +445,6 @@ res_wt_cb_wide <- res_wt_combined %>%
                         select(term, estimate_females = estimate),
                       by = "term"
                     )
-
 
 rel_sizes <- res_wt_cb_wide %>% 
                 filter(
@@ -482,11 +474,13 @@ mean_rel <- c(rel_sizes_summary[1, 1:3])
 ```
 
 
-Figure \@ref(fig:plot-res-wt) plots selection effects among the entire
+Figure \@ref(fig:plot-res-wt) plots selection effects in the entire
 sample.[^balance-diverse-def] To correct for ascertainment bias, we weight
 participants using the model of @van2021effects. Weighting makes a
-large difference to estimates, increasing effect sizes by a mean of 
-`r percent(mean_rel$Main - 1)`.[^weighting]
+large difference: effect sizes go up by a mean of 
+`r percent(mean_rel$Main - 1)`.[^weighting] `n_sig` out of 33 selection effects
+are significant at $p$ < 0.05/33.
+
 
 [^balance-diverse-def]: We also check for stabilizing and disruptive selection by
 estimating \@ref(eq:regression) with a quadratic term. Stabilizing selection
@@ -497,7 +491,7 @@ fertility is smaller (Appendix Figure \@ref(fig:plot-purifying)).
 
 [^weighting]: We use these weights throughout. All our qualitative results are
 robust if we run unweighted regressions. Appendix Table \@ref(tab:tbl-res-wt)
-shows results from alternative weighting schemes.
+shows results from alternative weighting schemes. 
 
 
 ```{r plot-res-wt, fig.cap = "Selection effects: weighted and unweighted regressions.  Each point represents a single bivariate regression of number of children on a polygenic score. P value threshold is 0.05, Bonferroni-corrected for multiple comparisons. Confidence intervals are uncorrected."}
@@ -554,6 +548,17 @@ polygenic score, grouping respondents by age of completing full-time education,
 and by household income. Effects are larger and more significant for the lowest
 income category, and for the lowest education category. These results are robust
 to controlling for respondents' age (Appendix section \@ref(sec:age-control)).
+Turning to family structure, we split respondents by lifetime number of sexual
+partners, at the median value of 3 (Figure \@ref(fig:plot-n-partners)a).
+Now, selection effects are larger and more significant among
+those with more than 3 lifetime partners. Next we split respondents by whether
+they were living with a spouse or partner at the time of interview.
+Effects are larger among those not living with a spouse or partner
+(Figure \@ref(fig:plot-n-partners)b).[^sex] 
+
+[^sex]: The same pattern holds if we analyse men and women separately (Appendix Figure
+\@ref(fig:plot-n-partners-sex)). We also directly compared selection effects 
+between men and women (Appendix Figure \@ref(fig:plot-sexes)). 
 
 
 ```{r plot-income-educ-level, fig.cap = "Selection effects by education and income.", fig.subcap = c("Age left full-time education", "Household income"), fig.ncol = 1}
@@ -583,19 +588,6 @@ res_income %>%
       standard_ggplot(n_regs = n_regs, fill_col = `Income`, 
                         fill_direction = -1)
 ```
-
-
-Turning to family structure, we split respondents by lifetime number of sexual
-partners, at the median value of 3 (Figure \@ref(fig:plot-n-partners)a).
-Selection effects are larger and more significant among
-those with more than 3 lifetime partners. Next we split respondents by whether
-they were living with a spouse or partner at the time of interview.
-Effects are larger among those not living with a spouse or partner
-(Figure \@ref(fig:plot-n-partners)b).[^sex] 
-
-[^sex]: The same pattern holds if we analyse men and women separately (Appendix Figure
-\@ref(fig:plot-n-partners-sex)). We also directly compared selection effects 
-between men and women (Appendix Figure \@ref(fig:plot-sexes)). 
 
 
 ```{r plot-n-partners, fig.cap = "Selection effects by number of sexual partners and presence of a partner.", fig.subcap = c("Lifetime number of sexual partners", "Presence of a partner"), fig.ncol = 1, fig.align = "center", fig.height = 4}
@@ -717,15 +709,14 @@ stopifnot(sib_chn_cor$p.value < 2e-16)
 ```
 
 
-We emphasize that our categories are not necessarily exogenous to polygenic
-scores. For example -- both in the data (Appendix Figure
-\@ref(fig:plot-age-flb-dv)) and in our model -- age at first live birth is a
-choice variable, which is endogenous to an individual's human capital and
-related polygenic scores. Nevertheless, observed differences in equation
-\@ref(eq:regression) across subgroups constrain the set of possible
-theories; a good theory of contemporary natural selection needs to explain
-how these results arise. As we show below, a model based on the economic
-theory of fertility can do just that.
+We emphasize that our categories are not exogenous to polygenic scores. For
+example -- both in the data (Appendix Figure \@ref(fig:plot-age-flb-dv)) and in
+our theoretical model -- age at first live birth is a choice variable, which is
+endogenous to a person's human capital and their related polygenic scores.
+Nevertheless, differences in selection effects across subgroups constrain the
+set of possible theories; a good theory of contemporary natural selection needs
+to explain how these results come about. As we show below, a model based on the
+economic theory of fertility can do just that.
 
 We also examine selection effects among respondents' parents, using information
 on respondents' number of siblings to calculate parents' RLRS. Effect sizes of
@@ -745,7 +736,7 @@ and change sign when controlling for AFLB, among both mothers and fathers
 (Appendix Figures \@ref(fig:plot-age-birth-parents-cross), 
 \@ref(fig:plot-age-birth-parents)). Lastly, we check for a
 "quantity-quality tradeoff" between parents' number of children and number of
-grandchildren. We do not find any: in fact, the correlation between respondents' 
+grandchildren. We don't find any: in fact, the correlation between respondents' 
 and parents' RLRS is positive ($\rho$ = `r sib_chn_cor$estimate`, 
 $p < 2 \times 10^{-16}$).
 
