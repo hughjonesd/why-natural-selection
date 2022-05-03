@@ -30,12 +30,12 @@ msoa_shapefile     <- file.path(data_dir, "infuse_msoa_lyr_2011_clipped",
                         "infuse_msoa_lyr_2011_clipped.shp")
 dep_data_dir       <- file.path(data_dir, "deprivation-data")
 fertility_data_dir <- file.path(data_dir, "fertility_PRS")
-
+van_alten_dir      <- "../UKBWeights"
 
 # plan ====
 
 weighting_scheme_syms <- rlang::syms(c("flb_weights", "age_qual_weights", 
-                        "msoa_weights"))
+                        "msoa_weights", "van_alten_weights"))
 period_weight_syms <- rlang::syms((c("age_qual_weights", "parent_aq_weights")))
 
 plan <- drake_plan(
@@ -149,6 +149,11 @@ plan <- drake_plan(
             famhist
           )
   },
+  
+  van_alten_weights = weight_van_alten(famhist_raw, 
+                                       van_alten_dir = 
+                                         file_in(!! van_alten_dir)
+                                       ),
   
   age_qual_weights = weight_by_census_age_qual(famhist, census_age_qual),
   
