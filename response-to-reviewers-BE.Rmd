@@ -282,7 +282,7 @@ We've also made some other changes:
 
 -   We moved the results on causality of polygenic scores to the appendix. We thought they were a distraction from the key point of Section 4, which is to test our theory.
 
--   Code to reproduce this paper is now publicly available at <https://github.com/hughjonesd/why-natural-selection>.
+-   Code is now publicly available at <https://github.com/hughjonesd/why-natural-selection>.
 
 With best wishes,
 
