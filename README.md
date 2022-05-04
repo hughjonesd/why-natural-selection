@@ -22,7 +22,16 @@ Data is stored separately. To get UK Biobank data you'll need to
 make an application to UK Biobank (or join our application). Other data is
 publicly available, so we can share it.
 
+We also use weights from 
+
+Alten, Sjoerd van, Benjamin W Domingue, Titus Galama, and Andries Marees. 2021. 
+“The Effects of Demographic-Based Selection Bias on GWAS Results in the UK Biobank.” 
+
+Thank you to Sjoerd and coauthors for their kindness in providing these!
+You'll need their code to recreate the weights. 
+
 # To run
+
 
 1. Start R within the project directory. This should automatically
    download the `{renv}` package.
@@ -31,10 +40,9 @@ publicly available, so we can share it.
 
 3. Edit directory locations in `_drake.R`.
 
-4. Within R:
+4. Within R, run
 
 ```r
-source("_drake.R")
 r_make()
 ```
 
