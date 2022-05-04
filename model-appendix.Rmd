@@ -416,7 +416,7 @@ is concave in $N_{1},N_{2}$ and $s$.
 \begin{proof}
 We examine the Hessian matrix of utility in each period. Note that
 period 1 utility is constant in $N_{2}$ and period 2 utility is constant
-in $N_{1}$. For period 1 the Hessian with respect to $N_{1}$and
+in $N_{1}$. For period 1 the Hessian with respect to $N_{1}$ and
 $s$ is: 
 \[
 \left[\begin{array}{cc}

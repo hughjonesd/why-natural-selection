@@ -1280,14 +1280,11 @@ AA is supported by the Foundation Volksbond Rotterdam and by ZonMw grant 8492000
 ## Selection effects by sex
 
 Figure \@ref(fig:plot-sexes) plots selection effects by sex. Differences are
-particularly large for educational attainment, height and MDD. Several polygenic
-scores for mental illness and personality traits are more selected for (or less
-against) among women, including major depressive disorder (MDD), schizophrenia
-and neuroticism, while extraversion is more selected for among men. Scores for
-waist circumference and waist-hip ratio are less selected for among women. One
-possible reason for these sex differences is that polygenic scores may affect
-fertility via success in marriage markets, and men and women may value different
-characteristics in these.
+particularly large for educational attainment, height, ADHD and MDD. Several
+polygenic scores for mental illness and personality traits are more selected for
+(or less against) among women, including major depressive disorder (MDD),
+schizophrenia and neuroticism, while extraversion is more selected for among
+men.
 
 ```{r plot-sexes, fig.cap = "Selection effects by sex. Solid lines are significant differences at p < 0.05/33. Solid points are significantly different from 0 at p < 0.05/66."}
 
@@ -1331,15 +1328,16 @@ res_sex %>%
 \clearpage
 ## Alternative weighting schemes
 
-We report results for 3 alternative weighting schemes: weighting by
-age/qualification; geographical (weighting by Middle Super Output Area); and for
-women only, age, qualification and age at first live birth. Population data for
-weighting is taken from the 2011 UK Census and the 2006 General Household Survey
-(GHS). Weighting for Age/Qualification and Age/Qualification/AFLB weights was
-done using marginal totals from a linear model, using the `calibrate()` function
-in the R "survey" package [@lumley2020survey]. Geographical weighting was done
-with iterative post-stratification using the `rake()` function, on Census Middle
-Layer Super Output Areas, sex and presence/absence of a partner.
+We compare results for our main weights to 3 alternative weighting schemes:
+weighting by age/qualification; geographical (weighting by Middle Super Output
+Area); and for women only, age, qualification and age at first live birth.
+Population data for weighting is taken from the 2011 UK Census and the 2006
+General Household Survey (GHS). Weighting for Age/Qualification and
+Age/Qualification/AFLB weights was done using marginal totals from a linear
+model, using the `calibrate()` function in the R "survey" package
+[@lumley2020survey]. Geographical weighting was done with iterative
+post-stratification using the `rake()` function, on Census Middle Layer Super
+Output Areas, sex and presence/absence of a partner.
 
 Table \@ref(tab:tbl-res-wt) gives effect sizes as a proportion of the unweighted
 effect size, for all polygenic scores which are consistently signed and which
@@ -1660,18 +1658,18 @@ birth year, median split at 1950 ("early born" versus "late born"). We use both
 respondents' RLRS and parents' RLRS as a dependent variable. We use our standard
 weights, and further adjust for selection in the parents' generation (see above).
 
-Table \@ref(tab:tbl-change-by-period) 
-summarizes the results. We report the number of scores showing significant
-changes over time (i.e. a significant interaction between polygenic score and
-the "late born" dummy): either a significant change in sign, a significant
-increase in size, or a significant decrease in size. There is little evidence
-for changes in selection effects within the parents' generation, with just one
-score showing a significant decrease in size. In the respondents' generation,
-effect sizes were significantly larger in absolute size among the later-born for
-eight polygenic scores: ADHD, age at menopause, cognitive
-ability, Coronary Artery Disease, EA2, EA3, extraversion and Major Depressive
-Disorder. These changes are inconsistent with the intergenerational change,
-where estimated effect sizes were larger among the earlier, parents' generation.
+Table \@ref(tab:tbl-change-by-period) summarizes the results. We report the
+number of scores showing significant changes over time (i.e. a significant
+interaction between polygenic score and the "late born" dummy): either a
+significant change in sign, a significant increase in effect size, or a
+significant decrease in size. There is little evidence for changes in selection
+effects within the parents' generation, with just one score showing a
+significant decrease in size. In the respondents' generation, effect sizes were
+significantly larger in absolute size among the later-born for eight polygenic
+scores: ADHD, age at menopause, cognitive ability, Coronary Artery Disease, EA2,
+EA3, extraversion and Major Depressive Disorder. These changes are inconsistent
+with the intergenerational change, where estimated effect sizes were larger
+among the earlier, parents' generation.
 
 Overall, while there is some suggestive evidence for an increase in the strength
 of selection in recent history, the clearest result is that the pattern of
@@ -1844,7 +1842,7 @@ Figure \@ref(fig:plot-age-birth-parents) shows the regressions controlling for
 either parent's age at their birth. Effect sizes are very similar, whether
 controlling for father's or mother's age. As in the respondents' generation,
 effect sizes are negatively correlated with the effect sizes from bivariate
-regressions without the age at birth control (father's age at birth: $\rho$ 
+regressions without the control for age at birth (father's age at birth: $\rho$ 
 `r cor_unc_fath`; mother's age at birth: $\rho$ `r cor_unc_moth`).
 
 ```{r plot-age-birth-parents, fig.cap = "Selection effects (parents' generation) among eldest siblings, controlling for parents' age at birth. Weights multiplied by 1/number of siblings."}
