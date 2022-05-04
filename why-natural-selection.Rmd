@@ -171,7 +171,7 @@ pval_geom_point <- function (size = 1.6, stroke = 0.9, fill = NULL, ...) {
 
 confint_geom_segment <- function () {
   geom_segment(aes(x = conf.low, xend = conf.high, linetype = "95% c.i. uncorrected"), 
-                    color = "grey55", alpha = 0.25, size = 1.1, 
+                    color = "grey55", alpha = 0.2, size = 1.1, 
                     lineend = "round")
 }
 
@@ -590,7 +590,7 @@ median_pct_diff <- function (dfr) {
                     pct_diff = estimate.x/estimate.y
                   ) %>% 
                   pull(pct_diff) %>% 
-                  mean()
+                  median()
    # percentage difference:
    prop - 1
 }
@@ -1508,7 +1508,6 @@ res_partners %>%
       standard_ggplot(fill_col = `N partners`, score_col = score_name, 
                         n_regs = n_regs) +
         facet_grid(cols = vars(sex))
-        sexes_guides
 
 drake::loadd(res_with_partner_sex)
 res_with_partner_sex %<>% filter(grepl(":", term)) 
@@ -1522,8 +1521,7 @@ res_with_partner_sex %>%
       ) %>% 
       standard_ggplot(fill_col = Household, score_col = score_name, 
                         n_regs = n_regs) +
-        facet_grid(cols = vars(sex)) + 
-        sexes_guides
+        facet_grid(cols = vars(sex)) 
   
 ```
 
