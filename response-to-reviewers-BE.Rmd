@@ -321,7 +321,7 @@ Done.
 
 > p\. 2: "natural selection may substantially increase the correlation between genetic scores and income, i.e. the "genetic lottery" (Harden, 2021)." Although the meaning eventually becomes clear, this sentence may be very cryptic.
 
-We have made it more explicit: "natural selection may substantially increase the correlation between genetic scores and income, increasing genetic differences between different social groups, and thus making the "genetic lottery" (Harden 2021) more unfair."
+We have made it more explicit: "natural selection substantially increases the correlation between polygenic scores and income, increasing genetic differences between different social groups, and thus making the "genetic lottery" (Harden 2021) more unfair."
 
 > p\. 4, footnote 1: That the covariance between the number of children and the polygenic score for a given phenotype is equal to the evolutionary change in the phenotype between generations is, after some adjustment of terminology, Robertson's (1966, 1968) Secondary Theorem of Natural Selection (see also Walsh & Lynch, 2018, pp. 165-167). I think this should be pointed out.
 
@@ -339,7 +339,7 @@ The literature on estimating utility functions is vast (see e.g. Chuang and Sche
 
 > p\. 30: I feel that more thought might be given to the choice of covariates. For example, if fluid IQ is on the causal path between the PGS and EA, then controlling it will bias downward the estimate of the the PGS effect on EA. But since this mediation analysis seems tentative and not crucial to the paper, perhaps some looseness here can be tolerated.
 
-Yes. Conversely, fluid IQ might affect fertility choices via other pathways than human capital in the labour market, and not controlling for it might leave these to be picked up by EA. We prefer to be "conservative" in controlling for it, in the sense that we'd rather bias the estimate indirect effect of EA towards zero than away from zero. We now mention this issue in the appendix: "Note that controlling for fluid IQ is conservative, in the sense that IQ might also measure human capital; nevertheless, we control for it because fluid IQ might affect fertility decisions via other channels than human capital."
+Yes. Conversely, fluid IQ might affect fertility choices via other pathways than human capital in the labour market, and not controlling for it might leave these to be picked up by EA. We prefer to be "conservative" in controlling for it, in the sense that we'd rather bias the estimate indirect effect of EA towards zero than away from zero. We now mention this issue in the appendix: "Note that controlling for fluid IQ is conservative, in the sense that IQ might also measure human capital in the labour market; nevertheless, we control for it because fluid IQ might affect fertility decisions via other channels than human capital."
 
 That said, the mediation analysis is really the central test of our theory. So we have tried to make it seem less tentative. See our response to Reviewer 2.
 
@@ -357,7 +357,7 @@ That said, the mediation analysis is really the central test of our theory. So w
 >
 > (6) The assumption that eta is independent of p_star seems very strong. It includes, for example, the assumption that the PGS over rare variants is uncorrelated with the PGS over common variants. I think this is unlikely to be true, as a result of assortative mating (Yengo et al., 2018).
 
-We accept point (6) in particular. We had pushback from people saying "this is no big deal", so we want to show that at least under some assumptions, yes it might be. The within-family estimate should remove many of the worries about exogeneity of p\*, but they are estimated with a smaller sample. We agree that the estimate seems high, and indeed, the bootstrapped 95% confidence interval is from around 0% to 300%, which is not really informative, though it does suggest that genetic nurture is more likely to bias our results downwards than upwards. We've removed the discussion.
+We accept point (6) in particular. We had pushback from people saying "this is no big deal", so we want to show that at least under some assumptions, yes it might be. The within-family estimate should remove many of the worries about exogeneity of p\*, but it is estimated with a smaller sample. We agree that the estimate seems high, and indeed, the bootstrapped 95% confidence interval is from around 0% to 300%, which is not really informative, though it does suggest that genetic nurture is more likely to bias our results downwards than upwards. We've removed the discussion.
 
 > p\. 40 and following: I confess to not following the derivations completely. The authors seem adept at what they do, and I trust that they have made no serious errors.
 >
@@ -385,7 +385,7 @@ Equation 14 similarly bounds $h$, as follows. Equation 22 rearranges equation 14
 
 We have tweaked the discussion slightly to reflect the above. The best way to gain intuition is probably to try a few numerical examples.
 
-## Reviewer 2  
+## Reviewer 2
 
 > 1\. The authors have improved the presentation of their results, but it can still be further improved. There are still so many results, plus a model, and as a result the paper still reads like a disconnected set of findings and lacks an overall coherent narrative (although a bit less so than before).
 
@@ -398,7 +398,7 @@ We don't want to go too far, by pretending that the theory came to us fully-form
 
 We think these analyses are important. First, they motivate our theory, in which education, income, AFLB etc. are indeed endogenous choice variables which are co-determined with fertility. If these mediators were *not* endogenous, we'd need a different theory.
 
-We also think the results matter in their own right. Any theory of contemporary natural selection needs to explain why correlations with fertility are lower at higher levels of income, education, etc. Non-causal explanations are fine, but theories which don't generate these correlations must be missing something. Note that Fisher, cited by Reviewer 1, used observed correlations quite like ours to differentiate between theories of the fertility-income relationship. Generally, significant correlations have often led to important theoretical literatures, even when the direction of causality is initially uncertain (e.g. education/wages in labour economics, or democracy/GDP levels in political economy).
+We also think the results matter in their own right. Any theory of contemporary natural selection needs to explain why correlations with fertility are lower at higher levels of income, education, etc. Non-causal explanations are fine, but theories which don't generate these correlations must be missing something. Note that Fisher, cited by Reviewer 1, used observed correlations quite like ours to differentiate between theories of the fertility-income relationship. Generally, significant correlations have often led to important theoretical literatures, even when causality is initially uncertain (e.g. education/wages in labour economics, or democracy/GDP levels in political economy).
 
 As described above, we have shortened Section 2 to focus on the key results of variation by income, education, number of partners, partner presence and AFLB. These empirics now take up just 39 lines of text, plus Figures 3-5. We no longer split respondents by sex in Figure 4. This saves two figures, and should reduce space in the final version.
 
@@ -408,13 +408,13 @@ As described above, we have shortened Section 2 to focus on the key results of v
 
 The result in Figure 6 is that the size of a score's selection effect correlates with the score's correlation with education and earnings. Intuitively, the fact that part of the selection effect comes from the mediation indeed helps to explains table 6. That is, if
 
-*PGS effect on fertility = PGS correlation with education X education effect on fertility + direct effect of PGS on fertility*
+*PGS effect on fertility = PGS correlation with education* $\times$ *education effect on fertility + direct effect of PGS on fertility*
 
 then indeed PGS effect on fertility, and PGS correlation with education, will be correlated. In that sense, the mediation analysis is just a more precise version of Figure 6 (more precise because it also estimates the education effect on fertility). We're not sure if there is an obvious way to work out "how much" of the Figure 6 correlation is explained by mediation. It may be a bit like asking "how much of a bivariate correlation is explained by the same correlation but with controls": these are really two alternate models of the same process, one less controlled than than the other. We are probably hitting the limits of our econometric expertise, so we are open to suggestions.
 
 > \> In the mediation analysis, why do the authors only use education as the mediator? The mediation framework they use can easily accommodate many mediators (see Section 6 of the Supplementary Information of the "EA2" paper by Okbay et al., Nature Genetics 2016). I would like to see a more full-fledged mediation analysis that also includes other proxies for human capital as mediators, including earnings in a respondent's first job as well as household income (though the later is not an ideal variable for that, especially for females).
 
-We would like to have more mediators, but appropriate variables are hard to find. Earnings in first job reduces our N by a factor of 10, and this makes results too noisy to be informative. As the reviewer suggests, current household income is very much endogenous not only to human capital, but also to previous fertility, which makes it inappropriate as a mediator.
+We would like to have more mediators, but appropriate variables are hard to find. Earnings in first job reduces our N by a factor of 10, and this makes results too noisy to be informative. As the reviewer suggests, current household income is very much endogenous not only to human capital, but also to previous fertility, which makes it inappropriate as a mediator. We welcome any other ideas. See also our response to Reviewer 1's comment on fluid IQ.
 
 > \> Also, in the mediation analysis, some of the ratios of indirect to total effects are negative or larger than 100%. This could indicate that the indirect and direct effects have opposite signs, but could also be due to the imprecision of the estimates. The authors should estimate 95% CIs for the ratio of indirect/total effects (these can be obtained by bootstrapping). They could then focus their discussion on the ratios that are significant and not on those that are just noisy estimates.
 
@@ -463,7 +463,7 @@ We have changed our figures to use both shape and colour for categories. We hope
 
 > 9\. The authors should provide more info to help readers understand the details of the analyses whose results are shown in Appendix Tables 3-4.
 
-We now say: 'We report the number of scores showing significant changes over time (i.e. a significant interaction between polygenic score and the "late born" dummy): either a significant change in sign, a significant increase in size, or a significant decrease in size.'
+We now say: 'We report the number of scores showing significant changes over time (i.e. a significant interaction between polygenic score and the "late born" dummy): either a significant change in sign, a significant increase in effect size, or a significant decrease in size.'
 
 > 10\. The authors do not refer to Figure 10 in the main text.
 
