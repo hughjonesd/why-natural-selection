@@ -433,9 +433,15 @@ run_mediation <- function (famhist, res_all) {
   res <- purrr::map_dfr(sig_scores, run_one_mediation, famhist = famhist)
   
   # bootstraps
+  famhist <- famhist %>% filter(!is.na(weights))
   boot_res <- purrr::map_dfr(1:100, function (r) {
                               fh_boot <- famhist %>% 
-                                           slice_sample(prop = 1, replace = TRUE)
+                                           slice_sample(
+                                             prop = 1, 
+                                             replace = TRUE,
+                                             # weight-everything: weights added
+                                             weight_by = famhist$weights
+                                           )
                               br <- purrr::map_dfr(sig_scores, 
                                                    run_one_mediation, famhist = fh_boot)
                               br <- br[c("term", "estimate_total", "estimate_ind")]
