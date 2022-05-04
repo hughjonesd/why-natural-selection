@@ -60,7 +60,7 @@ drake::loadd(score_names)
 drake::loadd(famhist)
 
 options(digits = 2)
-options(dplyr.summarise.inform = FALSE) # shut up about summarize
+options(dplyr.summarise.inform = FALSE) 
 
 knitr::opts_chunk$set(
         echo       = FALSE, 
@@ -85,8 +85,6 @@ theme_set(theme_minimal())
 
 my_hline <- geom_hline(yintercept = 0, colour = "grey20", linetype = "dotted")
 my_vline <- geom_vline(xintercept = 0, colour = "grey20", linetype = "dotted")
-pval_palette <- c("FALSE" = "grey65", "TRUE" = "#f3b372")
-
 
 
 standard_ggplot <- function (
@@ -123,7 +121,8 @@ standard_ggplot <- function (
   }
   
   n_regs <- as.double(n_regs)
-  
+  shape_values <- c(16, 15, 17, 18, 20)[1:n_cats]
+  if (fill_direction == -1) shape_values <- rev(shape_values)
   dfr %>% mutate(
     !! score_col := pretty_names(!! score_col),
     !! score_col := fct_reorder(!! score_col, estimate, order_abs(order_idx))
@@ -136,7 +135,7 @@ standard_ggplot <- function (
     geom_point(size = 1.8, alpha = 0.9, aes(color = {{fill_col}})) +
     geom_point(size = 0.7, color = "white", aes(alpha = p < 0.05/{{n_regs}})) +
     my_fill_scale(aesthetics = "color", n = n_cats, direction = fill_direction) +
-    scale_shape_manual(values = 1:n_cats + 14) +
+    scale_shape_manual(values = shape_values) +
     my_labs() +
     my_theme() +
     confint_scale +
@@ -157,9 +156,6 @@ standard_ggplot <- function (
 my_theme <- function (...) theme(axis.text.y = element_text(size = 7), ...)
 
 
-pval_scale <- function (...) scale_color_manual(values = pval_palette, ...)
-
-
 pval_geom_point <- function (size = 1.6, stroke = 0.9, fill = NULL, ...) {
   if (is.null(fill)) {
     geom_point(shape = 21, size = size, stroke = stroke, ...)
@@ -176,7 +172,7 @@ confint_geom_segment <- function () {
 }
 
 
-my_fill_scale <- function (n, aesthetics = "fill", ...) {
+my_fill_scale <- function (n, aesthetics = "fill", direction = 1, ...) {
   
   fill_colors <- c("steelblue4", "darkred")
   
@@ -187,8 +183,13 @@ my_fill_scale <- function (n, aesthetics = "fill", ...) {
                                         aesthetics = aesthetics), 
                                    dots))
   } else {
-    scale <- scale_color_brewer(aesthetics = aesthetics, ...)
-    shades::lightness(scale, shades::scalefac(0.75))
+    # scale <- scale_color_viridis_d(aesthetics = aesthetics, option = "D",
+    #                                  direction = direction, end = 0.6, ...)
+    if (direction != -1) fill_colors <- rev(fill_colors)
+    scale_color_manual(aesthetics = aesthetics, 
+                         values = shades::gradient(fill_colors,
+                                                     steps = n), 
+                         ...) 
   }
   
   scale
@@ -534,7 +535,7 @@ res_wt_combined %>%
         term     = pretty_names(term),
         term     = fct_reorder(term, estimate, order_abs(1))
       ) %>% 
-      standard_ggplot(fill_col = Weights, n_regs = n_regs)
+      standard_ggplot(fill_col = Weights, n_regs = n_regs, fill_direction = -1)
 
 ```
 
@@ -634,8 +635,7 @@ res_edu %>%
         "Age left FTE" = fct_relevel(age_fte_cat, "< 16", "16-18", "> 18"),
         "Age left FTE" = add_n(`Age left FTE`, "age_fte_cat")
       ) %>% 
-      standard_ggplot(n_regs = n_regs, fill_col = `Age left FTE`, 
-                        fill_direction = -1)
+      standard_ggplot(n_regs = n_regs, fill_col = `Age left FTE`)
    
 drake::loadd(res_income)
 
@@ -647,8 +647,7 @@ res_income %>%
         ),
         Income = add_n(Income, "income_cat")
       ) %>% 
-      standard_ggplot(n_regs = n_regs, fill_col = `Income`, 
-                        fill_direction = -1)
+      standard_ggplot(n_regs = n_regs, fill_col = `Income`)
 ```
 
 
@@ -668,7 +667,7 @@ res_partners_joint %>%
                                mutate(n_partners_split = n_partners <= 3))
       ) %>% 
       standard_ggplot(fill_col = `N partners`, n_regs = n_regs, 
-                        score_col = score_name)
+                        score_col = score_name, fill_direction = -1)
 
 
 drake::loadd(res_with_partner)
@@ -683,7 +682,7 @@ res_with_partner %>%
         Household = add_n(Household, "with_partner", reverse = TRUE)
       ) %>% 
       standard_ggplot(fill_col = Household, n_regs = n_regs, 
-                        score_col = score_name)
+                        score_col = score_name, fill_direction = -1)
 ```
 
 
@@ -765,8 +764,7 @@ res_age_flb_cross %>%
         `Age at first live birth` = add_n(`Age at first live birth`, "age_flb_cat")
       ) %>% 
       standard_ggplot(score_col = score_name, 
-                      fill_col = `Age at first live birth`, n_regs = n_regs,
-                      fill_direction = -1)
+                      fill_col = `Age at first live birth`, n_regs = n_regs)
 
 ```
 
@@ -947,14 +945,14 @@ dfr <- data.frame(
 
 dfr %>% 
       mutate(
-        PGS      = ifelse(abs(effect_size) > 0.02, PGS, ""),
+        PGS      = ifelse(abs(effect_size) > 0.027, PGS, ""),
         PGS      = sub("(^\\w*?)_.*", "\\1", PGS)
       ) %>% 
       filter(
         Controls == "None"
       ) %>% 
-      ggplot(aes(effect_size, cor, colour = Correlation)) + 
-        geom_point() +
+      ggplot(aes(effect_size, cor)) + 
+        geom_point(color = "steelblue4") +
         geom_text(aes(label = PGS), size = 3, colour = "black", 
                     check_overlap = TRUE, nudge_x = 0.002) +
         facet_wrap( ~ Correlation, scales = "free") + 
@@ -962,7 +960,6 @@ dfr %>%
         my_hline +
         labs(x = "Selection effect", y = "Correlation") +
         coord_cartesian(clip = "off") +
-        scale_colour_brewer(type = "qual", palette = 2) +
         theme(
           legend.position = "none",
           panel.spacing = unit(20, "pt")
@@ -1038,7 +1035,7 @@ res_mediation %>%
                         width = 0.3,
                         color = "grey50"
                       ) +
-        scale_fill_manual(values = pval_palette) +
+        scale_fill_manual(values = c("FALSE" = "grey65", "TRUE" = "orange2")) +
         my_vline +
         scale_x_continuous(labels = scales::percent, n.breaks = 7) +
         coord_cartesian(xlim = c(-0.5, 1)) +
@@ -1208,7 +1205,7 @@ income_EA3 <- famhist %>%
 income_EA3 %>% 
               ggplot(aes(`Household income`, `Children's mean EA3`, fill = name)) +
                 geom_col(position = "dodge") +
-                scale_fill_manual(values = c("navy", "grey60")) +
+                scale_fill_manual(values = c("darkred", "grey65")) +
                 theme(
                   legend.background = element_rect(fill = "white", colour = NA),
                   legend.title = element_blank(), 
@@ -1293,7 +1290,7 @@ possible reason for these sex differences is that polygenic scores may affect
 fertility via success in marriage markets, and men and women may value different
 characteristics in these.
 
-```{r plot-sexes, fig.cap = "Selection effects by sex. Highlighted lines are significant differences at p < 0.05/33. Highlighted points are significantly different from 0 at p < 0.05/66."}
+```{r plot-sexes, fig.cap = "Selection effects by sex. Solid lines are significant differences at p < 0.05/33. Solid points are significantly different from 0 at p < 0.05/66."}
 
 drake::loadd(res_sex)
 n_regs <- as.double(nrow(res_sex))
@@ -1323,7 +1320,7 @@ res_sex %>%
                 xmax   = max_est - 0.0005,
                 linetype = p < 0.05/{{n_comps}}
               )) +
-      scale_linetype_manual(values = c("TRUE" = 1, "FALSE" = 2))
+      scale_linetype_manual(values = c("TRUE" = 1, "FALSE" = 3))
       
 
       
@@ -1506,7 +1503,7 @@ res_partners %<>%
 n_regs <- as.double(nrow(res_partners))
 res_partners %>% 
       standard_ggplot(fill_col = `N partners`, score_col = score_name, 
-                        n_regs = n_regs) +
+                        n_regs = n_regs, fill_direction = -1) +
         facet_grid(cols = vars(sex))
 
 drake::loadd(res_with_partner_sex)
@@ -1520,7 +1517,7 @@ res_with_partner_sex %>%
                       "Without partner")
       ) %>% 
       standard_ggplot(fill_col = Household, score_col = score_name, 
-                        n_regs = n_regs) +
+                        n_regs = n_regs, fill_direction = -1) +
         facet_grid(cols = vars(sex)) 
   
 ```
@@ -1738,7 +1735,8 @@ res_townsend_parents %>%
   standard_ggplot(fill_col    = `Townsend quintile`,
                     n_regs    = n_regs, 
                     score_col = score_name, 
-                    order_idx = 5
+                    order_idx = 5,
+                    fill_direction = -1
                   )
 
 ```
@@ -1759,7 +1757,8 @@ res_townsend %>%
   standard_ggplot(fill_col    = `Townsend quintile`,
                     n_regs    = n_regs, 
                     score_col = score_name, 
-                    order_idx = 5
+                    order_idx = 5,
+                    fill_direction = -1
                   )
 
 ```
@@ -1818,8 +1817,7 @@ res_age_flb_mothers_cross %>%
                                           )
       ) %>% 
       standard_ggplot(score_col = score_name, 
-                      fill_col = `Age at first live birth`, n_regs = n_regs,
-                      fill_direction = -1)
+                      fill_col = `Age at first live birth`, n_regs = n_regs)
 
 
 
@@ -1836,8 +1834,7 @@ res_age_flb_fathers_cross %>%
                                           )
       ) %>% 
       standard_ggplot(score_col = score_name, 
-                      fill_col = `Age at first live birth`, n_regs = n_regs,
-                      fill_direction = -1)
+                      fill_col = `Age at first live birth`, n_regs = n_regs)
 
 rm(famhist_bo1)
 
@@ -1863,7 +1860,8 @@ res_age_birth_parents %>%
                   "Mother's age at birth"
                 )
     ) %>% 
-    standard_ggplot(fill_col = Control, n_regs = n_regs, order_idx = 2)
+    standard_ggplot(fill_col = Control, n_regs = n_regs, order_idx = 2,
+                      fill_direction = -1)
     
 
 ```
@@ -1905,7 +1903,10 @@ correlation of `r cor_flb_fath`; for mother's age and own age it is
 
 [^only-eldest]: Parental AFLB can only be calculated for this group.
 
-```{r plot-age-flb-dv, fig.cap = "Effects of polygenic scores on age at first live birth."}
+
+```{r plot-age-flb-dv, fig.cap = "Effects of polygenic scores on age at first live birth.", fig.align = "center"}
+
+drake::loadd(res_age_flb_dv)
 
 n_regs <- as.double(nrow(res_age_flb_dv))
 
@@ -1914,7 +1915,9 @@ res_age_flb_dv %>% standard_ggplot(n_regs = n_regs)
 ```
 
 
-```{r plot-age-birth-parents-dv, fig.cap = "Effects of polygenic scores on parents' age at respondent's birth, eldest siblings. Weights multiplied by 1/number of siblings."}
+```{r plot-age-birth-parents-dv, fig.cap = "Effects of polygenic scores on parents' age at respondent's birth, eldest siblings. Weights multiplied by 1/number of siblings.", fig.align = "center"}
+
+drake::loadd(res_age_birth_parents_dv)
 
 n_regs <- as.double(nrow(res_age_birth_parents_dv))
 
@@ -1925,7 +1928,8 @@ res_age_birth_parents_dv %>%
           "moth_age_birth" = "Mother's AFLB"
         )
       ) %>% 
-      standard_ggplot(fill_col = `Dependent variable`, n_regs = n_regs)
+      standard_ggplot(fill_col = `Dependent variable`, n_regs = n_regs, 
+                        fill_direction = -1)
 
 ```
 
@@ -1968,17 +1972,17 @@ fluid IQ might affect fertility decisions via other channels than human capital.
 
 drake::loadd(res_mediation)
 
+n_regs <- nrow(res_mediation)
 res_mediation %<>% mutate(
                      # 0.025 not 0.05 because two-sided
-                     sig  = abs(statistic_ind) > qnorm(1 - 0.025/33),
+                     sig  = abs(statistic_ind) > qnorm(1 - 0.025/n_regs),
                      star = ifelse(sig, "*", "")
                    )
 
 
 n_pos_sig <- sum(res_mediation$sig & res_mediation$prop_ind > 0)
 
-footnote <- sprintf("* p < 0.05/33. Analysis run on %s PGS which correlated 
-                    significantly with fertility.", nrow(res_mediation))
+footnote <- sprintf("* p < 0.05/%s. Analysis run on %s PGS which correlated significantly with fertility.", n_regs, n_regs)
 
 res_mediation %>%
       arrange(desc(estimate_total)) %>%
@@ -2004,12 +2008,12 @@ res_mediation %>%
       add_footnote(footnote, font_size = 8)
 ```
 
-Table \@ref(tab:tbl-res-mediation) shows results. For `r n_pos_sig` out of
-`r nrow(res_mediation)` scores, the indirect effect on fertility via human 
-capital is significantly different from 0 at $p = 0.05/33$ and has the
-same sign as the total effect. We also calculate
-the proportion of the total effect that is mediated via the indirect effect,
-along with uncorrected 95% confidence intervals (100 bootstraps).
+Table \@ref(tab:tbl-res-mediation) shows results. For `r n_pos_sig` out of 
+`r n_regs` scores, the indirect effect on fertility via human capital is
+significantly different from 0 at $p$ = 0.05/`r n_regs` and has the same sign
+as the total effect. We also calculate the proportion of the total effect that
+is mediated via the indirect effect, along with uncorrected 95% confidence
+intervals (100 bootstraps).
 
 \FloatBarrier
 \clearpage
@@ -2047,8 +2051,7 @@ res_fe_fertility %>%
   mutate(
     Controls = ifelse(Regression == "Controlled", "FE + education", "FE only")
   ) %>% 
-  standard_ggplot(fill_col = Controls, n_regs = n_regs,
-                  fill_direction = -1) +
+  standard_ggplot(fill_col = Controls, n_regs = n_regs, fill_direction = -1) +
     guides(alpha = guide_legend(
                    override.aes = list(
                              shape = 1,
@@ -2187,11 +2190,11 @@ res_all %<>% mutate(
 
 res_all %>% 
       filter(dep.var == "RLRS") %>% 
-      standard_ggplot(fill_col = PGS, n_regs = n_regs)
+      standard_ggplot(fill_col = PGS, n_regs = n_regs, fill_direction = -1)
 
 res_all %>% 
       filter(dep.var == "RLRS_parents") %>% 
-      standard_ggplot(fill_col = PGS, n_regs = n_regs)
+      standard_ggplot(fill_col = PGS, n_regs = n_regs, fill_direction = -1)
 
 ```
 
