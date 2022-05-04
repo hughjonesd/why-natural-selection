@@ -532,10 +532,9 @@ res_wt_combined %>%
       filter(Weights %in% c("Main", "None")) %>% 
       mutate(
         Weights  = recode(Weights, "Main" = "Weighted", "None" = "Unweighted"),
-        term     = pretty_names(term),
-        term     = fct_reorder(term, estimate, order_abs(1))
       ) %>% 
-      standard_ggplot(fill_col = Weights, n_regs = n_regs, fill_direction = -1)
+      standard_ggplot(fill_col = Weights, n_regs = n_regs, fill_direction = -1,
+                        order_idx = 2)
 
 ```
 
@@ -919,7 +918,7 @@ by @becker1981treatise. A related literature shows negative correlations between
 IQ and fertility [e.g. @lynn2004new; @reeve2018systematic].
 
 
-```{r plot-cors-earnings-educ, fig.cap="Selection effects by correlations with earnings and educational attainment. Each point represents one polygenic score."}
+```{r plot-cors-earnings-educ, fig.cap="Selection effects by correlations with earnings and educational attainment. Each point represents one polygenic score. Selected scores are annotated."}
 
 drake::loadd(res_all)
 drake::loadd(res_age_flb)
@@ -1164,7 +1163,7 @@ Because selection effects are concentrated in lower-income groups, they may also
 increase inequality with respect to polygenic scores. For example, Figure
 \@ref(fig:plot-mean-EA3-by-income) plots mean polygenic scores for educational
 attainment (EA3) among children from households of different income groups. The
-blue bars show the actual means, i.e. parents' mean polygenic score weighted by
+red bars show the actual means, i.e. parents' mean polygenic score weighted by
 number of children. The grey bars show the hypothetical means if all households
 had equal numbers of children. Natural selection against genes associated with
 educational attainment, which lowers the mean, is stronger at the bottom of the
@@ -1310,7 +1309,7 @@ n_comps <-as.double(nrow(res_sex_wide))
 
 res_sex %>% 
       standard_ggplot(fill_col = sex, n_regs = n_regs, score_col = term,
-                        conf_int = FALSE) +
+                        conf_int = FALSE, fill_direction = -1) +
       geom_linerange(data = res_sex_wide, inherit.aes = FALSE, 
                      color = "steelblue4", alpha = 1,
               aes(
@@ -1584,12 +1583,13 @@ drake::loadd(res_sibs_parent_weights)
 drake::loadd(res_children_comparison)
 
 res_sibs_kids <-  bind_rows(
-                    Siblings = res_sibs_parent_weights, 
-                    Children = res_children_comparison,
-                    .id = "Dep. var."
+                    Parents = res_sibs_parent_weights, 
+                    Respondents = res_children_comparison,
+                    .id = "Generation"
                   )
 
-standard_ggplot(res_sibs_kids, `Dep. var.`, n_regs = length(score_names))
+standard_ggplot(res_sibs_kids, Generation, n_regs = length(score_names),
+                  fill_direction = -1)
 ```
 
 
