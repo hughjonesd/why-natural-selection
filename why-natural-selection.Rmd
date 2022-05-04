@@ -347,7 +347,7 @@ changes could reflect natural selection within the UK population, but also
 emigration, or ascertainment bias in the sample [@10.1093/aje/kwx246]. 
 
 
-```{r plot-means-over-time, fig.height = 7, fig.cap = "Mean polygenic scores (PGS) by birth year in UK Biobank. Circles are means for 5-year intervals. Lines are 95% confidence intervals. Triangles show a significant linear increase or decrease over time (p < 0.05/33)."}
+```{r plot-means-over-time, fig.height = 7, fig.cap = "Mean polygenic scores (PGS) by birth year in UK Biobank. Symbols show means for 5-year intervals. Bars are 95% confidence intervals. Triangles denote a significant linear increase or decrease over time (p < 0.05/33)."}
 
 drake::loadd(pgs_over_time)
 
@@ -772,7 +772,7 @@ polygenic scores are highly correlated across the two generations (Appendix
 Figure \@ref(fig:plot-res-sibs)). Median-splitting respondents by year of birth,
 we find little evidence of change in effect sizes among the parents' generation.
 There is some evidence that selection effect sizes are increasing in the 
-respondents' generation, with 9 polygenic scores showing a significant increase. 
+respondents' generation, with 8 polygenic scores showing a significant increase. 
 We also check whether selection effects vary by
 AFLB and socio-economic status in the parents' generation, using the 1971 
 Townsend deprivation score of respondents' birthplace as a proxy for income
