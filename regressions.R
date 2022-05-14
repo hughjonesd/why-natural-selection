@@ -439,8 +439,10 @@ run_mediation <- function (famhist, res_all) {
                                            slice_sample(
                                              prop = 1, 
                                              replace = TRUE,
-                                             # weight-everything: weights added
-                                             weight_by = famhist$weights
+                                             # weight-everything: *don't*
+                                             # weight bootstrap, only weight
+                                             # regressions
+                                             # weight_by = famhist$weights
                                            )
                               br <- purrr::map_dfr(sig_scores, 
                                                    run_one_mediation, famhist = fh_boot)
