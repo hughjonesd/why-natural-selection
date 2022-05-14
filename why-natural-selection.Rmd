@@ -2,7 +2,7 @@
 title: "Human capital mediates natural selection in contemporary humans"
 author: "David Hugh-Jones \\thanks{Corresponding author. School of Economics, University of East Anglia, Norwich, UK. Email: D.Hugh-Jones@uea.ac.uk}, Abdel Abdellaoui \\thanks{Department of Psychiatry, Amsterdam UMC, University of Amsterdam, Amsterdam, The Netherlands. Email: a.abdellaoui@amsterdamumc.nl}"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
-abstract: "\\noindent Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection through the association between 33 polygenic scores and fertility, across two generations, using data from UK Biobank (N = 409,629 British subjects with European ancestry). Consistently over time, polygenic scores that predict lower earnings, education and health also predict lower fertility. Selection effects are concentrated among lower SES groups, younger parents, people with more lifetime sexual partners, and people not living with a partner. The direction of natural selection is reversed among older parents, or after controlling for age at first live birth. These patterns are in line with the economic theory of fertility, in which earnings-increasing human capital may either increase or decrease fertility via income and substitution effects in the labour market. Studying natural selection can help us understand the genetic architecture of health outcomes: we find evidence in modern day Great Britain for multiple natural selection pressures that vary between subgroups in the direction and strength of their effects, that are strongly related to the socio-economic system, and that may contribute to health inequalities across income groups."
+abstract: "\\noindent Natural selection has been documented in contemporary humans, but  little is known about the mechanisms behind it. We test for natural selection through the association between 33 polygenic scores and fertility, across two generations, using data from UK Biobank (N = 409,629 British subjects with European ancestry). Consistently over time, polygenic scores that predict higher earnings, education and health also predict lower fertility. Selection effects are concentrated among lower SES groups, younger parents, people with more lifetime sexual partners, and people not living with a partner. The direction of natural selection is reversed among older parents, or after controlling for age at first live birth. These patterns are in line with the economic theory of fertility, in which earnings-increasing human capital may either increase or decrease fertility via income and substitution effects in the labour market. Studying natural selection can help us understand the genetic architecture of health outcomes: we find evidence in modern day Great Britain for multiple natural selection pressures that vary between subgroups in the direction and strength of their effects, that are strongly related to the socio-economic system, and that may contribute to health inequalities across income groups."
 bibliography: "why-natural-selection.bib"
 output: 
   bookdown::pdf_document2:
@@ -112,7 +112,7 @@ standard_ggplot <- function (
     confint_scale <- scale_linetype_manual(
                        name   = "", 
                        values = c("95% c.i. uncorrected" = 1),
-                       guide  = guide_legend(order = 1)
+                       guide  = guide_legend(order = 3)
                      )
     confint_geom_segment <- confint_geom_segment()
   } else {
@@ -120,6 +120,7 @@ standard_ggplot <- function (
     confint_geom_segment <- NULL
   }
   
+  my_shape_fill_guide <- guide_legend(order = 1)
   n_regs <- as.double(n_regs)
   shape_values <- c(16, 15, 17, 18, 20)[1:n_cats]
   if (fill_direction == -1) shape_values <- rev(shape_values)
@@ -134,14 +135,15 @@ standard_ggplot <- function (
     confint_geom_segment +
     geom_point(size = 1.8, alpha = 0.9, aes(color = {{fill_col}})) +
     geom_point(size = 0.7, color = "white", aes(alpha = p < 0.05/{{n_regs}})) +
-    my_fill_scale(aesthetics = "color", n = n_cats, direction = fill_direction) +
-    scale_shape_manual(values = shape_values) +
+    my_fill_scale(aesthetics = "color", n = n_cats, direction = fill_direction, 
+                    guide = my_shape_fill_guide) +
+    scale_shape_manual(values = shape_values, guide = my_shape_fill_guide) +
     my_labs() +
-    my_theme() +
+    my_theme(legend.justification = "top") +
     confint_scale +
     scale_alpha_discrete(range = c(1, 0), 
                            guide = guide_legend(
-                             order = 0,
+                             order = 2,
                              override.aes = list(
                                shape = c(1, 16),
                                color = "black",
@@ -153,8 +155,12 @@ standard_ggplot <- function (
 
 
 
-my_theme <- function (...) theme(axis.text.y = element_text(size = 7), ...)
-
+my_theme <- function (...) {
+  theme(
+          axis.text.y = element_text(size = 7), 
+          ...
+        )
+}
 
 pval_geom_point <- function (size = 1.6, stroke = 0.9, fill = NULL, ...) {
   if (is.null(fill)) {
@@ -185,10 +191,11 @@ my_fill_scale <- function (n, aesthetics = "fill", direction = 1, ...) {
   } else {
     # scale <- scale_color_viridis_d(aesthetics = aesthetics, option = "D",
     #                                  direction = direction, end = 0.6, ...)
+    fill_colors <- c(fill_colors[1], "skyblue", fill_colors[2])
     if (direction != -1) fill_colors <- rev(fill_colors)
     scale_color_manual(aesthetics = aesthetics, 
                          values = shades::gradient(fill_colors,
-                                                     steps = n), 
+                                                     steps = n, space = "Lab"), 
                          ...) 
   }
   
@@ -1029,17 +1036,17 @@ res_mediation %>%
         geom_errorbar(aes(
                           xmin = prop_ind_conf_low, 
                           xmax = prop_ind_conf_high,
-                          linetype = "Bootstrap 95% c.i.",
+                          linetype = "Bootstrap 95% c.i. uncorrected",
                         ),
-                        width = 0.3,
+                        width = 0.2,
                         color = "grey50"
                       ) +
-        scale_fill_manual(values = c("FALSE" = "grey65", "TRUE" = "orange2")) +
+        scale_fill_manual(values = c("FALSE" = "grey65", "TRUE" = "blue3")) +
         my_vline +
         scale_x_continuous(labels = scales::percent, n.breaks = 7) +
         coord_cartesian(xlim = c(-0.5, 1)) +
         labs(x = "Proportion mediated", y = "") +
-        scale_linetype_manual(name = "", values = c("Bootstrap 95% c.i." = 1))
+        scale_linetype_manual(name = "", values = c("Bootstrap 95% c.i. uncorrected" = 1))
 
 
 ```
@@ -1166,20 +1173,19 @@ attainment (EA3) among children from households of different income groups. The
 red bars show the actual means, i.e. parents' mean polygenic score weighted by
 number of children. The grey bars show the hypothetical means if all households
 had equal numbers of children. Natural selection against genes associated with
-educational attainment, which lowers the mean, is stronger at the bottom of the
-income distribution, and this increases the differences between groups.
-Overall, natural selection increases the correlation of polygenic scores with
-income for `r n_increases` out of 33 polygenic scores, with a median percentage
-increase of `r median_pct_change`% in the respondents' generation (Appendix
-Table \@ref(tab:tbl-inequality-effects)).  If inequalities in polygenic scores
-are important for understanding social structure and mobility
-[@belsky2018genetic; @Rimfeld_2018; @harden2021genetic], then these increases
-are substantive. Similarly, since many polygenic scores are predictive of
-disease risk, they could potentially increase health inequalities. In general,
-the evolutionary history of anatomically modern humans is related to disease
-risk [@benton2021influence]; understanding the role of contemporary natural
-selection may help researchers to map the genetic architecture of health
-disparities.
+educational attainment is stronger at the bottom of the income distribution, and
+this increases the differences between groups. Overall, natural selection
+increases the correlation of polygenic scores with income for `r n_increases`
+out of 33 polygenic scores, with a median percentage increase of 
+`r median_pct_change`% in the respondents' generation (Appendix Table
+\@ref(tab:tbl-inequality-effects)).  If inequalities in polygenic scores are
+important for understanding social structure and mobility [@belsky2018genetic;
+@Rimfeld_2018; @harden2021genetic], then these increases are substantive.
+Similarly, since many polygenic scores are predictive of disease risk, they
+could potentially increase health inequalities. In general, the evolutionary
+history of anatomically modern humans is related to disease risk
+[@benton2021influence]; understanding the role of contemporary natural selection
+may help researchers to map the genetic architecture of health disparities.
 
 
 ```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean polygenic score for educational attainment (EA3) of children by household income group. Blue is actual. Grey is hypothetical in the absence of selection effects.", fig.width = 4}
