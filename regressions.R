@@ -438,7 +438,7 @@ run_mediation <- function (famhist, res_all) {
                               fh_boot <- famhist %>% 
                                            slice_sample(
                                              prop = 1, 
-                                             replace = TRUE,
+                                             replace = TRUE
                                              # weight-everything: *don't*
                                              # weight bootstrap, only weight
                                              # regressions
