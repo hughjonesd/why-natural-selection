@@ -114,7 +114,17 @@ standard_ggplot <- function (
                        values = c("95% c.i. uncorrected" = 1),
                        guide  = guide_legend(order = 3)
                      )
-    confint_geom_segment <- confint_geom_segment()
+    confint_geom_segment <- geom_segment(
+                              aes(
+                                x        = conf.low, 
+                                xend     = conf.high,
+                                linetype = "95% c.i. uncorrected"
+                              ), 
+                              color   = "grey45", 
+                              alpha   = 0.2, 
+                              size    = 1.1, 
+                              lineend = "round"
+                            )
   } else {
     confint_scale <- NULL
     confint_geom_segment <- NULL
@@ -123,7 +133,9 @@ standard_ggplot <- function (
   my_shape_fill_guide <- guide_legend(order = 1)
   
   n_regs <- as.double(n_regs)
-  shape_values <- c(16, 15, 17, 18, 20)[1:n_cats]
+  shape_values <- paste(c("circle", "square", "triangle", "diamond", 
+                            "triangle down"), "filled")
+  shape_values <- shape_values[1:n_cats]
   if (fill_direction == -1) shape_values <- rev(shape_values)
   dfr %>% mutate(
     !! score_col := pretty_names(!! score_col),
@@ -134,41 +146,34 @@ standard_ggplot <- function (
                shape = {{fill_col}}, ...)) +
     my_vline + 
     confint_geom_segment +
-    geom_point(size = 1.8, alpha = 0.9, aes(color = {{fill_col}})) +
-    geom_point(size = 0.7, color = "white", aes(alpha = p < 0.05/{{n_regs}})) +
+    geom_point(size = 1.8, alpha = 0.8, aes(color = {{fill_col}}, 
+                 fill = stage(p < 0.05/{{n_regs}}, after_scale = ifelse(
+                 fill == "white", fill, color)))) +
     my_fill_scale(aesthetics = "color", n = n_cats, direction = fill_direction, 
                     guide = my_shape_fill_guide) +
+    scale_fill_manual(values = c("TRUE" = "black", "FALSE" = "white"), 
+                        guide = guide_legend(
+                                  title = sprintf("p < 0.05/%s", n_regs),
+                                  override.aes = list(shape = "circle filled"),
+                                  order = 2
+                                )) + 
     scale_shape_manual(values = shape_values, guide = my_shape_fill_guide) +
     my_labs() +
-    my_theme(legend.justification = "top") +
-    confint_scale +
-    scale_alpha_discrete(range = c(1, 0), 
-                           guide = guide_legend(
-                             order = 2,
-                             override.aes = list(
-                               shape = c(1, 16),
-                               color = "black",
-                               alpha = 1,
-                               size = 1.8
-                             )
-                         )) 
+    my_theme(
+      legend.justification = "top", 
+      panel.grid.major.y   = element_blank()
+    ) +
+    confint_scale
 }
 
 
 my_theme <- function (...) {
   theme(
-          axis.text.y = element_text(size = 7), 
+          axis.text.y        = element_text(size = 7),
+          panel.grid.major   = element_line(size = rel(0.5)),
           ...
         )
 }
-
-
-confint_geom_segment <- function () {
-  geom_segment(aes(x = conf.low, xend = conf.high, linetype = "95% c.i. uncorrected"), 
-                    color = "grey55", alpha = 0.2, size = 1.1, 
-                    lineend = "round")
-}
-
 
 my_fill_scale <- function (n, aesthetics = "fill", direction = 1, ...) {
   
@@ -952,7 +957,7 @@ dfr %>%
       ggplot(aes(effect_size, cor)) + 
         geom_point(color = "steelblue4") +
         geom_text(aes(label = PGS), size = 3, colour = "black", 
-                    check_overlap = TRUE, nudge_x = 0.002) +
+                    check_overlap = TRUE, nudge_x = 0.008) +
         facet_wrap( ~ Correlation, scales = "free") + 
         my_vline + 
         my_hline +
@@ -1033,12 +1038,16 @@ res_mediation %>%
                         width = 0.2,
                         color = "grey50"
                       ) +
-        scale_fill_manual(values = c("FALSE" = "grey65", "TRUE" = "blue3")) +
+        scale_fill_manual(values = c("FALSE" = "grey65", "TRUE" = "darkgreen")) +
         my_vline +
         scale_x_continuous(labels = scales::percent, n.breaks = 7) +
         coord_cartesian(xlim = c(-0.5, 1)) +
         labs(x = "Proportion mediated", y = "") +
-        scale_linetype_manual(name = "", values = c("Bootstrap 95% c.i. uncorrected" = 1))
+        scale_linetype_manual(name = "", values = c("Bootstrap 95% c.i. uncorrected" = 1)) +
+        my_theme(
+          panel.grid.major.y = element_blank(),
+          panel.grid.minor.x = element_blank()
+        )
 
 
 ```
@@ -1162,7 +1171,7 @@ Because selection effects are concentrated in lower-income groups, they may also
 increase inequality with respect to polygenic scores. For example, Figure
 \@ref(fig:plot-mean-EA3-by-income) plots mean polygenic scores for educational
 attainment (EA3) among children from households of different income groups. The
-red bars show the actual means, i.e. parents' mean polygenic score weighted by
+green bars show the actual means, i.e. parents' mean polygenic score weighted by
 number of children. The grey bars show the hypothetical means if all households
 had equal numbers of children. Natural selection against genes associated with
 educational attainment is stronger at the bottom of the income distribution, and
@@ -1180,7 +1189,7 @@ history of anatomically modern humans is related to disease risk
 may help researchers to map the genetic architecture of health disparities.
 
 
-```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean polygenic score for educational attainment (EA3) of children by household income group. Blue is actual. Grey is hypothetical in the absence of selection effects.", fig.width = 4}
+```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean polygenic score for educational attainment (EA3) of children by household income group. Green is actual. Grey is hypothetical in the absence of selection effects.", fig.width = 4}
 income_EA3 <- famhist %>% 
       filter(! is.na(n_children), ! is.na(income_cat)) %>% 
       mutate(
@@ -1202,9 +1211,15 @@ income_EA3 <- famhist %>%
 income_EA3 %>% 
               ggplot(aes(`Household income`, `Children's mean EA3`, fill = name)) +
                 geom_col(position = "dodge") +
-                scale_fill_manual(values = c("darkred", "grey65")) +
+                scale_fill_manual(values = c("darkgreen", "grey65")) +
                 theme(
-                  legend.background = element_rect(fill = "white", colour = NA),
+                  legend.background = element_rect(
+                                        fill = "white", 
+                                        colour = "black",
+                                        size = rel(0.5)
+                                      ),
+                  legend.margin = margin(t = 0, b = 5.5, l = 5.5, 
+                                           r = 5.5),
                   legend.title = element_blank(), 
                   legend.position = c(.25, .85)
                 )
@@ -1790,7 +1805,7 @@ subsets. Figure \@ref(fig:plot-age-birth-parents-cross) shows selection effects
 by terciles of age at first live birth, for mothers and fathers. As in the
 respondents' generation, effect sizes are smaller, or even oppositely signed, for older parents. Importantly, this holds for both sexes.
 
-```{r plot-age-birth-parents-cross, fig.cap = "Selection effects (parents' RLRS) by age at first live birth terciles.  Weights multiplied by 1/number of siblings.", fig.subcap = c("Mothers", "Fathers"), fig.ncol = 1}
+```{r plot-age-birth-parents-cross, fig.cap = "Selection effects (parents' RLRS) among eldest siblings, by parents' age at first live birth terciles.  Weights multiplied by 1/number of siblings.", fig.subcap = c("Mothers", "Fathers"), fig.ncol = 1}
 
 drake::loadd(res_age_flb_mothers_cross)
 drake::loadd(res_age_flb_fathers_cross)
@@ -1843,7 +1858,7 @@ effect sizes are negatively correlated with the effect sizes from bivariate
 regressions without the control for age at birth (father's age at birth: $\rho$ 
 `r cor_unc_fath`; mother's age at birth: $\rho$ `r cor_unc_moth`).
 
-```{r plot-age-birth-parents, fig.cap = "Selection effects (parents' generation) among eldest siblings, controlling for parents' age at birth. Weights multiplied by 1/number of siblings."}
+```{r plot-age-birth-parents, fig.cap = "Selection effects (parents' RLRS) among eldest siblings, controlling for parents' age at birth. Weights multiplied by 1/number of siblings."}
 
 
 n_regs <- as.double(nrow(res_age_birth_parents)/2)
