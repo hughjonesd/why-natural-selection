@@ -509,7 +509,7 @@ mean_rel <- c(rel_sizes_summary[1, 1:3])
  
 Figure \@ref(fig:plot-res-wt) plots selection effects in the whole
 sample.[^balance-diverse-def] To correct for ascertainment bias, we use
-participant weights from @van2021effects, which match the UK Biobank eligible
+participant weights from @vanalten2022reweighting, which match the UK Biobank eligible
 population on sex, birth year, location, education, employment, health,
 household size and tenure, number of cars and age at death. Weighting makes a
 large difference: effect sizes go up by a mean of 
@@ -1273,7 +1273,7 @@ described in @abdellaoui2019genetic.
 Earnings in first job are estimated from mean earnings in the 2007 Annual Survey
 of Hours and Earnings, using the SOC 2000 job code (Biobank field 22617).
 
-Weighting data was kindly provided by @van2021effects.
+Weighting data was kindly provided by @vanalten2022reweighting.
 
 Code for this paper is available at 
 https://github.com/hughjonesd/why-natural-selection.
