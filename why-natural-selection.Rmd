@@ -67,7 +67,8 @@ knitr::opts_chunk$set(
         warning    = FALSE, 
         cache      = FALSE, 
         error      = FALSE,
-        fig.height = 3.5
+        fig.height = 3.5,
+        dev        = "cairo_pdf"
       )
 
 knitr::knit_hooks$set(
@@ -82,6 +83,9 @@ options(huxtable.long_minus = TRUE)
 huxtable::set_default_properties(latex_float = "h!")
 
 theme_set(theme_minimal())
+theme_update(
+  text = element_text(family = "Abadi MT Condensed Light")
+)
 
 my_hline <- geom_hline(yintercept = 0, colour = "grey20", linetype = "dotted")
 my_vline <- geom_vline(xintercept = 0, colour = "grey20", linetype = "dotted")
@@ -169,8 +173,8 @@ standard_ggplot <- function (
 
 my_theme <- function (...) {
   theme(
-          axis.text.y        = element_text(size = 7),
-          panel.grid.major   = element_line(size = rel(0.5)),
+          axis.text.y      = element_text(size = 7),
+          panel.grid.major = element_line(size = rel(0.5)),
           ...
         )
 }
@@ -392,7 +396,7 @@ pgs_over_time %>%
                                     )) +
       theme(
         line        = element_line(size = 0.5, lineend = "round"),
-        strip.text  = element_text(size = 6), 
+        strip.text  = element_text(size = 8), 
         axis.text.x = element_text(size = 7),
         legend.position = "none"
       ) +
@@ -957,7 +961,8 @@ dfr %>%
       ggplot(aes(effect_size, cor)) + 
         geom_point(color = "steelblue4") +
         geom_text(aes(label = PGS), size = 3, colour = "black", 
-                    check_overlap = TRUE, nudge_x = 0.008) +
+                    family = "Abadi MT Condensed Light",
+                    check_overlap = TRUE, nudge_x = 0.004) +
         facet_wrap( ~ Correlation, scales = "free") + 
         my_vline + 
         my_hline +
@@ -1043,10 +1048,12 @@ res_mediation %>%
         scale_x_continuous(labels = scales::percent, n.breaks = 7) +
         coord_cartesian(xlim = c(-0.5, 1)) +
         labs(x = "Proportion mediated", y = "") +
-        scale_linetype_manual(name = "", values = c("Bootstrap 95% c.i. uncorrected" = 1)) +
+        scale_linetype_manual(name = "", 
+          values = c("Bootstrap 95% c.i. uncorrected" = 1)) +
         my_theme(
           panel.grid.major.y = element_blank(),
-          panel.grid.minor.x = element_blank()
+          panel.grid.minor.x = element_blank(),
+          legend.justification = "top"
         )
 
 
@@ -2240,7 +2247,8 @@ res_pcs %>%
       ggplot(aes(estimate, dep.var, shape = p < 0.05/{{n_regs}})) + 
         geom_point(alpha = 0.8, color = "steelblue4", position = pj) +
         geom_text(aes(estimate, dep.var, label = top_pcs), position = pj, 
-                    hjust = "right", color = "black", size = 3) +
+                    hjust = "right", color = "black", size = 3,
+                    family = "Abadi MT Condensed Light") +
         scale_x_log10(labels = scales::label_number(accuracy = 0.0001)) +
         labs(x = "Effect size (log scale)", y = "") + 
         scale_shape_manual(values = c("FALSE" = "circle open", "TRUE" = "circle"))
