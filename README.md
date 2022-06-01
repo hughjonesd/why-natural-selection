@@ -9,7 +9,7 @@ The current version is available at https://github.com/hughjonesd/why-natural-se
 
 # BGA poster
 
-The BGA poster is available at https://github.com/hughjonesd/why-natural-selection/blob/master/BGA poster.pdf.
+The BGA poster is available [here](https://github.com/hughjonesd/why-natural-selection/blob/master/BGA poster.pdf).
 
 # To download
 
