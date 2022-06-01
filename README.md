@@ -7,6 +7,10 @@ contemporary humans" by Abdel Abdellaoui and David Hugh-Jones.
 
 The current version is available at https://github.com/hughjonesd/why-natural-selection/blob/master/why-natural-selection.pdf.
 
+# BGA poster
+
+The BGA poster is available at https://github.com/hughjonesd/why-natural-selection/blob/master/BGA-poster.pdf.
+
 # To download
 
 From your command line, run:
