@@ -184,19 +184,6 @@ run_regs_age_flb_parents_cross <- function(famhist, score_names, age_birth_var) 
 }
 
 
-run_regs_mnlogit <- function (score_names, fhl_mlogit) {
-  loadNamespace("mnlogit")
-  run_1_mnlogit <- function(score_name) {
-    fml <- as.formula(glue::glue("n_ch_fac ~ 1 | {score_name}"))
-    res <- try(mod <- mnlogit::mnlogit(fml, fhl_mlogit, ncores = 2))
-    if (inherits(res, "try-error")) return(res)
-    mod$model <- NULL # otherwise it stores a copy of the entire data 8-(
-    return(mod)
-  }
-  lapply(score_names, run_1_mnlogit)
-}
-
-
 run_age_anova <- function (score_name, control, famhist) {
   fml <- as.formula(glue::glue(
     "RLRS ~ {score_name}*({control} + 
@@ -383,7 +370,7 @@ run_mediation <- function (famhist, res_all) {
   
   run_one_mediation <- function (score_name, famhist = famhist) {
     
-    controls <- "age_at_recruitment + sex + fluid_iq + height + f.2040.0.0"
+    controls <- "age_at_recruitment + sex"
     f_mediator <- as.formula(glue::glue("age_fulltime_edu ~ {score_name} +
                                            {controls}"))
 
@@ -445,7 +432,8 @@ run_mediation <- function (famhist, res_all) {
                                              # weight_by = famhist$weights
                                            )
                               br <- purrr::map_dfr(sig_scores, 
-                                                   run_one_mediation, famhist = fh_boot)
+                                                   run_one_mediation, 
+                                                   famhist = fh_boot)
                               br <- br[c("term", "estimate_total", "estimate_ind")]
                               br["rep"] <- r
                               br
@@ -459,8 +447,12 @@ run_mediation <- function (famhist, res_all) {
                prop_ind = estimate_ind/estimate_total
              ) %>%
              summarize(
-               prop_ind_conf_low   = quantile(prop_ind, 0.025),
-               prop_ind_conf_high  = quantile(prop_ind, 0.975)
+               estimate_ind_conf_low    = quantile(estimate_ind, 0.025),
+               estimate_ind_conf_high   = quantile(estimate_ind, 0.975),
+               estimate_total_conf_low  = quantile(estimate_total, 0.025),
+               estimate_total_conf_high = quantile(estimate_total, 0.975),
+               prop_ind_conf_low        = quantile(prop_ind, 0.025),
+               prop_ind_conf_high       = quantile(prop_ind, 0.975)
              )
   
   res <- left_join(res, boot_res, by = "term")

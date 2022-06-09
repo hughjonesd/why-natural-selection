@@ -532,7 +532,7 @@ robust if we run unweighted regressions. Appendix Table \@ref(tab:tbl-res-wt)
 shows results from alternative weighting schemes. 
 
 
-```{r plot-res-wt, fig.cap = "Selection effects: weighted and unweighted regressions.  Each point represents a single bivariate regression of number of children on a polygenic score. P value threshold is 0.05, Bonferroni-corrected for multiple comparisons. Confidence intervals are uncorrected."}
+```{r plot-res-wt, fig.cap = "Selection effects: weighted and unweighted regressions.  Each point represents a single bivariate regression of RLRS on a polygenic score. P value threshold is 0.05, Bonferroni-corrected for multiple comparisons. Confidence intervals are uncorrected."}
 
 n_regs <- as.double(length(score_names))
 
@@ -998,7 +998,9 @@ res_mediation %<>% mutate(
                      # 0.025 not 0.05 because two-sided
                      sig     = abs(statistic_ind) > qnorm(1 - 0.025/
                                                             nrow(res_mediation)),
-                     pos_sig = sig & prop_ind > 0
+                     pos_sig = sig & prop_ind > 0,
+                     bounded_ci = sign(estimate_total_conf_low) ==
+                                  sign(estimate_total_conf_high)
                    )
 
 
@@ -1024,14 +1026,18 @@ relatively crude measure of human capital: more accurate measures would likely
 explain more of the total effect.
 
 
-```{r plot-mediation, fig.align = "center", fig.cap = "Proportion of selection effect mediated by educational attainment, among polygenic scores with significant selection effects"}
+(ref:franzcite) [@franz2007ratios]
 
-res_mediation %>% 
+```{r plot-mediation, fig.align = "center", fig.cap = "Proportion of selection effect mediated by educational attainment, among polygenic scores with significant selection effects. Bootstrap confidence intervals for the proportion are shown only where the interval is bounded (ref:franzcite)."}
+
+res_mediation <- res_mediation %>% 
       mutate(
         term = pretty_names(term),
         term = fct_reorder(term, prop_ind, order_abs(1)),
         `Indirect effect p < 0.05/23` = sig 
-      ) %>% 
+      )
+
+res_mediation %>% 
       ggplot(aes(y = term)) + 
         geom_col(aes(x = prop_ind, fill = `Indirect effect p < 0.05/23`), 
                    width = .5) + 
@@ -1040,10 +1046,11 @@ res_mediation %>%
                           xmax = prop_ind_conf_high,
                           linetype = "Bootstrap 95% c.i. uncorrected",
                         ),
+                        data = res_mediation %>% filter(bounded_ci),
                         width = 0.2,
-                        color = "grey50"
+                        color = "grey20"
                       ) +
-        scale_fill_manual(values = c("FALSE" = "grey65", "TRUE" = "darkgreen")) +
+        scale_fill_manual(values = c("FALSE" = "grey65", "TRUE" = "steelblue4")) +
         my_vline +
         scale_x_continuous(labels = scales::percent, n.breaks = 7) +
         coord_cartesian(xlim = c(-0.5, 1)) +
@@ -1178,7 +1185,7 @@ Because selection effects are concentrated in lower-income groups, they may also
 increase inequality with respect to polygenic scores. For example, Figure
 \@ref(fig:plot-mean-EA3-by-income) plots mean polygenic scores for educational
 attainment (EA3) among children from households of different income groups. The
-green bars show the actual means, i.e. parents' mean polygenic score weighted by
+blue bars show the actual means, i.e. parents' mean polygenic score weighted by
 number of children. The grey bars show the hypothetical means if all households
 had equal numbers of children. Natural selection against genes associated with
 educational attainment is stronger at the bottom of the income distribution, and
@@ -1196,7 +1203,7 @@ history of anatomically modern humans is related to disease risk
 may help researchers to map the genetic architecture of health disparities.
 
 
-```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean polygenic score for educational attainment (EA3) of children by household income group. Green is actual. Grey is hypothetical in the absence of selection effects.", fig.width = 4}
+```{r plot-mean-EA3-by-income, fig.align = "center", fig.cap = "Mean polygenic score for educational attainment (EA3) of children by household income group. Blue is actual. Grey is hypothetical in the absence of selection effects.", fig.width = 4}
 income_EA3 <- famhist %>% 
       filter(! is.na(n_children), ! is.na(income_cat)) %>% 
       mutate(
@@ -1218,7 +1225,7 @@ income_EA3 <- famhist %>%
 income_EA3 %>% 
               ggplot(aes(`Household income`, `Children's mean EA3`, fill = name)) +
                 geom_col(position = "dodge") +
-                scale_fill_manual(values = c("darkgreen", "grey65")) +
+                scale_fill_manual(values = c("steelblue4", "grey65")) +
                 theme(
                   legend.background = element_rect(
                                         fill = "white", 
@@ -1966,7 +1973,7 @@ EA_i & = \delta + \zeta PGS_i + X_i\mu + \eta_i
 where $RLRS_i$ is relative lifetime reproductive success, $PGS_i$ is the
 polygenic score, $EA_i$ is educational attainment (age of leaving fulltime
 education), and $X_i$ is a vector of controls. The total effect of $PGS$ on
-number of children is $\beta + \gamma \zeta$. The "indirect effect" mediated by
+$RLRS$ is $\beta + \gamma \zeta$. The "indirect effect" mediated by
 $EA$ is $\gamma \zeta$. The standard error of the indirect effect can be
 calculated as
 
@@ -1974,17 +1981,8 @@ calculated as
 \sqrt{\hat\gamma^2 \hat\sigma_\zeta^2 + \hat\zeta^2\hat\sigma_\gamma^2}
 \]
 
-where $\hat\sigma_\zeta$ is the standard error of $\hat\zeta$, etc.
-
-We are not concerned about endogeneity of polygenic scores, since our theory
-requires only that these correlate with human capital. However, endogeneity of
-educational attainment is a concern, i.e., educational attainment might
-correlate with unobserved characteristics that affect one's fertility (and which
-are not related to human capital). To partially address this, we include
-controls for age, sex, fluid IQ, height and risk attitude in $X$. Note that
-controlling for fluid IQ is conservative, in the sense that IQ might also measure
-human capital in the labour market; nevertheless, we control for it because 
-fluid IQ might affect fertility decisions via other channels than human capital.
+where $\hat\sigma_\zeta$ is the standard error of $\hat\zeta$, etc. We include 
+controls for age and sex in $X$. 
 
 ```{r tbl-res-mediation}
 
