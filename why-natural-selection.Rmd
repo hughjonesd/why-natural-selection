@@ -2006,11 +2006,16 @@ res_mediation %>%
         PGS = pretty_names(term),
         `Total effect`    = estimate_total,
         `Indirect effect` = paste(estimate_ind, star),
-        `Proportion (%)`      = prop_ind * 100,
+        `Proportion (%)`  = prop_ind * 100,
+        bounded_ci        = sign(estimate_total_conf_low) ==
+                              sign(estimate_total_conf_high),
         `Proportion 95% c.i. (%)` = glue::glue(
-                     "[{prop_ind_conf_low * 100}, {prop_ind_conf_high * 100}]"
-                     )
-      ) %>%
+                     "[{prop_ind_conf_low * 100}, {prop_ind_conf_high * 100}]"),
+        `Proportion 95% c.i. (%)` = ifelse(bounded_ci, 
+                                             `Proportion 95% c.i. (%)`,
+                                             "Unbounded")
+      ) %>% 
+      select(-bounded_ci) %>%
       as_hux() %>%
       set_align(everywhere, -1, "right") %>% 
       set_number_format(-1, 2:3, 4) %>% 
@@ -2029,7 +2034,9 @@ Table \@ref(tab:tbl-res-mediation) shows results. For `r n_pos_sig` out of
 significantly different from 0 at $p$ = 0.05/`r n_regs` and has the same sign
 as the total effect. We also calculate the proportion of the total effect that
 is mediated via the indirect effect, along with uncorrected 95% confidence
-intervals (100 bootstraps).
+intervals (100 bootstraps). Note that if the confidence interval for the total
+effect contains zero, the confidence interval for the proportion may be unbounded
+[@franz2007ratios].
 
 \FloatBarrier
 \clearpage
