@@ -5,6 +5,7 @@ contemporary humans" by Abdel Abdellaoui and David Hugh-Jones.
 
 # The paper
 
+The published version is in *Behavior Genetics* 52(4), available at https://link.springer.com/article/10.1007/s10519-022-10107-w
 The current version is available at https://github.com/hughjonesd/why-natural-selection/blob/master/why-natural-selection.pdf.
 
 # BGA poster
